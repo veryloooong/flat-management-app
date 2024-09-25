@@ -10,6 +10,7 @@ use tokio::sync::Mutex;
 
 use crate::AppState;
 
+/// Login command. Takes a username and password and checks if they match a user in the database.
 #[tauri::command]
 pub(crate) async fn login<R: Runtime>(
   app: tauri::AppHandle<R>,

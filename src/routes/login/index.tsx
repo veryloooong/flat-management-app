@@ -28,7 +28,7 @@ function App() {
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-blue-100">
-      <div className="bg-white shadow-lg p-16 text-center rounded-md w-1/3">
+      <div className="bg-white shadow-lg p-16 text-center rounded-md w-1/3 min-w-96">
         <Link to=".." className="w-full text-left flex p-0">
           <Button type="reset" variant="link" className="w-fit text-left p-0">
             <ChevronLeft size={24} className="text-black" />

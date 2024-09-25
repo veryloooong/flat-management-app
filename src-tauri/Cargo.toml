@@ -1,5 +1,5 @@
 [package]
-name = "it3180-app-new"
+name = "it3180-flat-management-app"
 version = "0.1.0"
 description = "A Tauri App"
 authors = ["long"]

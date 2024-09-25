@@ -16,8 +16,9 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 
 ### Prerequisites
 
-- A Node.js installation
-- Rustup
+- A Node.js installation. Install Node.js via the [Node Version Manager](https://github.com/nvm-sh/nvm).
+- Rustup. Install via [`rustup.rs`](https://rustup.rs/).
+- A PostgreSQL instance running. Install via the [official site](https://www.postgresql.org/download/).
 
 ### Steps
 
@@ -25,13 +26,20 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 ```bash
 git clone https://github.com/veryloooong/flat-management-app && cd flat-management-app
 ```
-- Install dependencies.
+- Install dependencies for the application and the database.
 ```bash
 npm install
+cargo install sea-orm-cli # for db migration
+```
+- Make an `.env` file, with keys following the `.env.example` file.
+- Initiate database migration.
+```bash
+sea migrate refresh
 ```
 - Run in dev mode: `npm run tauri dev`
 - Build for prod: `npm run tauri build`
 
 ## Credits
 
-This app was created from the [create-tauri-app template](https://tauri.app).
+- This app was created from the [create-tauri-app template](https://tauri.app).
+- Makes use of the [shadcn/ui library](https://ui.shadcn.com/) and the [TanStack router](https://tanstack.com/).

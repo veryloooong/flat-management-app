@@ -8,13 +8,13 @@ use tokio::sync::Mutex;
 mod entities;
 mod user;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+/// Test command to prove IPC works
 #[tauri::command]
 fn greet(name: &str) -> String {
   format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-// Global app state
+/// The global state of the application, currently contains the database connection.
 #[derive(Debug, Clone)]
 pub struct AppState {
   db: DatabaseConnection,
@@ -22,13 +22,11 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
-  dotenvy::from_filename(".env.local").ok();
+  dotenvy::from_filename("../.env").ok();
   env_logger::init();
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   let db_url = std::env::var("DATABASE_URL").expect("database not found");
-  dbg!(&db_url);
-
   let db = Database::connect(&db_url)
     .await
     .expect("database connection failed");
