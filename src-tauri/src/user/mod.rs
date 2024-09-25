@@ -49,9 +49,6 @@ pub(crate) async fn login<R: Runtime>(
   let password_hash = argon2::hash_encoded(password.as_bytes(), salt.as_bytes(), &argon2_config)
     .expect("Server error");
 
-  log::debug!("Hashed password: {}", password_hash);
-  log::debug!("Stored password: {}", hashed_password);
-
   // Compare the hashed password with the stored password
   if password_hash != hashed_password {
     log::error!("Login failed");
