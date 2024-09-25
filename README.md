@@ -1,6 +1,6 @@
-# Tauri + React + Typescript
+# Flat management app in Typescript + Tauri
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+This is a desktop app to manage flat details and fees. Made for school, class HUST/IT3180.
 
 ## Recommended IDE Setup
 
@@ -11,3 +11,7 @@ This template should help get you started developing with Tauri, React and Types
 - `migration`: Handles database migrations.
 - `src`: Contains front-end source.
 - `src-tauri`: Contains back-end source.
+
+## Credits
+
+This app was created from the [create-tauri-app template](https://tauri.app).
