@@ -67,7 +67,14 @@ function LoginPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mật khẩu</FormLabel>
+                <FormLabel className="flex flex-row justify-between items-center w-full">
+                  <p>Mật khẩu</p>
+                  <Link to="/password">
+                    <Button type="button" className="p-0 text-main-palette-5" variant="link">
+                      Quên mật khẩu?
+                    </Button>
+                  </Link>
+                </FormLabel>
                 <FormControl>
                   <Input type="password" {...field} required />
                 </FormControl>
@@ -75,11 +82,6 @@ function LoginPage(): JSX.Element {
               </FormItem>
             )}
           />
-
-
-          <Button type="button" className="p-0 self-end" variant="link">
-            Quên mật khẩu?
-          </Button>
 
 
           <Button type="submit" className="bg-main-palette-4 hover:bg-main-palette-5 mt-8">Đăng nhập</Button>
