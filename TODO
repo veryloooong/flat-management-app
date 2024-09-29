@@ -4,6 +4,9 @@ Luồng về tài khoản:
   ✔ Đăng ký @done(24-09-29 22:59)
     ☐ Logic đăng ký ở backend
   ☐ Quên mật khẩu
+    ☐ Nhập email
+    ☐ Gửi email xác nhận và nhập mã xác nhận
+    ☐ Nhập mật khẩu mới
   ☐ Đăng xuất
   ☐ Xem thông tin cá nhân
   ☐ Sửa thông tin cá nhân
