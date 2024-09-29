@@ -1,0 +1,14 @@
+Luồng về tài khoản:
+  ✔ Đăng nhập @done(24-09-29 22:59)
+    ☐ Logic đăng nhập ở backend
+  ✔ Đăng ký @done(24-09-29 22:59)
+    ☐ Logic đăng ký ở backend
+  ☐ Quên mật khẩu
+  ☐ Đăng xuất
+  ☐ Xem thông tin cá nhân
+  ☐ Sửa thông tin cá nhân
+  Admin:
+    ☐ Kích hoạt tài khoản
+    ☐ Khóa tài khoản
+    ☐ Xóa tài khoản
+    ☐ Xem danh sách tài khoản
