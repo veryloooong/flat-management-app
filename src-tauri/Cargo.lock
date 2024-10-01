@@ -1825,6 +1825,7 @@ version = "0.1.0"
 dependencies = [
  "dotenvy",
  "env_logger",
+ "fastrand",
  "log",
  "rust-argon2",
  "sea-orm",
