@@ -33,6 +33,13 @@ function HomePage(): JSX.Element {
               <UserPlus size={24} /> <p className="text-lg">Đăng ký</p>
             </Button>
           </Link>
+          <Link to="/dashboard">
+            <Button
+              className="flex items-center justify-start gap-4 p-8 bg-main-palette-1 hover:bg-main-palette-1"
+            >
+              to dashboard
+            </Button>
+          </Link>
         </div>
       </div>
 

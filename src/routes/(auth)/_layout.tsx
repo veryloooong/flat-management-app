@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react'
 
 function AuthPagesLayout(): JSX.Element {
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-main-palette-1">
+    <div className="w-screen h-fit min-h-screen py-16 flex items-center justify-center bg-main-palette-1">
       {/* TODO: add login awesome background thing */}
       <div className="flex flex-col gap-2 w-fit min-w-[30rem] p-10 bg-main-palette-0 rounded-lg">
         <Link to="..">
