@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Fragment } from 'react'
+import { invoke } from '@tauri-apps/api'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -32,7 +33,9 @@ function LoginPage(): JSX.Element {
   })
 
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
-    console.log(data)
+    invoke('account_login', data)
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err))
   }
 
   return (
@@ -61,7 +64,7 @@ function LoginPage(): JSX.Element {
               <FormItem>
                 <FormLabel className="flex flex-row justify-between items-center w-full">
                   <p>Mật khẩu</p>
-                  <Link to="/passchange">
+                  <Link to="/password-reset">
                     <Button type="button" className="p-0 text-main-palette-5" variant="link">
                       Quên mật khẩu?
                     </Button>

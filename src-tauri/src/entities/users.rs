@@ -15,7 +15,9 @@ pub struct Model {
   pub email: String,
   #[sea_orm(column_type = "VarBinary(StringLen::None)")]
   pub salt: Vec<u8>,
-  pub password: String,
+  #[sea_orm(column_type = "VarBinary(StringLen::None)")]
+  pub password: Vec<u8>,
+  pub phone: String,
   pub role: UserRole,
   pub status: UserStatus,
 }

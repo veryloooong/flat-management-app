@@ -27,7 +27,8 @@ impl MigrationTrait for Migration {
           .col(string(Users::Username).unique_key().not_null())
           .col(string(Users::Email).unique_key().not_null())
           .col(binary_len(Users::Salt, 16).not_null())
-          .col(string(Users::Password).not_null())
+          .col(binary(Users::Password).not_null())
+          .col(string(Users::Phone).not_null())
           .col(
             ColumnDef::new(Users::Role)
               .custom(UserRole::name())
@@ -52,13 +53,14 @@ impl MigrationTrait for Migration {
     let admin_username = "admin";
     let admin_password = "admin";
     let admin_email = "hailong2004ptcnn@gmail.com";
-    let admin_hashed_pw = argon2::hash_encoded(admin_password.as_bytes(), &salt, &config).unwrap();
+    let admin_hashed_pw = argon2::hash_raw(admin_password.as_bytes(), &salt, &config).unwrap();
 
     let insert_stmt = Query::insert()
       .into_table(Users::Table)
       .columns(vec![
         Users::Username,
         Users::Email,
+        Users::Phone,
         Users::Salt,
         Users::Password,
         Users::Role,
@@ -67,6 +69,7 @@ impl MigrationTrait for Migration {
       .values_panic([
         admin_username.into(),
         admin_email.into(),
+        "0927146787".into(),
         salt.into(),
         admin_hashed_pw.into(),
         SimpleExpr::Custom("'admin'::user_role".to_string()),
@@ -102,6 +105,7 @@ pub enum Users {
   Email,
   Salt,
   Password,
+  Phone,
   Role,
   Status,
 }

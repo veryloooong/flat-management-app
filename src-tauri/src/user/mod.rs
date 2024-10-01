@@ -1,15 +1,11 @@
-// #[tauri::command]
-// pub(crate) fn login() {
-//   println!("Logging in...");
-// }
-
 use crate::entities::{prelude::*, sea_orm_active_enums::*, users};
 use crate::AppState;
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
-/// Login command. Takes a username and password and checks if they match a user in the database.
+/// Login command.
+/// Takes a username and password and checks if they match a user in the database. Also checks if the user account is active.
 #[tauri::command]
 pub(crate) async fn account_login<R: Runtime>(
   app: tauri::AppHandle<R>,
@@ -20,6 +16,8 @@ pub(crate) async fn account_login<R: Runtime>(
   let state = state.lock().await;
   let db = &state.db;
 
+  let login_failed_message: String = "Login failed".to_string();
+
   // Get user info from db
   let user_info = match Users::find()
     .filter(users::Column::Username.eq(username))
@@ -29,17 +27,22 @@ pub(crate) async fn account_login<R: Runtime>(
     Ok(user) => user,
     Err(e) => {
       log::error!("Error: {:?}", e);
-      return Err("User not found".to_string());
+      return Err(login_failed_message);
     }
   };
 
   let user_info = match user_info {
     Some(user) => user,
     None => {
-      log::error!("User not found");
-      return Err("User not found".to_string());
+      return Err(login_failed_message);
     }
   };
+
+  // Check if the user account is active
+  if user_info.status != UserStatus::Active {
+    log::error!("User account is not active");
+    return Err(login_failed_message);
+  }
 
   let salt = user_info.salt;
   let hashed_password = user_info.password;
@@ -47,7 +50,7 @@ pub(crate) async fn account_login<R: Runtime>(
   // Hash the password
   let argon2_config = argon2::Config::default();
   let password_hash =
-    argon2::hash_encoded(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
+    argon2::hash_raw(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
       log::error!("Error hashing password: {:?}", e);
       "Server error".to_string()
     })?;
@@ -55,11 +58,20 @@ pub(crate) async fn account_login<R: Runtime>(
   // Compare the hashed password with the stored password
   if password_hash != hashed_password {
     log::error!("Login failed");
-    return Err("Login failed".to_string());
+    return Err(login_failed_message);
   } else {
     log::info!("Login successful");
     return Ok("Login successful".to_string());
   }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct AccountInfo {
+  username: String,
+  email: String,
+  phone: String,
+  password: String,
+  role: UserRole,
 }
 
 /// Register command. Takes a username, email, and password and creates a new user in the database.
@@ -68,14 +80,24 @@ pub(crate) async fn account_login<R: Runtime>(
 #[tauri::command]
 pub(crate) async fn account_register<R: Runtime>(
   app: tauri::AppHandle<R>,
-  username: String,
-  email: String,
-  password: String,
-  role: String,
+  account_info: AccountInfo,
+  // username: String,
+  // email: String,
+  // phone: String,
+  // password: String,
+  // role: String,
 ) -> Result<String, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
   let db = &state.db;
+
+  let AccountInfo {
+    username,
+    email,
+    phone,
+    password,
+    role,
+  } = account_info;
 
   // Check if the user already exists by username or email
   let user_exists = Users::find()
@@ -105,25 +127,16 @@ pub(crate) async fn account_register<R: Runtime>(
     .collect::<Vec<u8>>();
 
   let hashed_password =
-    argon2::hash_encoded(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
+    argon2::hash_raw(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
       log::error!("Error hashing password: {:?}", e);
       "Server error".to_string()
     })?;
-
-  let role = match role.as_str() {
-    "admin" => UserRole::Admin,
-    "manager" => UserRole::Manager,
-    "tenant" => UserRole::Tenant,
-    _ => {
-      log::error!("Invalid role");
-      return Err("User create error".to_string());
-    }
-  };
 
   // Create the user
   let new_user = users::ActiveModel {
     username: Set(username.clone()),
     email: Set(email.clone()),
+    phone: Set(phone.clone()),
     salt: Set(salt.clone()),
     password: Set(hashed_password.clone()),
     role: Set(role),
@@ -136,4 +149,37 @@ pub(crate) async fn account_register<R: Runtime>(
   })?;
 
   Ok("User created".to_string())
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+enum AccountRecoveryMethod {
+  #[serde(rename = "email")]
+  Email,
+  #[serde(rename = "phone")]
+  Phone,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct AccountRecoveryInfo {
+  username: String,
+  method: AccountRecoveryMethod,
+  email: Option<String>,
+  phone: Option<String>,
+}
+
+/// Account recovery command. Takes a username and a choice of email or phone number to send a recovery code to.
+/// The recovery code is stored in the database and sent to the user.
+/// The user can then use the recovery code to reset their password.
+#[tauri::command]
+pub(crate) async fn account_recovery<R: Runtime>(
+  app: tauri::AppHandle<R>,
+  recovery_info: AccountRecoveryInfo,
+) -> Result<String, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let _db = &state.db;
+
+  // Get user info from db (todo)
+
+  Ok("Recovery code sent".to_string())
 }

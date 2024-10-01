@@ -40,7 +40,8 @@ async fn main() {
     .invoke_handler(tauri::generate_handler![
       greet,
       user::account_login,
-      user::account_register
+      user::account_register,
+      user::account_recovery
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

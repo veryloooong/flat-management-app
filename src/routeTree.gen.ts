@@ -18,9 +18,7 @@ import { Route as DashboardLayoutImport } from './routes/dashboard/_layout'
 import { Route as authLayoutImport } from './routes/(auth)/_layout'
 import { Route as DashboardLayoutIndexImport } from './routes/dashboard/_layout/index'
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
-import { Route as authLayoutPasswordTeleImport } from './routes/(auth)/_layout/passwordTele'
-import { Route as authLayoutPasswordEmailImport } from './routes/(auth)/_layout/passwordEmail'
-import { Route as authLayoutPasschangeImport } from './routes/(auth)/_layout/passchange'
+import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout/login'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
@@ -67,18 +65,8 @@ const authLayoutRegisterRoute = authLayoutRegisterImport.update({
   getParentRoute: () => authLayoutRoute,
 } as any)
 
-const authLayoutPasswordTeleRoute = authLayoutPasswordTeleImport.update({
-  path: '/passwordTele',
-  getParentRoute: () => authLayoutRoute,
-} as any)
-
-const authLayoutPasswordEmailRoute = authLayoutPasswordEmailImport.update({
-  path: '/passwordEmail',
-  getParentRoute: () => authLayoutRoute,
-} as any)
-
-const authLayoutPasschangeRoute = authLayoutPasschangeImport.update({
-  path: '/passchange',
+const authLayoutPasswordResetRoute = authLayoutPasswordResetImport.update({
+  path: '/password-reset',
   getParentRoute: () => authLayoutRoute,
 } as any)
 
@@ -146,25 +134,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLayoutLoginImport
       parentRoute: typeof authLayoutImport
     }
-    '/(auth)/_layout/passchange': {
-      id: '/_layout/passchange'
-      path: '/passchange'
-      fullPath: '/passchange'
-      preLoaderRoute: typeof authLayoutPasschangeImport
-      parentRoute: typeof authLayoutImport
-    }
-    '/(auth)/_layout/passwordEmail': {
-      id: '/_layout/passwordEmail'
-      path: '/passwordEmail'
-      fullPath: '/passwordEmail'
-      preLoaderRoute: typeof authLayoutPasswordEmailImport
-      parentRoute: typeof authLayoutImport
-    }
-    '/(auth)/_layout/passwordTele': {
-      id: '/_layout/passwordTele'
-      path: '/passwordTele'
-      fullPath: '/passwordTele'
-      preLoaderRoute: typeof authLayoutPasswordTeleImport
+    '/(auth)/_layout/password-reset': {
+      id: '/_layout/password-reset'
+      path: '/password-reset'
+      fullPath: '/password-reset'
+      preLoaderRoute: typeof authLayoutPasswordResetImport
       parentRoute: typeof authLayoutImport
     }
     '/(auth)/_layout/register': {
@@ -202,17 +176,13 @@ declare module '@tanstack/react-router' {
 
 interface authLayoutRouteChildren {
   authLayoutLoginRoute: typeof authLayoutLoginRoute
-  authLayoutPasschangeRoute: typeof authLayoutPasschangeRoute
-  authLayoutPasswordEmailRoute: typeof authLayoutPasswordEmailRoute
-  authLayoutPasswordTeleRoute: typeof authLayoutPasswordTeleRoute
+  authLayoutPasswordResetRoute: typeof authLayoutPasswordResetRoute
   authLayoutRegisterRoute: typeof authLayoutRegisterRoute
 }
 
 const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutLoginRoute: authLayoutLoginRoute,
-  authLayoutPasschangeRoute: authLayoutPasschangeRoute,
-  authLayoutPasswordEmailRoute: authLayoutPasswordEmailRoute,
-  authLayoutPasswordTeleRoute: authLayoutPasswordTeleRoute,
+  authLayoutPasswordResetRoute: authLayoutPasswordResetRoute,
   authLayoutRegisterRoute: authLayoutRegisterRoute,
 }
 
@@ -262,9 +232,7 @@ export interface FileRoutesByFullPath {
   '/': typeof authLayoutRouteWithChildren
   '/dashboard': typeof DashboardLayoutRouteWithChildren
   '/login': typeof authLayoutLoginRoute
-  '/passchange': typeof authLayoutPasschangeRoute
-  '/passwordEmail': typeof authLayoutPasswordEmailRoute
-  '/passwordTele': typeof authLayoutPasswordTeleRoute
+  '/password-reset': typeof authLayoutPasswordResetRoute
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/': typeof DashboardLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
@@ -275,9 +243,7 @@ export interface FileRoutesByTo {
   '/': typeof authLayoutRouteWithChildren
   '/dashboard': typeof DashboardLayoutIndexRoute
   '/login': typeof authLayoutLoginRoute
-  '/passchange': typeof authLayoutPasschangeRoute
-  '/passwordEmail': typeof authLayoutPasswordEmailRoute
-  '/passwordTele': typeof authLayoutPasswordTeleRoute
+  '/password-reset': typeof authLayoutPasswordResetRoute
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
@@ -290,9 +256,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/dashboard/_layout': typeof DashboardLayoutRouteWithChildren
   '/_layout/login': typeof authLayoutLoginRoute
-  '/_layout/passchange': typeof authLayoutPasschangeRoute
-  '/_layout/passwordEmail': typeof authLayoutPasswordEmailRoute
-  '/_layout/passwordTele': typeof authLayoutPasswordTeleRoute
+  '/_layout/password-reset': typeof authLayoutPasswordResetRoute
   '/_layout/register': typeof authLayoutRegisterRoute
   '/dashboard/_layout/': typeof DashboardLayoutIndexRoute
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
@@ -305,9 +269,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
-    | '/passchange'
-    | '/passwordEmail'
-    | '/passwordTele'
+    | '/password-reset'
     | '/register'
     | '/dashboard/'
     | '/dashboard/account/edit'
@@ -317,9 +279,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
-    | '/passchange'
-    | '/passwordEmail'
-    | '/passwordTele'
+    | '/password-reset'
     | '/register'
     | '/dashboard/account/edit'
     | '/dashboard/account'
@@ -330,9 +290,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/_layout'
     | '/_layout/login'
-    | '/_layout/passchange'
-    | '/_layout/passwordEmail'
-    | '/_layout/passwordTele'
+    | '/_layout/password-reset'
     | '/_layout/register'
     | '/dashboard/_layout/'
     | '/dashboard/_layout/account/edit'
@@ -380,9 +338,7 @@ export const routeTree = rootRoute
       "parent": "/",
       "children": [
         "/_layout/login",
-        "/_layout/passchange",
-        "/_layout/passwordEmail",
-        "/_layout/passwordTele",
+        "/_layout/password-reset",
         "/_layout/register"
       ]
     },
@@ -405,16 +361,8 @@ export const routeTree = rootRoute
       "filePath": "(auth)/_layout/login.tsx",
       "parent": "/_layout"
     },
-    "/_layout/passchange": {
-      "filePath": "(auth)/_layout/passchange.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/passwordEmail": {
-      "filePath": "(auth)/_layout/passwordEmail.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/passwordTele": {
-      "filePath": "(auth)/_layout/passwordTele.tsx",
+    "/_layout/password-reset": {
+      "filePath": "(auth)/_layout/password-reset.tsx",
       "parent": "/_layout"
     },
     "/_layout/register": {
