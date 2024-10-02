@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Fragment } from 'react'
 
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormLabel,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -58,6 +58,7 @@ const registerFormSchema = z.object({
     }, "Mật khẩu phải chứa ít nhất một ký tự đặc biệt"),
   confirmPassword: z.string().min(8, "Mật khẩu phải chứa ít nhất 8 ký tự"),
   email: z.string().email("Email không hợp lệ"),
+  phone: z.string(),
   type: z.enum(['manager', 'tenant']),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp",
@@ -72,6 +73,7 @@ function RegisterPage(): JSX.Element {
       password: '',
       confirmPassword: '',
       email: '',
+      phone: '',
       type: 'manager',
     }
   })
@@ -91,7 +93,7 @@ function RegisterPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tên đăng nhập</FormLabel>
+                <FormLabel>Tên đăng nhập <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input {...field} maxLength={32} required />
                 </FormControl>
@@ -104,7 +106,7 @@ function RegisterPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mật khẩu</FormLabel>
+                <FormLabel>Mật khẩu <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input type="password" {...field} required />
                 </FormControl>
@@ -117,7 +119,7 @@ function RegisterPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Xác nhận mật khẩu</FormLabel>
+                <FormLabel>Xác nhận mật khẩu <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input type="password" {...field} required />
                 </FormControl>
@@ -130,7 +132,7 @@ function RegisterPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input type="email" {...field} required />
                 </FormControl>
@@ -139,11 +141,24 @@ function RegisterPage(): JSX.Element {
             )}
           />
           <FormField
+            name="phone"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số điện thoại</FormLabel>
+                <FormControl>
+                  <Input {...field} required />
+                </FormControl>
+                <FormMessage>{form.formState.errors.phone?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
             name="type"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Loại tài khoản</FormLabel>
+                <FormLabel>Loại tài khoản <span className="text-red-500">*</span></FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
