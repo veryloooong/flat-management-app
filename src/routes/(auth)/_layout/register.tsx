@@ -145,7 +145,7 @@ function RegisterPage(): JSX.Element {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Số điện thoại</FormLabel>
+                <FormLabel>Số điện thoại <span className="text-red-500">*</span></FormLabel>
                 <FormControl>
                   <Input {...field} required />
                 </FormControl>

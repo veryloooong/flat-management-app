@@ -1,6 +1,9 @@
 use crate::entities::{prelude::*, sea_orm_active_enums::*, users};
 use crate::AppState;
+
+use jwt_simple::prelude::*;
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
+use serde_json::json;
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
@@ -11,16 +14,18 @@ pub(crate) async fn account_login<R: Runtime>(
   app: tauri::AppHandle<R>,
   username: String,
   password: String,
-) -> Result<String, String> {
+) -> Result<serde_json::Value, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
   let db = &state.db;
+  let access_token = &state.access_token_secret;
+  let refresh_token = &state.refresh_token_secret;
 
   let login_failed_message: String = "Login failed".to_string();
 
   // Get user info from db
   let user_info = match Users::find()
-    .filter(users::Column::Username.eq(username))
+    .filter(users::Column::Username.eq(&username))
     .one(db)
     .await
   {
@@ -61,7 +66,40 @@ pub(crate) async fn account_login<R: Runtime>(
     return Err(login_failed_message);
   } else {
     log::info!("Login successful");
-    return Ok("Login successful".to_string());
+
+    // Create a JWT access token
+    let access_key = HS256Key::from_bytes(access_token);
+    let mut custom_claims = json!({
+      "username": username,
+      "role": user_info.role,
+    });
+    let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_mins(10));
+    let access_token = access_key
+      .authenticate(claims)
+      .map_err(|e| {
+        log::error!("Error creating token: {:?}", e);
+        "Server error".to_string()
+      })
+      .unwrap();
+
+    // Create a JWT refresh token
+    let refresh_key = HS256Key::from_bytes(refresh_token);
+    custom_claims["refreshTokenVersion"] = json!(1);
+    let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_hours(24));
+    let refresh_token = refresh_key
+      .authenticate(claims)
+      .map_err(|e| {
+        log::error!("Error creating token: {:?}", e);
+        "Server error".to_string()
+      })
+      .unwrap();
+
+    let response = json!({
+      "accessToken": access_token,
+      "refreshToken": refresh_token,
+    });
+
+    return Ok(response);
   }
 }
 
@@ -181,5 +219,7 @@ pub(crate) async fn account_recovery<R: Runtime>(
 
   // Get user info from db (todo)
 
-  Ok("Recovery code sent".to_string())
+  todo!()
+
+  // Ok("Recovery code sent".to_string())
 }
