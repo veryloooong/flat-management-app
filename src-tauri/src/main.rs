@@ -1,7 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use jwt_simple::prelude::*;
 use sea_orm::{Database, DatabaseConnection};
 use tauri::Manager;
 use tokio::sync::Mutex;
@@ -35,6 +34,7 @@ async fn main() {
     .expect("database connection failed");
 
   tauri::Builder::default()
+    .plugin(tauri_plugin_shell::init())
     .setup(|app| {
       let state = AppState {
         db,

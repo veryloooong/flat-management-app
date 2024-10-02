@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Fragment } from 'react'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 
 import { Button } from '@/components/ui/button'
 import {

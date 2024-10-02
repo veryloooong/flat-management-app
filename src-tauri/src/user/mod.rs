@@ -1,3 +1,5 @@
+mod auth;
+
 use crate::entities::{prelude::*, sea_orm_active_enums::*, users};
 use crate::AppState;
 
@@ -119,11 +121,6 @@ pub(crate) struct AccountInfo {
 pub(crate) async fn account_register<R: Runtime>(
   app: tauri::AppHandle<R>,
   account_info: AccountInfo,
-  // username: String,
-  // email: String,
-  // phone: String,
-  // password: String,
-  // role: String,
 ) -> Result<String, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
@@ -139,7 +136,6 @@ pub(crate) async fn account_register<R: Runtime>(
 
   // Check if the user already exists by username or email
   let user_exists = Users::find()
-    // .filter(users::Column::Username.eq(username.clone()))
     .filter(
       Condition::any()
         .add(users::Column::Username.eq(username.clone()))

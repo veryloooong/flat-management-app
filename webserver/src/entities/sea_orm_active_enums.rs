@@ -13,7 +13,7 @@ pub enum UserRole {
   #[serde(rename = "manager")]
   Manager,
   #[sea_orm(string_value = "tenant")]
-  #[serde(rename = "manager")]
+  #[serde(rename = "tenant")]
   Tenant,
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
