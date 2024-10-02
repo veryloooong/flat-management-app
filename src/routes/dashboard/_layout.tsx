@@ -49,7 +49,7 @@ function DashboardLayoutPage(): JSX.Element {
             {/* Dropdown Menu */}
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
-                <Link to="/dashboard/account/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Link to="/account/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   Xem thông tin tài khoản
                 </Link>
                 <Link to="/dashboard/account/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -86,3 +86,5 @@ function DashboardLayoutPage(): JSX.Element {
 export const Route = createFileRoute('/dashboard/_layout')({
   component: DashboardLayoutPage,
 })
+
+
