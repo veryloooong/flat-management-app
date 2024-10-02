@@ -35,9 +35,11 @@ function LoginPage(): JSX.Element {
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
     invoke('account_login', data)
       .then((res) => {
-        console.log(res);
+        // handle login success
       })
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        // handle login error
+      })
   }
 
   return (

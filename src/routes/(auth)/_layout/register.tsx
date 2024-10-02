@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { invoke } from '@tauri-apps/api/core'
 
 const registerFormSchema = z.object({
   username: z.string().toLowerCase()
@@ -59,7 +60,7 @@ const registerFormSchema = z.object({
   confirmPassword: z.string().min(8, "Mật khẩu phải chứa ít nhất 8 ký tự"),
   email: z.string().email("Email không hợp lệ"),
   phone: z.string(),
-  type: z.enum(['manager', 'tenant']),
+  role: z.enum(['manager', 'tenant']),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp",
   path: ['confirmPassword'],
@@ -74,12 +75,22 @@ function RegisterPage(): JSX.Element {
       confirmPassword: '',
       email: '',
       phone: '',
-      type: 'manager',
+      role: 'manager',
     }
   })
 
   function onSubmit(data: z.infer<typeof registerFormSchema>) {
-    console.log(data)
+    invoke('account_register', {
+      accountInfo: {
+        username: data.username,
+        password: data.password,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+      }
+    })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err))
   }
 
   return (
@@ -154,7 +165,7 @@ function RegisterPage(): JSX.Element {
             )}
           />
           <FormField
-            name="type"
+            name="role"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -170,7 +181,7 @@ function RegisterPage(): JSX.Element {
                     <SelectItem value="tenant">Hộ dân</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage>{form.formState.errors.type?.message}</FormMessage>
+                <FormMessage>{form.formState.errors.role?.message}</FormMessage>
               </FormItem>
             )}
           />
