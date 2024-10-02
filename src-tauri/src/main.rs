@@ -22,8 +22,8 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
-  dotenvy::from_filename("../.env").ok();
   env_logger::init();
+  dotenvy::from_filename("../.env").ok();
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   let db_url = std::env::var("DATABASE_URL").expect("database not found");
@@ -37,7 +37,12 @@ async fn main() {
       app.manage(Mutex::new(state));
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![greet, user::login])
+    .invoke_handler(tauri::generate_handler![
+      greet,
+      user::account_login,
+      user::account_register,
+      user::account_recovery
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

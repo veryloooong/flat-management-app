@@ -4,11 +4,10 @@ import { ChevronLeft } from 'lucide-react'
 
 function AuthPagesLayout(): JSX.Element {
   return (
-    <div className="w-screen h-fit min-h-screen py-16 flex items-center justify-center bg-main-palette-1">
-      {/* TODO: add login awesome background thing */}
-      <div className="flex flex-col gap-2 w-fit min-w-[30rem] p-10 bg-main-palette-0 rounded-lg">
+    <div className="w-screen min-h-screen min-w-fit h-fit py-16 flex items-center justify-center bg-main-palette-1">
+      <div className="flex flex-col gap-2 w-[30rem] p-10 bg-main-palette-0 rounded-lg">
         <Link to="..">
-          <Button className="flex flex-row items-center content-center gap-2 px-0" variant="link">
+          <Button className="flex flex-row items-center content-center gap-2 px-0 w-fit" variant="link">
             <ChevronLeft size={18} />
             <p className="">Quay lại trang chính</p>
           </Button>
