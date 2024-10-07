@@ -53,6 +53,12 @@ impl MigrationTrait for Migration {
               .default(UserStatus::Inactive)
               .not_null(),
           )
+          .col(
+            ColumnDef::new(Users::RefreshTokenVersion)
+              .integer()
+              .default(1)
+              .not_null(),
+          )
           .to_owned(),
       )
       .await?;
@@ -120,6 +126,7 @@ pub enum Users {
   Phone,
   Role,
   Status,
+  RefreshTokenVersion,
 }
 
 // Create role enum

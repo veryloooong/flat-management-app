@@ -3,7 +3,7 @@ function Start-Development {
   Write-Output "Installing prerequisites..."
 
   # Install Rustup
-  if (-not (Test-Path rustup.exe)) {
+  if (-not (Get-Command rustup.exe -ErrorAction SilentlyContinue)) {
     Write-Output "Rustup not found. Downloading..."
     Invoke-WebRequest -Uri "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe" -OutFile $env:TEMP\rustup-init.exe
     Start-Process -FilePath $env:TEMP\rustup-init.exe -ArgumentList @("--verbose", "--default-host", "x86_64-pc-windows-gnu", "--default-toolchain", "stable") -Wait -ErrorAction Stop
@@ -14,7 +14,7 @@ function Start-Development {
   }
 
   # Install Node.js
-  if (-not (Test-Path npm.exe)) {
+  if (-not (Get-Command node.exe -ErrorAction SilentlyContinue)) {
     Write-Output "Node not found. Downloading..."
     Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi" -OutFile $env:TEMP\node-installer.msi
     msiexec.exe /i $env:TEMP\node-installer.msi /quiet /norestart
@@ -25,7 +25,7 @@ function Start-Development {
   }
 
   # Install PostgreSQL
-  if (-not (Test-Path pg_ctl.exe)) {
+  if (-not (Get-Command psql.exe -ErrorAction SilentlyContinue)) {
     Write-Output "PostgreSQL not found. Downloading..."
     Invoke-WebRequest -Uri "https://sbp.enterprisedb.com/getfile.jsp?fileid=1259129" -OutFile $env:TEMP\postgresql-installer.exe
     Write-Output "Follow the installer instructions to install PostgreSQL"
@@ -46,7 +46,7 @@ function Start-Development {
 # Function to automatically add function to migrate the DB and generate the entities
 function Start-Migration {
   # Check if the sea-orm-cli is installed
-  if (-not (Test-Path .\sea-orm-cli.exe)) {
+  if (-not (Get-Command sea-orm-cli.exe -ErrorAction SilentlyContinue)) {
     Write-Output "sea-orm-cli.exe not found. Downloading..."
     cargo.exe install sea-orm-cli
   }
@@ -57,8 +57,8 @@ function Start-Migration {
 
   # Generate entities
   Write-Output "Generating entities..."
-  sea-orm-cli.exe generate entity -o './src-tauri/src/entities' --with-serde=both --enum-extra-attribute 'serde(rename_all = "snake_case")'
-  sea-orm-cli.exe generate entity -o './webserver/src/entities' --with-serde=both --enum-extra-attribute 'serde(rename_all = "snake_case")'
+  sea-orm-cli.exe generate entity -o './src-tauri/src/entities' --with-serde=both --enum-extra-attributes 'serde(rename_all = "snake_case")'
+  sea-orm-cli.exe generate entity -o './webserver/src/entities' --with-serde=both --enum-extra-attributes 'serde(rename_all = "snake_case")'
   
   Write-Output "Migration and entity generation completed"
 }

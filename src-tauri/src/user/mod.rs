@@ -69,17 +69,37 @@ pub(crate) async fn account_register<R: Runtime>(
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
   let server_url = &state.server_url;
+  let client = &state.client;
 
   log::debug!("Registering user '{:?}'", account_info);
 
-  Ok("register".to_string())
+  let register_err = "Registration failed".to_string();
+
+  let response = client
+    .post(&format!("{}/register", server_url))
+    .json(&account_info)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send registration request: {}", e);
+      register_err.clone()
+    })?
+    .text()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse registration response: {}", e);
+      register_err.clone()
+    })?;
+
+  log::debug!("Registration successful: {}", response);
+
+  Ok("registration success".to_string())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 enum AccountRecoveryMethod {
-  #[serde(rename = "email")]
   Email,
-  #[serde(rename = "phone")]
   Phone,
 }
 
@@ -99,8 +119,29 @@ pub(crate) async fn account_recovery<R: Runtime>(
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
   let server_url = &state.server_url;
+  let client = &state.client;
 
   log::debug!("Recovering account '{:?}'", recovery_info);
+
+  let recovery_err = "Recovery failed".to_string();
+
+  let response = client
+    .post(&format!("{}/recovery", server_url))
+    .json(&recovery_info)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send recovery request: {}", e);
+      recovery_err.clone()
+    })?
+    .text()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse recovery response: {}", e);
+      recovery_err.clone()
+    })?;
+
+  log::debug!("Recovery successful: {}", response);
 
   Ok("recovery".to_string())
 }

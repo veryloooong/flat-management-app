@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use jwt_simple::prelude::HS256Key;
 use router::create_router;
 use sea_orm::{prelude::*, Database};
@@ -8,6 +6,7 @@ use tokio::net::TcpListener;
 mod authenticate;
 mod entities;
 mod router;
+mod user;
 
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {

@@ -11,4 +11,15 @@
     "typescript",
     "typescriptreact"
   ],
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "database": "it3180",
+      "username": "it3180_user",
+      "name": "Dev"
+    }
+  ],
 }
