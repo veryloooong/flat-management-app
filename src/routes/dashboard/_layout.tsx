@@ -79,3 +79,5 @@ function DashboardLayoutPage(): JSX.Element {
 export const Route = createFileRoute('/dashboard/_layout')({
   component: DashboardLayoutPage,
 })
+
+
