@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Fragment } from 'react'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -34,8 +34,12 @@ function LoginPage(): JSX.Element {
 
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
     invoke('account_login', data)
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err))
+      .then((res) => {
+        // handle login success
+      })
+      .catch((err) => {
+        // handle login error
+      })
   }
 
   return (

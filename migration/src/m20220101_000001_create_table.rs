@@ -24,6 +24,18 @@ impl MigrationTrait for Migration {
           .table(Users::Table)
           .if_not_exists()
           .col(pk_auto(Users::Id))
+          // .col(
+          //   uuid(Users::Id)
+          //     .primary_key()
+          //     .default(Expr::cust("uuid_generate_v4()")),
+          // )
+          // .col(
+          //   ColumnDef::new(Users::Id)
+          //     .uuid()
+          //     .not_null()
+          //     .primary_key()
+          //     .default(Expr::custom_keyword(Alias::new("uuid_generate_v4()"))),
+          // )
           .col(string(Users::Username).unique_key().not_null())
           .col(string(Users::Email).unique_key().not_null())
           .col(binary_len(Users::Salt, 16).not_null())
@@ -39,6 +51,12 @@ impl MigrationTrait for Migration {
             ColumnDef::new(Users::Status)
               .custom(UserStatus::name())
               .default(UserStatus::Inactive)
+              .not_null(),
+          )
+          .col(
+            ColumnDef::new(Users::RefreshTokenVersion)
+              .integer()
+              .default(1)
               .not_null(),
           )
           .to_owned(),
@@ -108,6 +126,7 @@ pub enum Users {
   Phone,
   Role,
   Status,
+  RefreshTokenVersion,
 }
 
 // Create role enum

@@ -61,8 +61,6 @@ function AccountPage(): JSX.Element {
       </div>
     </div>
   )
-  
-  
 }
 
 export const Route = createFileRoute('/dashboard/_layout/account/')({
