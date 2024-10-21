@@ -11,6 +11,7 @@ pub use axum_extra::headers::Authorization;
 pub use axum_extra::TypedHeader;
 pub use jwt_simple::prelude::*;
 pub use sea_orm::{prelude::*, Condition, Database, Set};
+pub use utoipa::ToSchema;
 
 // Importing the necessary modules
 pub use crate::authenticate::types::*;

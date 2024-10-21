@@ -4,6 +4,9 @@ use axum::{
   Router,
 };
 use tower_http::cors::CorsLayer;
+use utoipa::OpenApi;
+use utoipa_axum::{router::OpenApiRouter, routes};
+use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
   authenticate::{self, validate_token::*},
@@ -11,11 +14,21 @@ use crate::{
 };
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
-  let authenticate_router = Router::new()
-    .route("/login", post(authenticate::account_login))
-    .route("/register", post(authenticate::account_register))
-    .route("/refresh", post(grant_new_access_token))
-    .route("/logout", post(authenticate::account_logout));
+  #[derive(OpenApi)]
+  #[openapi(tags(
+    (name = "auth")
+  ))]
+  struct ApiDoc;
+
+  let authenticate_router = OpenApiRouter::new()
+    .routes(routes!(authenticate::account_login))
+    .routes(routes!(authenticate::account_register))
+    .routes(routes!(grant_new_access_token))
+    .routes(routes!(authenticate::account_logout));
+
+  let (auth_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    .nest("/auth", authenticate_router)
+    .split_for_parts();
 
   let user_router = Router::new()
     .route(
@@ -29,8 +42,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
 
   Router::new()
     .route("/", get(index))
-    .nest("/auth", authenticate_router)
+    // .nest("/auth", authenticate_router)
+    .merge(auth_router)
     .nest("/user", user_router)
+    .merge(SwaggerUi::new("/api").url("/api-docs/openapi.json", api))
     .with_state(state)
     .layer(CorsLayer::permissive())
 }

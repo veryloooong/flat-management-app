@@ -57,6 +57,17 @@ pub async fn validate_request(
   return Ok(next.run(req).await);
 }
 
+/// Grant a new access token by providing a refresh token.
+#[utoipa::path(
+  post,
+  path = "/refresh",
+  summary = "Grant a new access token by providing a refresh token",
+  tag = "auth",
+  responses(
+    (status = OK, description = "New access token granted", body = TokenResponse),
+    (status = UNAUTHORIZED, description = "Invalid token", body = AccessTokenError),
+  )
+)]
 pub async fn grant_new_access_token() -> &'static str {
   // ...
 
