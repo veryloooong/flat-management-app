@@ -1,7 +1,6 @@
-use crate::entities::prelude::*;
-use crate::entities::sea_orm_active_enums::*;
+use crate::prelude::*;
 
-use sea_orm::{prelude::*, FromQueryResult};
+use sea_orm::FromQueryResult;
 
 #[derive(serde::Serialize, serde::Deserialize, FromQueryResult, DerivePartialModel)]
 #[sea_orm(entity = "Users")]

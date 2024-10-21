@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use reqwest::Client as ReqwestClient;
 use tauri::Manager;
 use tokio::sync::Mutex;
 
@@ -23,7 +24,7 @@ pub struct AppState {
   /// JWT refresh token.
   refresh_token: Option<String>,
   /// Web request client.
-  client: reqwest::Client,
+  client: ReqwestClient,
 }
 
 #[tokio::main]
@@ -50,7 +51,8 @@ async fn main() {
       greet,
       user::account_login,
       user::account_register,
-      user::account_recovery
+      user::account_recovery,
+      user::get_info::get_user_info,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

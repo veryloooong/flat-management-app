@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Fragment } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/hooks/use-toast'
 
 
 const loginFormSchema = z.object({
@@ -24,6 +25,10 @@ const loginFormSchema = z.object({
 })
 
 function LoginPage(): JSX.Element {
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const LOGIN_NAVIGATE_DELAY = 2000
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -34,11 +39,26 @@ function LoginPage(): JSX.Element {
 
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
     invoke('account_login', data)
-      .then((res) => {
-        // handle login success
+      .then((_) => {
+        toast({
+          title: 'Đăng nhập thành công',
+          description: 'Bạn sẽ được chuyển hướng tới trang chính',
+          duration: LOGIN_NAVIGATE_DELAY,
+        })
+        setTimeout(() => {
+          navigate({
+            to: "/dashboard",
+          })
+        }, LOGIN_NAVIGATE_DELAY)
       })
-      .catch((err) => {
+      .catch((_) => {
         // handle login error
+        toast({
+          title: 'Đăng nhập thất bại',
+          description: 'Vui lòng kiểm tra lại thông tin đăng nhập',
+          duration: 5000,
+          variant: 'destructive'
+        })
       })
   }
 

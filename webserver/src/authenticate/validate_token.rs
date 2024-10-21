@@ -1,15 +1,6 @@
-use axum::extract::{Request, State};
-use axum::http::{header, HeaderMap, StatusCode};
-use axum::middleware::Next;
-use axum::response::IntoResponse;
-use axum_extra::headers::authorization::{Authorization, Bearer};
-use axum_extra::TypedHeader;
-use jwt_simple::prelude::MACLike;
+use crate::prelude::*;
+
 use serde_json::json;
-
-use crate::AppState;
-
-use super::{AccessTokenClaims, AccessTokenError};
 
 pub async fn validate_request(
   State(state): State<AppState>,
@@ -66,7 +57,18 @@ pub async fn validate_request(
   return Ok(next.run(req).await);
 }
 
-pub async fn grant_new_refresh_token() -> &'static str {
+/// Grant a new access token by providing a refresh token.
+#[utoipa::path(
+  post,
+  path = "/refresh",
+  summary = "Grant a new access token by providing a refresh token",
+  tag = "auth",
+  responses(
+    (status = OK, description = "New access token granted", body = TokenResponse),
+    (status = UNAUTHORIZED, description = "Invalid token", body = AccessTokenError),
+  )
+)]
+pub async fn grant_new_access_token() -> &'static str {
   // ...
 
   "Hello, World!"

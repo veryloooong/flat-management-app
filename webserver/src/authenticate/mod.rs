@@ -1,19 +1,26 @@
 pub mod types;
 pub mod validate_token;
 
-use crate::authenticate::types::*;
-use crate::entities::sea_orm_active_enums::*;
-use crate::entities::{prelude::*, users};
-use crate::AppState;
+use crate::prelude::*;
 
-use axum::http::{header, HeaderMap, StatusCode};
-use axum::{extract::State, response::IntoResponse, Json};
-use jwt_simple::prelude::*;
-use sea_orm::{prelude::*, Condition, Set};
+use crate::entities::users;
+
+use axum::Json;
 use serde_json::json;
+
+const AUTH_TAG: &str = "auth";
 
 /// Login command.
 /// Takes a username and password and checks if they match a user in the database. Also checks if the user account is active.
+#[utoipa::path(
+  post,
+  path = "/login",
+  tag = AUTH_TAG,
+  responses(
+    (status = OK, description = "Login successful", body = TokenResponse),
+    (status = BAD_REQUEST, description = "Invalid credentials", body = AccessTokenError),
+  )
+)]
 pub(crate) async fn account_login(
   State(state): State<AppState>,
   Json(login_info): Json<LoginInfo>,
@@ -107,6 +114,7 @@ pub(crate) async fn account_login(
   // Create JWT
   let custom_claims = AccessTokenClaims {
     username: user_info.username.clone(),
+    id: user_info.id,
     role: user_info.role.clone(),
   };
   let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_mins(15));
@@ -117,6 +125,7 @@ pub(crate) async fn account_login(
 
   let custom_claims = RefreshTokenClaims {
     username: user_info.username.clone(),
+    id: user_info.id,
     role: user_info.role.clone(),
     refresh_token_version: user_info.refresh_token_version,
   };
@@ -140,6 +149,15 @@ pub(crate) async fn account_login(
 
 /// Register command.
 /// Takes registration info as JSON and creates a new user in the database.
+#[utoipa::path(
+  post,
+  path = "/register",
+  tag = AUTH_TAG,
+  responses(
+    (status = CREATED, description = "Registration successful"),
+    (status = BAD_REQUEST, description = "Registration failed"),
+  )
+)]
 pub(crate) async fn account_register(
   State(state): State<AppState>,
   Json(register_info): Json<RegisterInfo>,
@@ -205,6 +223,15 @@ pub(crate) async fn account_register(
 /// Logout command.
 /// Takes a JWT token and increases the refresh token version of the user in the database.
 /// This will invalidate all refresh tokens for the user.
+#[utoipa::path(
+  post,
+  path = "/logout",
+  tag = AUTH_TAG,
+  responses(
+    (status = OK, description = "Logout successful"),
+    (status = UNAUTHORIZED, description = "Logout failed"),
+  )
+)]
 pub(crate) async fn account_logout(
   State(state): State<AppState>,
   headers: HeaderMap,

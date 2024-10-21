@@ -1,8 +1,8 @@
 Luồng về tài khoản:
   ✔ Đăng nhập @done(24-09-29 22:59)
-    ☐ Logic đăng nhập ở backend
+    ✔ Logic đăng nhập ở backend @done(24-10-21 14:47)
   ✔ Đăng ký @done(24-09-29 22:59)
-    ☐ Logic đăng ký ở backend
+    ✔ Logic đăng ký ở backend @done(24-10-21 14:47)
   ☐ Quên mật khẩu
     ☐ Nhập email
     ☐ Gửi email xác nhận và nhập mã xác nhận
