@@ -1,18 +1,29 @@
 pub mod types;
 
-use axum::extract::{Path, State};
-use axum::http::{HeaderMap, StatusCode};
-use axum::response::IntoResponse;
-use sea_orm::prelude::*;
-use types::BasicUserInfo;
+use crate::prelude::*;
 
-use crate::entities::{prelude::*, users};
-use crate::AppState;
+use crate::entities::users;
 
 pub(crate) async fn get_user_info(
   State(state): State<AppState>,
-  Path(user_id): Path<i32>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  // use bearer token to get user info
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err((
+        StatusCode::UNAUTHORIZED,
+        HeaderMap::new(),
+        "invalid token".to_string(),
+      ));
+    }
+  };
+
+  let user_id = claims.custom.id;
+
   let user = match Users::find()
     .filter(users::Column::Id.eq(user_id))
     .into_partial_model::<BasicUserInfo>()
@@ -48,10 +59,24 @@ pub(crate) async fn get_user_info(
   ))
 }
 
-pub async fn modify_user_info(
+pub async fn update_user_info(
   State(state): State<AppState>,
-  Path(user_id): Path<i32>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
+  let jwt_access_secret = &state.jwt_access_secret;
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err((
+        StatusCode::UNAUTHORIZED,
+        HeaderMap::new(),
+        "invalid token".to_string(),
+      ));
+    }
+  };
+
+  let user_id = claims.custom.id;
+
   let user = match Users::find()
     .filter(users::Column::Id.eq(user_id))
     .one(&state.db)

@@ -11,6 +11,7 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 - `migration`: Handles database migrations.
 - `src`: Contains front-end source.
 - `src-tauri`: Contains back-end source.
+- `webserver`: Contains source for server.
 
 ## Development instructions
 
@@ -38,6 +39,9 @@ sea migrate refresh
 ```
 - Run in dev mode: `npm run tauri dev`
 - Build for prod: `npm run tauri build`
+- Run the webserver:
+  - Go to webserver directory: `cd webserver`
+  - Run the server: `cargo run`
 
 ## Credits
 

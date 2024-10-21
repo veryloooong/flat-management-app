@@ -1,5 +1,9 @@
+pub(crate) mod get_info;
+mod types;
+
 use crate::entities::sea_orm_active_enums::*;
 use crate::AppState;
+use types::LoginResponse;
 
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
@@ -9,7 +13,7 @@ pub(crate) async fn account_login<R: Runtime>(
   app: tauri::AppHandle<R>,
   username: String,
   password: String,
-) -> Result<String, String> {
+) -> Result<LoginResponse, String> {
   let state = app.state::<Mutex<AppState>>();
   let mut state = state.lock().await;
   let server_url = &state.server_url;
@@ -18,15 +22,8 @@ pub(crate) async fn account_login<R: Runtime>(
   log::debug!("Login attempt for user '{}'", username);
   let login_err = "Login failed".to_string();
 
-  #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-  #[serde(rename_all = "camelCase")]
-  struct LoginResponse {
-    access_token: String,
-    refresh_token: String,
-  }
-
   let response: LoginResponse = client
-    .post(&format!("{}/login", server_url))
+    .post(&format!("{}/auth/login", server_url))
     .json(&serde_json::json!({
       "username": username,
       "password": password,
@@ -46,10 +43,10 @@ pub(crate) async fn account_login<R: Runtime>(
 
   log::debug!("Login successful, got tokens: {:?}", response);
 
-  state.access_token = Some(response.access_token);
-  state.refresh_token = Some(response.refresh_token);
+  state.access_token = Some(response.access_token.clone());
+  state.refresh_token = Some(response.refresh_token.clone());
 
-  Ok("login success".to_string())
+  Ok(response)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -76,7 +73,7 @@ pub(crate) async fn account_register<R: Runtime>(
   let register_err = "Registration failed".to_string();
 
   let response = client
-    .post(&format!("{}/register", server_url))
+    .post(&format!("{}/auth/register", server_url))
     .json(&account_info)
     .send()
     .await

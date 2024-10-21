@@ -37,6 +37,7 @@ pub struct RegisterInfo {
 #[serde(rename_all = "snake_case")]
 pub(crate) struct AccessTokenClaims {
   pub username: String,
+  pub id: i32,
   pub role: UserRole,
 }
 
@@ -44,6 +45,7 @@ pub(crate) struct AccessTokenClaims {
 #[serde(rename_all = "snake_case")]
 pub(crate) struct RefreshTokenClaims {
   pub username: String,
+  pub id: i32,
   pub role: UserRole,
   pub refresh_token_version: i32,
 }

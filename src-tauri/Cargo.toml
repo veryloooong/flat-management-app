@@ -25,6 +25,9 @@ tokio = { version = "1.40.0", features = ["full"] }
 dotenvy = "0.15.7"
 log = "0.4.22"
 env_logger = "0.11.5"
+jwt-simple = { version = "0.12", default-features = false, features = [
+  "pure-rust",
+] }
 fastrand = "2.1.1"
 anyhow = "1.0.89"
 hex = "0.4.3"

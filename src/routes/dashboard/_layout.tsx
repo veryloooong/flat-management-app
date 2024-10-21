@@ -1,16 +1,18 @@
 import { useState } from 'react';
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createFileRoute, Outlet, Link } from '@tanstack/react-router'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover'
+
+import { createFileRoute, Outlet, Link, redirect } from '@tanstack/react-router'
 import { SearchIcon, HomeIcon, BellIcon, UserIcon } from 'lucide-react'
+import { isAuthenticated } from '@/lib/auth';
 
 function DashboardLayoutPage(): JSX.Element {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Trạng thái của menu
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // Toggle trạng thái menu
-  };
-
   return (
     <div>
       <header className="w-full h-20 bg-main-palette-5 flex items-center justify-between">
@@ -40,14 +42,12 @@ function DashboardLayoutPage(): JSX.Element {
 
           {/* Icon User */}
           <div className="relative">
-            <UserIcon
-              className="w-6 h-6 text-white cursor-pointer"
-              onClick={toggleMenu} // Sự kiện click để mở menu
-            />
-
             {/* Dropdown Menu */}
-            {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
+            <Popover>
+              <PopoverTrigger>
+                <UserIcon className="w-6 h-6 text-white cursor-pointer" />
+              </PopoverTrigger>
+              <PopoverContent className="p-2 w-fit">
                 <Link to="/dashboard/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   Xem thông tin tài khoản
                 </Link>
@@ -66,8 +66,8 @@ function DashboardLayoutPage(): JSX.Element {
                     Đăng xuất
                   </button>
                 </Link>
-              </div>
-            )}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </header>
@@ -77,6 +77,12 @@ function DashboardLayoutPage(): JSX.Element {
 }
 
 export const Route = createFileRoute('/dashboard/_layout')({
+  beforeLoad: () => {
+    console.log('TODO: Check if user is authenticated');
+    if (!isAuthenticated()) {
+      throw redirect({ to: '/login' });
+    }
+  },
   component: DashboardLayoutPage,
 })
 

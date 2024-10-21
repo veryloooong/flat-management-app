@@ -1,12 +1,13 @@
-use jwt_simple::prelude::HS256Key;
-use router::create_router;
-use sea_orm::{prelude::*, Database};
-use tokio::net::TcpListener;
-
 mod authenticate;
 mod entities;
+pub mod prelude;
 mod router;
 mod user;
+
+use crate::prelude::*;
+
+use router::create_router;
+use tokio::net::TcpListener;
 
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {

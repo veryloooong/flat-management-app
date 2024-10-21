@@ -1,15 +1,11 @@
 pub mod types;
 pub mod validate_token;
 
-use crate::authenticate::types::*;
-use crate::entities::sea_orm_active_enums::*;
-use crate::entities::{prelude::*, users};
-use crate::AppState;
+use crate::prelude::*;
 
-use axum::http::{header, HeaderMap, StatusCode};
-use axum::{extract::State, response::IntoResponse, Json};
-use jwt_simple::prelude::*;
-use sea_orm::{prelude::*, Condition, Set};
+use crate::entities::users;
+
+use axum::Json;
 use serde_json::json;
 
 /// Login command.
@@ -107,6 +103,7 @@ pub(crate) async fn account_login(
   // Create JWT
   let custom_claims = AccessTokenClaims {
     username: user_info.username.clone(),
+    id: user_info.id,
     role: user_info.role.clone(),
   };
   let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_mins(15));
@@ -117,6 +114,7 @@ pub(crate) async fn account_login(
 
   let custom_claims = RefreshTokenClaims {
     username: user_info.username.clone(),
+    id: user_info.id,
     role: user_info.role.clone(),
     refresh_token_version: user_info.refresh_token_version,
   };

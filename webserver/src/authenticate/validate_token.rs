@@ -1,15 +1,6 @@
-use axum::extract::{Request, State};
-use axum::http::{header, HeaderMap, StatusCode};
-use axum::middleware::Next;
-use axum::response::IntoResponse;
-use axum_extra::headers::authorization::{Authorization, Bearer};
-use axum_extra::TypedHeader;
-use jwt_simple::prelude::MACLike;
+use crate::prelude::*;
+
 use serde_json::json;
-
-use crate::AppState;
-
-use super::{AccessTokenClaims, AccessTokenError};
 
 pub async fn validate_request(
   State(state): State<AppState>,
@@ -66,7 +57,7 @@ pub async fn validate_request(
   return Ok(next.run(req).await);
 }
 
-pub async fn grant_new_refresh_token() -> &'static str {
+pub async fn grant_new_access_token() -> &'static str {
   // ...
 
   "Hello, World!"
