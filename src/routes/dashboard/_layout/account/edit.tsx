@@ -121,80 +121,41 @@ function AccountEditPage(): JSX.Element {
     <Fragment>
       <h1 className='flex justify-center items-center font-sans mt-10 text-indigo-600'>Thay đổi thông tin tài khoản</h1>
       <div className="flex justify-center items-center">
-        <div className="bg-gray-100 max-w-4xl w-full m-5 p-1 rounded-lg border-sky-200 border-4">
+        <div className=" max-w-4xl w-full m-5 p-1">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col m-12 text-main-palette-6">
-              
-              <FormField
-                name="oldPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Mật khẩu cũ <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      {/* <Input type={showPassword ? "text" : "password"} {...field} required /> */}
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.oldPassword?.message}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="newPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Mật khẩu mới <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.oldPassword?.message}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="confirmPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Xác nhận mật khẩu <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.confirmPassword?.message}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} required />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.email?.message}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
+              <p className = "flex justify-center font-mono text-3xl">Tài khoản cá nhân</p>
+              {/* Account Information Section */}
+              <div className="border-b pb-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    name="username"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Họ và tên</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Nhập họ và tên" required />
+                        </FormControl>
+                        <FormMessage>{form.formState.errors.username?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Địa chỉ email</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="nhập địa chỉ email" required />
+                        </FormControl>
+                        <FormMessage>{form.formState.errors.email?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+
+<FormField
                 name="phone"
                 control={form.control}
                 render={({ field }) => (
@@ -236,17 +197,76 @@ function AccountEditPage(): JSX.Element {
                 )}
               />
 
+                </div>
+                <div className="flex justify-end mt-4">
+                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Cập nhật
+                  </Button>
+                </div>
+              </div>
+
+              {/* Password Update Section */}
+              <p className = "flex justify-center font-mono text-3xl">Mật khẩu</p>
+                <FormField
+                  name="oldPassword"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Mật khẩu cũ <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput {...field} required />
+                      </FormControl>
+                      <FormMessage>{form.formState.errors.oldPassword?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="newPassword"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Mật khẩu mới <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput {...field} required />
+                      </FormControl>
+                      <FormMessage>{form.formState.errors.newPassword?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="confirmPassword"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Xác nhận mật khẩu <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput {...field} required />
+                      </FormControl>
+                      <FormMessage>{form.formState.errors.confirmPassword?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+          
+
               <Button
                 type="submit"
-                className="bg-main-palette-4 hover:bg-main-palette-5 mt-8 text-indigo-50"
+                className="bg-blue-500 hover:bg-main-palette-5 mt-8 text-indigo-50"
               >
-                Cập nhật
+                Cập nhật mật khẩu
               </Button>
             </form>
           </Form>
         </div>
       </div>
     </Fragment>
+
+
   )
 }
 

@@ -38,7 +38,17 @@ function DashboardLayoutPage(): JSX.Element {
         {/* Icons */}
         <div className="flex items-center gap-4 mr-6 relative">
           {/* Icon Notification */}
-          <BellIcon className="w-6 h-6 text-white cursor-pointer" />
+          <div className="relative">
+            <BellIcon
+              className="w-6 h-6 text-white cursor-pointer"
+              onClick={toggleBellText}
+            />
+            {showBellText && (
+              <div className="absolute top-8 right-0 bg-white text-black rounded-md p-2">
+                Bạn có thông báo mới
+              </div>
+            )}
+          </div>
 
           {/* Icon User */}
           <div className="relative">
@@ -52,7 +62,7 @@ function DashboardLayoutPage(): JSX.Element {
                   Xem thông tin tài khoản
                 </Link>
                 <Link to="/dashboard/account/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Chỉnh sửa thông tin tài khoản
+                  Chỉnh sửa thông tin tài khoản 
                 </Link>
                 <Link to='/login'>
                   <button
