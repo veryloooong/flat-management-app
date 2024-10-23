@@ -16,5 +16,6 @@ pub use utoipa::ToSchema;
 // Importing the necessary modules
 pub use crate::authenticate::types::*;
 pub use crate::entities::{prelude::*, sea_orm_active_enums::*};
+pub use crate::router::tags;
 pub use crate::user::types::*;
 pub(crate) use crate::AppState;

@@ -7,7 +7,7 @@ function AuthPagesLayout(): JSX.Element {
     <div className="w-screen min-h-screen min-w-fit h-fit py-16 flex items-center justify-center bg-main-palette-1">
       <div className="flex flex-col gap-2 w-[30rem] p-10 bg-main-palette-0 rounded-lg">
         <Link to="..">
-          <Button className="flex flex-row items-center content-center gap-2 px-0 w-fit" variant="link">
+          <Button className="flex flex-row items-center content-center gap-2 px-0 w-fit" variant="link" tabIndex={-1}>
             <ChevronLeft size={18} />
             <p className="">Quay lại trang chính</p>
           </Button>

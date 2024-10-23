@@ -1,7 +1,6 @@
-use utoipa::openapi::schema;
-
 use crate::prelude::*;
 
+/// Represents username / password for login
 #[derive(serde::Serialize, serde::Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct LoginInfo {
@@ -9,22 +8,29 @@ pub struct LoginInfo {
   pub password: String,
 }
 
+/// Represents an error response for access token
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct AccessTokenError {
+  #[schema(examples("invalid_token"))]
   pub error: String,
+  #[schema(examples("expired token"))]
   pub error_description: String,
 }
 
+/// Represents a successful token response with access token, refresh token, and expiry
 #[derive(serde::Serialize, serde::Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct TokenResponse {
   pub access_token: String,
   pub refresh_token: String,
+  #[schema(examples(300))]
   pub expires_in: i64,
+  #[schema(examples("Bearer"))]
   pub token_type: String,
 }
 
+/// Represents user registration information
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct RegisterInfo {
@@ -34,6 +40,12 @@ pub struct RegisterInfo {
   pub password: String,
   #[schema(value_type = String, examples("manager", "tenant"))]
   pub role: UserRole,
+}
+
+/// Represents an access token refresh request
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
+pub struct RefreshTokenRequest {
+  pub refresh_token: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

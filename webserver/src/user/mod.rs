@@ -4,6 +4,24 @@ use crate::prelude::*;
 
 use crate::entities::users;
 
+use tags::USER;
+
+/// Gets the user info from the database. Takes a bearer token and returns the user info.
+#[utoipa::path(
+  get,
+  path = "/info",
+  tag = USER,
+  responses(
+    (status = OK, description = "User info", body = BasicUserInfo),
+    (status = BAD_REQUEST, description = "Invalid request", body = String),
+    (status = NOT_FOUND, description = "User not found", body = String),
+    (status = UNAUTHORIZED, description = "Invalid token", body = String),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
 pub(crate) async fn get_user_info(
   State(state): State<AppState>,
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,

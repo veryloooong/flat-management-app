@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -99,8 +99,6 @@ const registerFormSchema = z
   })
 
 function AccountEditPage(): JSX.Element {
-  const [showPassword, setShowPassword] = useState(false);
-
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
@@ -124,7 +122,7 @@ function AccountEditPage(): JSX.Element {
         <div className=" max-w-4xl w-full m-5 p-1">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col m-12 text-main-palette-6">
-              <p className = "flex justify-center font-mono text-3xl">Tài khoản cá nhân</p>
+              <p className="flex justify-center font-mono text-3xl">Tài khoản cá nhân</p>
               {/* Account Information Section */}
               <div className="border-b pb-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,47 +153,47 @@ function AccountEditPage(): JSX.Element {
                     )}
                   />
 
-<FormField
-                name="phone"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Số điện thoại <span className='text-red-500'>*</span></FormLabel>
-                    <FormControl>
-                      <Input {...field} required />
-                    </FormControl>
-                    <FormMessage>
-                      {form.formState.errors.phone?.message}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="type"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Loại tài khoản <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn loại tài khoản" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="manager">Quản lý</SelectItem>
-                        <SelectItem value="tenant">Hộ dân</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage>{form.formState.errors.type?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    name="phone"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Số điện thoại <span className='text-red-500'>*</span></FormLabel>
+                        <FormControl>
+                          <Input {...field} required />
+                        </FormControl>
+                        <FormMessage>
+                          {form.formState.errors.phone?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="type"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Loại tài khoản <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn loại tài khoản" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="manager">Quản lý</SelectItem>
+                            <SelectItem value="tenant">Hộ dân</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage>{form.formState.errors.type?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
 
                 </div>
                 <div className="flex justify-end mt-4">
@@ -206,53 +204,53 @@ function AccountEditPage(): JSX.Element {
               </div>
 
               {/* Password Update Section */}
-              <p className = "flex justify-center font-mono text-3xl">Mật khẩu</p>
-                <FormField
-                  name="oldPassword"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Mật khẩu cũ <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <PasswordInput {...field} required />
-                      </FormControl>
-                      <FormMessage>{form.formState.errors.oldPassword?.message}</FormMessage>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  name="newPassword"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Mật khẩu mới <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <PasswordInput {...field} required />
-                      </FormControl>
-                      <FormMessage>{form.formState.errors.newPassword?.message}</FormMessage>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  name="confirmPassword"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Xác nhận mật khẩu <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <PasswordInput {...field} required />
-                      </FormControl>
-                      <FormMessage>{form.formState.errors.confirmPassword?.message}</FormMessage>
-                    </FormItem>
-                  )}
-                />
-          
+              <p className="flex justify-center font-mono text-3xl">Mật khẩu</p>
+              <FormField
+                name="oldPassword"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Mật khẩu cũ <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput {...field} required />
+                    </FormControl>
+                    <FormMessage>{form.formState.errors.oldPassword?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="newPassword"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Mật khẩu mới <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput {...field} required />
+                    </FormControl>
+                    <FormMessage>{form.formState.errors.newPassword?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="confirmPassword"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Xác nhận mật khẩu <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput {...field} required />
+                    </FormControl>
+                    <FormMessage>{form.formState.errors.confirmPassword?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
 
               <Button
                 type="submit"

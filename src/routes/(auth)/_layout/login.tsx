@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Fragment } from 'react'
-import { invoke } from '@tauri-apps/api/core'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/lib/auth'
 
 
 const loginFormSchema = z.object({
@@ -28,6 +28,7 @@ function LoginPage(): JSX.Element {
   const { toast } = useToast()
   const navigate = useNavigate()
   const LOGIN_NAVIGATE_DELAY = 2000
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -38,7 +39,8 @@ function LoginPage(): JSX.Element {
   })
 
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
-    invoke('account_login', data)
+    // invoke('account_login', data)
+    login(data)
       .then((_) => {
         toast({
           title: 'Đăng nhập thành công',
@@ -89,7 +91,7 @@ function LoginPage(): JSX.Element {
                 <FormLabel className="flex flex-row justify-between items-center w-full">
                   <p>Mật khẩu</p>
                   <Link to="/password-reset">
-                    <Button type="button" className="p-0 text-main-palette-5" variant="link">
+                    <Button type="button" className="p-0 text-main-palette-5" variant="link" tabIndex={-1}>
                       Quên mật khẩu?
                     </Button>
                   </Link>
@@ -105,7 +107,7 @@ function LoginPage(): JSX.Element {
 
           <Button type="submit" className="bg-main-palette-4 hover:bg-main-palette-5 mt-8">Đăng nhập</Button>
           <Link to="/register" className="w-full">
-            <Button type="button" className="bg-main-palette-6 hover:bg-main-palette-7 mt-2 w-full">Đăng ký</Button>
+            <Button type="button" className="bg-main-palette-6 hover:bg-main-palette-7 mt-2 w-full" tabIndex={-1}>Đăng ký</Button>
           </Link>
         </form>
       </Form>

@@ -1,6 +1,11 @@
 import { Toaster } from '@/components/ui/toaster'
-import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { AuthContext } from '@/lib/auth'
+
+type RouterContext = {
+  authentication: AuthContext
+}
 
 function RootIndex(): JSX.Element {
   return (
@@ -12,6 +17,6 @@ function RootIndex(): JSX.Element {
   )
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootIndex,
 })

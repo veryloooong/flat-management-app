@@ -8,14 +8,14 @@ use crate::entities::users;
 use axum::Json;
 use serde_json::json;
 
-const AUTH_TAG: &str = "auth";
+use crate::router::tags::AUTH;
 
 /// Login command.
 /// Takes a username and password and checks if they match a user in the database. Also checks if the user account is active.
 #[utoipa::path(
   post,
   path = "/login",
-  tag = AUTH_TAG,
+  tag = AUTH,
   responses(
     (status = OK, description = "Login successful", body = TokenResponse),
     (status = BAD_REQUEST, description = "Invalid credentials", body = AccessTokenError),
@@ -33,11 +33,11 @@ pub(crate) async fn account_login(
   let mut headers = HeaderMap::new();
   headers.append(header::CONTENT_TYPE, "application/json".parse().unwrap());
 
-  let server_error = Err((
+  let server_error = (
     StatusCode::INTERNAL_SERVER_ERROR,
     HeaderMap::new(),
     "server error".to_string(),
-  ));
+  );
 
   // Get user info from db
   let user_info = match Users::find()
@@ -48,7 +48,7 @@ pub(crate) async fn account_login(
     Ok(user) => user,
     Err(e) => {
       log::error!("Error: {:?}", e);
-      return server_error;
+      return Err(server_error.clone());
     }
   };
 
@@ -89,7 +89,7 @@ pub(crate) async fn account_login(
   let password =
     argon2::hash_raw(login_info.password.as_bytes(), &salt, &argon2_config).map_err(|e| {
       log::error!("Error hashing password: {:?}", e);
-      server_error.clone().err().unwrap()
+      server_error.clone()
     })?;
 
   if password != hashed_password {
@@ -120,7 +120,7 @@ pub(crate) async fn account_login(
   let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_mins(15));
   let access_token = jwt_access_secret.authenticate(claims).map_err(|e| {
     log::error!("Error creating access token: {:?}", e);
-    server_error.clone().err().unwrap()
+    server_error.clone()
   })?;
 
   let custom_claims = RefreshTokenClaims {
@@ -132,7 +132,7 @@ pub(crate) async fn account_login(
   let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_hours(24));
   let refresh_token = jwt_refresh_secret.authenticate(claims).map_err(|e| {
     log::error!("Error creating refresh token: {:?}", e);
-    server_error.clone().err().unwrap()
+    server_error
   })?;
 
   let response = TokenResponse {
@@ -152,7 +152,7 @@ pub(crate) async fn account_login(
 #[utoipa::path(
   post,
   path = "/register",
-  tag = AUTH_TAG,
+  tag = AUTH,
   responses(
     (status = CREATED, description = "Registration successful"),
     (status = BAD_REQUEST, description = "Registration failed"),
@@ -226,38 +226,32 @@ pub(crate) async fn account_register(
 #[utoipa::path(
   post,
   path = "/logout",
-  tag = AUTH_TAG,
+  tag = AUTH,
   responses(
     (status = OK, description = "Logout successful"),
     (status = UNAUTHORIZED, description = "Logout failed"),
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 pub(crate) async fn account_logout(
   State(state): State<AppState>,
-  headers: HeaderMap,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
   let AppState {
     jwt_access_secret, ..
   } = &state;
 
-  let logout_err = Err((StatusCode::UNAUTHORIZED, "Logout failed"));
+  let logout_err = (StatusCode::UNAUTHORIZED, "Logout failed");
 
-  let auth_header = headers
-    .get(header::AUTHORIZATION)
-    .ok_or(logout_err.clone().err().unwrap())?;
-
-  let token = auth_header.to_str().map_err(|e| {
-    log::error!("Error parsing token: {:?}", e);
-    logout_err.clone().err().unwrap()
-  })?;
-
-  let token = token.trim_start_matches("Bearer ");
+  let token = bearer.token();
 
   let claims = jwt_access_secret
     .verify_token::<AccessTokenClaims>(token, None)
     .map_err(|e| {
       log::error!("Error verifying token: {:?}", e);
-      logout_err.clone().err().unwrap()
+      logout_err.clone()
     })?;
 
   log::info!(
@@ -273,21 +267,21 @@ pub(crate) async fn account_logout(
     .await
     .map_err(|e| {
       log::error!("Error: {:?}", e);
-      logout_err.clone().err().unwrap()
+      logout_err.clone()
     })?;
 
   let user = match user {
     Some(user) => user,
     None => {
       log::error!("User not found");
-      return logout_err;
+      return Err(logout_err.clone());
     }
   };
 
   // Check if the user account is active
   if user.status != UserStatus::Active {
     log::error!("User account is not active");
-    return logout_err;
+    return Err(logout_err.clone());
   }
 
   // Increase refresh token version
@@ -296,7 +290,7 @@ pub(crate) async fn account_logout(
   new_user.refresh_token_version = Set(new_refresh_token_version);
   new_user.update(&state.db).await.map_err(|e| {
     log::error!("Error updating user: {:?}", e);
-    logout_err.clone().err().unwrap()
+    logout_err.clone()
   })?;
 
   Ok(StatusCode::OK)

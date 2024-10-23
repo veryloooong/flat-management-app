@@ -6,6 +6,7 @@ import { Link, RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from './routeTree.gen';
 import { Button } from "@/components/ui/button";
 import { CircleX } from "lucide-react";
+import { useAuth } from "./lib/auth";
 
 function NotFound(): JSX.Element {
   return (
@@ -24,6 +25,7 @@ function NotFound(): JSX.Element {
 const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFound,
+  context: { authentication: undefined! },
 });
 
 declare module '@tanstack/react-router' {
@@ -32,8 +34,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const authentication = useAuth();
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider router={router} context={{ authentication }} />
   </React.StrictMode>,
 );
