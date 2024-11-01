@@ -6,11 +6,10 @@ import { invoke } from "@tauri-apps/api/core";
 export const useAuth = () => {
   const isAuthenticated = async () => {
     try {
-      // const res = await invoke('account_check');
-      // return res as boolean;
-      return true;
+      const res = await invoke('get_user_info');
+      return res as boolean;
     } catch (error) {
-      throw error;
+      return false;
     }
   }
 

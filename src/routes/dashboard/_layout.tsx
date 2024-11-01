@@ -68,7 +68,7 @@ export const Route = createFileRoute('/dashboard/_layout')({
     console.log('TODO: Check if user is authenticated');
     const { isAuthenticated } = context.authentication;
 
-    if (!isAuthenticated()) {
+    if (!(await isAuthenticated())) {
       throw redirect({ to: '/login' });
     }
   },

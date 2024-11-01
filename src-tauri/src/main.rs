@@ -52,6 +52,7 @@ async fn main() {
       user::account_login,
       user::account_register,
       user::account_recovery,
+      user::account_logout,
       user::get_info::get_user_info,
     ])
     .run(tauri::generate_context!())

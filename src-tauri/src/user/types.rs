@@ -9,6 +9,24 @@ pub struct LoginResponse {
   pub token_type: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct RegisterInfo {
+  username: String,
+  email: String,
+  phone: String,
+  password: String,
+  role: UserRole,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct BasicAccountInfo {
+  pub id: i32,
+  pub username: String,
+  pub email: String,
+  pub phone: String,
+  pub role: UserRole,
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) struct AccessTokenClaims {
@@ -24,4 +42,19 @@ pub(crate) struct RefreshTokenClaims {
   pub id: i32,
   pub role: UserRole,
   pub refresh_token_version: i32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AccountRecoveryMethod {
+  Email,
+  Phone,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct AccountRecoveryInfo {
+  pub username: String,
+  pub method: AccountRecoveryMethod,
+  pub email: Option<String>,
+  pub phone: Option<String>,
 }

@@ -1,19 +1,21 @@
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
-use crate::AppState;
+use crate::{user::types::BasicAccountInfo, AppState};
 
-use super::AccountInfo;
+use super::RegisterInfo;
 
 #[tauri::command]
-pub async fn get_user_info<R: Runtime>(app: tauri::AppHandle<R>) -> Result<AccountInfo, String> {
+pub async fn get_user_info<R: Runtime>(
+  app: tauri::AppHandle<R>,
+) -> Result<BasicAccountInfo, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
   let server_url = &state.server_url;
   let client = &state.client;
   let access_token = state.access_token.clone().ok_or("Not logged in")?;
 
-  let response: AccountInfo = client
+  let response: BasicAccountInfo = client
     .get(format!("{}/user/info", server_url))
     .header("Authorization", format!("Bearer {}", access_token))
     .send()

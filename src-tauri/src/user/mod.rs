@@ -3,7 +3,7 @@ mod types;
 
 use crate::entities::sea_orm_active_enums::*;
 use crate::AppState;
-use types::LoginResponse;
+use types::{AccountRecoveryInfo, LoginResponse, RegisterInfo};
 
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
@@ -49,19 +49,10 @@ pub(crate) async fn account_login<R: Runtime>(
   Ok(response)
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub(crate) struct AccountInfo {
-  username: String,
-  email: String,
-  phone: String,
-  password: String,
-  role: UserRole,
-}
-
 #[tauri::command]
 pub(crate) async fn account_register<R: Runtime>(
   app: tauri::AppHandle<R>,
-  account_info: AccountInfo,
+  account_info: RegisterInfo,
 ) -> Result<String, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
@@ -91,21 +82,6 @@ pub(crate) async fn account_register<R: Runtime>(
   log::debug!("Registration successful: {}", response);
 
   Ok("registration success".to_string())
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum AccountRecoveryMethod {
-  Email,
-  Phone,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub(crate) struct AccountRecoveryInfo {
-  username: String,
-  method: AccountRecoveryMethod,
-  email: Option<String>,
-  phone: Option<String>,
 }
 
 #[tauri::command]
@@ -141,4 +117,17 @@ pub(crate) async fn account_recovery<R: Runtime>(
   log::debug!("Recovery successful: {}", response);
 
   Ok("recovery".to_string())
+}
+
+#[tauri::command]
+pub(crate) async fn account_logout<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let mut state = state.lock().await;
+
+  log::debug!("Logging out user");
+
+  state.access_token = None;
+  state.refresh_token = None;
+
+  Ok(())
 }
