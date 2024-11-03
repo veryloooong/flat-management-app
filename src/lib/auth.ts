@@ -2,14 +2,16 @@
 
 import { redirect } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
+import { BasicUserInfo } from "./user";
 
 export const useAuth = () => {
-  const isAuthenticated = async () => {
+  const checkAuthentication = async () => {
     try {
       const res = await invoke('get_user_info');
-      return res as boolean;
+      return res as BasicUserInfo;
+      // return res as boolean;
     } catch (error) {
-      return false;
+      return undefined;
     }
   }
 
@@ -33,7 +35,7 @@ export const useAuth = () => {
     }
   }
 
-  return { isAuthenticated, login, logout }
+  return { isAuthenticated: checkAuthentication, login, logout }
 }
 
 export type AuthContext = ReturnType<typeof useAuth>;

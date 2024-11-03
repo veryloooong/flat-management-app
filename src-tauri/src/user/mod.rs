@@ -99,7 +99,7 @@ pub(crate) async fn account_recovery<R: Runtime>(
   let recovery_err = "Recovery failed".to_string();
 
   let response = client
-    .post(&format!("{}/recovery", server_url))
+    .post(&format!("{}/auth/recovery", server_url))
     .json(&recovery_info)
     .send()
     .await
@@ -123,8 +123,29 @@ pub(crate) async fn account_recovery<R: Runtime>(
 pub(crate) async fn account_logout<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), String> {
   let state = app.state::<Mutex<AppState>>();
   let mut state = state.lock().await;
+  let server_url = &state.server_url;
+  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let client = &state.client;
 
   log::debug!("Logging out user");
+
+  let logout_err = "Logout failed".to_string();
+
+  let _ = client
+    .post(&format!("{}/auth/logout", server_url))
+    .bearer_auth(access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send logout request: {}", e);
+      logout_err.clone()
+    })?
+    .text()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse logout response: {}", e);
+      logout_err.clone()
+    })?;
 
   state.access_token = None;
   state.refresh_token = None;

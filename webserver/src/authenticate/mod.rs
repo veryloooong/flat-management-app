@@ -167,6 +167,7 @@ pub(crate) async fn account_register(
   let register_err = Err((StatusCode::BAD_REQUEST, "Registration failed"));
 
   let RegisterInfo {
+    name,
     username,
     email,
     phone,
@@ -203,6 +204,7 @@ pub(crate) async fn account_register(
   })?;
 
   let new_user = users::ActiveModel {
+    name: Set(name.clone()),
     username: Set(username.clone()),
     email: Set(email.clone()),
     phone: Set(phone.clone()),

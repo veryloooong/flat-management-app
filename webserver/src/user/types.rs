@@ -6,6 +6,7 @@ use sea_orm::FromQueryResult;
 #[sea_orm(entity = "Users")]
 pub struct BasicUserInfo {
   pub id: i32,
+  pub name: String,
   pub username: String,
   pub email: String,
   pub phone: String,

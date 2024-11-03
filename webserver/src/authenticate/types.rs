@@ -34,6 +34,7 @@ pub struct TokenResponse {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct RegisterInfo {
+  pub name: String,
   pub username: String,
   pub email: String,
   pub phone: String,

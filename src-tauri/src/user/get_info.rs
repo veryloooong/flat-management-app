@@ -3,8 +3,6 @@ use tokio::sync::Mutex;
 
 use crate::{user::types::BasicAccountInfo, AppState};
 
-use super::RegisterInfo;
-
 #[tauri::command]
 pub async fn get_user_info<R: Runtime>(
   app: tauri::AppHandle<R>,
@@ -17,7 +15,7 @@ pub async fn get_user_info<R: Runtime>(
 
   let response: BasicAccountInfo = client
     .get(format!("{}/user/info", server_url))
-    .header("Authorization", format!("Bearer {}", access_token))
+    .bearer_auth(access_token)
     .send()
     .await
     .map_err(|e| {

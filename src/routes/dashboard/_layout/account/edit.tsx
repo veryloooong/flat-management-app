@@ -23,8 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { PasswordInput } from '@/components/ui/password-input'
+import { invoke } from '@tauri-apps/api/core'
 
-const registerFormSchema = z
+const updateUserInfoSchema = z
   .object({
     username: z
       .string()
@@ -46,8 +47,15 @@ const registerFormSchema = z
         // Username must not be reserved
         return !['admin', 'root', 'superuser'].includes(data)
       }, 'Tên đăng nhập không hợp lệ'),
-    oldPassword: z
-      .string()
+    name: z.string().min(2, 'Tên không hợp lệ'),
+    email: z.string().email('Email không hợp lệ'),
+    phone: z.string(),
+    type: z.enum(['manager', 'tenant']),
+  })
+
+const updatePasswordSchema = z
+  .object({
+    oldPassword: z.string()
       .min(8, 'Mật khẩu phải chứa ít nhất 8 ký tự')
       .refine((value) => {
         // Password must contain at least one uppercase letter
@@ -65,8 +73,7 @@ const registerFormSchema = z
         // Password must contain at least one special character
         return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
       }, 'Mật khẩu phải chứa ít nhất một ký tự đặc biệt'),
-    newPassword: z
-      .string()
+    newPassword: z.string()
       .min(8, 'Mật khẩu phải chứa ít nhất 8 ký tự')
       .refine((value) => {
         // Password must contain at least one uppercase letter
@@ -85,9 +92,6 @@ const registerFormSchema = z
         return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
       }, 'Mật khẩu phải chứa ít nhất một ký tự đặc biệt'),
     confirmPassword: z.string().min(8, 'Mật khẩu phải chứa ít nhất 8 ký tự'),
-    email: z.string().email('Email không hợp lệ'),
-    phone: z.string(),
-    type: z.enum(['manager', 'tenant']),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Mật khẩu xác nhận không khớp',
@@ -99,19 +103,37 @@ const registerFormSchema = z
   })
 
 function AccountEditPage(): JSX.Element {
-  const form = useForm<z.infer<typeof registerFormSchema>>({
-    resolver: zodResolver(registerFormSchema),
+  const userInfo = Route.useLoaderData();
+
+  const updateUserInfoForm = useForm<z.infer<typeof updateUserInfoSchema>>({
+    resolver: zodResolver(updateUserInfoSchema),
     defaultValues: {
-      username: '',
-      oldPassword: '',
-      confirmPassword: '',
-      email: '',
-      phone: '',
-      type: 'manager',
+      name: userInfo.name,
+      username: userInfo.username,
+      email: userInfo.email,
+      phone: userInfo.phone,
+      type: userInfo.role === 'admin' ? undefined : userInfo.role,
     },
   })
 
-  function onSubmit(data: z.infer<typeof registerFormSchema>) {
+  const updatePasswordForm = useForm<z.infer<typeof updatePasswordSchema>>({
+    resolver: zodResolver(updatePasswordSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    }
+  })
+
+  async function onSubmitUpdateUserInfoForm(data: z.infer<typeof updateUserInfoSchema>) {
+    await invoke('update_user_info', data);
+
+    console.log(data)
+  }
+
+  async function onSubmitUpdatePasswordForm(data: z.infer<typeof updatePasswordSchema>) {
+    await invoke('update_password', data);
+
     console.log(data)
   }
 
@@ -120,42 +142,42 @@ function AccountEditPage(): JSX.Element {
       <h1 className='flex justify-center items-center font-sans mt-10 text-indigo-600'>Thay đổi thông tin tài khoản</h1>
       <div className="flex justify-center items-center">
         <div className=" max-w-4xl w-full m-5 p-1">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col m-12 text-main-palette-6">
+          <Form {...updateUserInfoForm}>
+            <form onSubmit={updateUserInfoForm.handleSubmit(onSubmitUpdateUserInfoForm)} className="flex flex-col m-12 text-main-palette-6">
               <p className="flex justify-center font-mono text-3xl">Tài khoản cá nhân</p>
               {/* Account Information Section */}
               <div className="border-b pb-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
-                    name="username"
-                    control={form.control}
+                    name="name"
+                    control={updateUserInfoForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Họ và tên</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Nhập họ và tên" required />
                         </FormControl>
-                        <FormMessage>{form.formState.errors.username?.message}</FormMessage>
+                        <FormMessage>{updateUserInfoForm.formState.errors.username?.message}</FormMessage>
                       </FormItem>
                     )}
                   />
                   <FormField
                     name="email"
-                    control={form.control}
+                    control={updateUserInfoForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Địa chỉ email</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="nhập địa chỉ email" required />
                         </FormControl>
-                        <FormMessage>{form.formState.errors.email?.message}</FormMessage>
+                        <FormMessage>{updateUserInfoForm.formState.errors.email?.message}</FormMessage>
                       </FormItem>
                     )}
                   />
 
                   <FormField
                     name="phone"
-                    control={form.control}
+                    control={updateUserInfoForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Số điện thoại <span className='text-red-500'>*</span></FormLabel>
@@ -163,14 +185,14 @@ function AccountEditPage(): JSX.Element {
                           <Input {...field} required />
                         </FormControl>
                         <FormMessage>
-                          {form.formState.errors.phone?.message}
+                          {updateUserInfoForm.formState.errors.phone?.message}
                         </FormMessage>
                       </FormItem>
                     )}
                   />
                   <FormField
                     name="type"
-                    control={form.control}
+                    control={updateUserInfoForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -190,7 +212,7 @@ function AccountEditPage(): JSX.Element {
                             <SelectItem value="tenant">Hộ dân</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage>{form.formState.errors.type?.message}</FormMessage>
+                        <FormMessage>{updateUserInfoForm.formState.errors.type?.message}</FormMessage>
                       </FormItem>
                     )}
                   />
@@ -198,66 +220,66 @@ function AccountEditPage(): JSX.Element {
                 </div>
                 <div className="flex justify-end mt-4">
                   <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                    Cập nhật
+                    Cập nhật thông tin
                   </Button>
                 </div>
               </div>
+            </form>
+          </Form>
 
-              {/* Password Update Section */}
-              <p className="flex justify-center font-mono text-3xl">Mật khẩu</p>
-              <FormField
-                name="oldPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Mật khẩu cũ <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>{form.formState.errors.oldPassword?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="newPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Mật khẩu mới <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>{form.formState.errors.newPassword?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="confirmPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Xác nhận mật khẩu <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput {...field} required />
-                    </FormControl>
-                    <FormMessage>{form.formState.errors.confirmPassword?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
+          {/* Password Update Section */}
 
-
-              <Button
-                type="submit"
-                className="bg-blue-500 hover:bg-main-palette-5 mt-8 text-indigo-50"
-              >
-                Cập nhật mật khẩu
-              </Button>
+          <Form {...updatePasswordForm}>
+            <form onSubmit={updatePasswordForm.handleSubmit(onSubmitUpdatePasswordForm)} className="flex flex-col m-12 text-main-palette-6">
+              <p className="flex justify-center font-mono text-3xl">Thay đổi mật khẩu</p>
+              <div className="border-b pb-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    name="oldPassword"
+                    control={updatePasswordForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mật khẩu cũ <span className="text-red-500">*</span></FormLabel>
+                        <FormControl>
+                          <PasswordInput {...field} required />
+                        </FormControl>
+                        <FormMessage>{updatePasswordForm.formState.errors.oldPassword?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="newPassword"
+                    control={updatePasswordForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mật khẩu mới <span className="text-red-500">*</span></FormLabel>
+                        <FormControl>
+                          <PasswordInput {...field} required />
+                        </FormControl>
+                        <FormMessage>{updatePasswordForm.formState.errors.newPassword?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="confirmPassword"
+                    control={updatePasswordForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Xác nhận mật khẩu <span className="text-red-500">*</span></FormLabel>
+                        <FormControl>
+                          <PasswordInput {...field} required />
+                        </FormControl>
+                        <FormMessage>{updatePasswordForm.formState.errors.confirmPassword?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-end mt-4">
+                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Cập nhật mật khẩu
+                  </Button>
+                </div>
+              </div>
             </form>
           </Form>
         </div>
@@ -270,4 +292,8 @@ function AccountEditPage(): JSX.Element {
 
 export const Route = createFileRoute('/dashboard/_layout/account/edit')({
   component: AccountEditPage,
+  loader: ({ context: { userInfo } }) => {
+    return userInfo;
+  }
+
 })

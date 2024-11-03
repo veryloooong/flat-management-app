@@ -11,6 +11,7 @@ pub struct LoginResponse {
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct RegisterInfo {
+  name: String,
   username: String,
   email: String,
   phone: String,
@@ -21,6 +22,7 @@ pub(crate) struct RegisterInfo {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct BasicAccountInfo {
   pub id: i32,
+  pub name: String,
   pub username: String,
   pub email: String,
   pub phone: String,

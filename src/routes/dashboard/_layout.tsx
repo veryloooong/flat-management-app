@@ -65,12 +65,15 @@ function DashboardLayoutPage(): JSX.Element {
 
 export const Route = createFileRoute('/dashboard/_layout')({
   beforeLoad: async ({ context }) => {
-    console.log('TODO: Check if user is authenticated');
     const { isAuthenticated } = context.authentication;
 
-    if (!(await isAuthenticated())) {
+    const userInfo = await isAuthenticated();
+
+    if (!userInfo) {
       throw redirect({ to: '/login' });
     }
+
+    return { userInfo };
   },
   component: DashboardLayoutPage,
 })

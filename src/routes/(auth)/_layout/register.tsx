@@ -25,6 +25,7 @@ import {
 import { invoke } from '@tauri-apps/api/core'
 
 const registerFormSchema = z.object({
+  name: z.string().min(2, "Tên không được quá ngắn").trim(),
   username: z.string().toLowerCase()
     .max(32, "Tên đăng nhập không được dài quá 32 ký tự")
     .regex(/^[a-zA-Z0-9_]+$/, "Tên đăng nhập chỉ được chứa ký tự chữ cái, chữ số và dấu gạch dưới")
@@ -70,6 +71,7 @@ function RegisterPage(): JSX.Element {
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
+      name: '',
       username: '',
       password: '',
       confirmPassword: '',
@@ -82,6 +84,7 @@ function RegisterPage(): JSX.Element {
   function onSubmit(data: z.infer<typeof registerFormSchema>) {
     invoke('account_register', {
       accountInfo: {
+        name: data.name,
         username: data.username,
         password: data.password,
         email: data.email,
@@ -135,6 +138,19 @@ function RegisterPage(): JSX.Element {
                   <Input type="password" {...field} required />
                 </FormControl>
                 <FormMessage>{form.formState.errors.confirmPassword?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="name"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Họ và tên <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <Input {...field} required />
+                </FormControl>
+                <FormMessage>{form.formState.errors.name?.message}</FormMessage>
               </FormItem>
             )}
           />

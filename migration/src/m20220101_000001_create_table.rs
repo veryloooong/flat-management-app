@@ -36,6 +36,7 @@ impl MigrationTrait for Migration {
           //     .primary_key()
           //     .default(Expr::custom_keyword(Alias::new("uuid_generate_v4()"))),
           // )
+          .col(string(Users::Name).not_null())
           .col(string(Users::Username).unique_key().not_null())
           .col(string(Users::Email).unique_key().not_null())
           .col(binary_len(Users::Salt, 16).not_null())
@@ -69,6 +70,7 @@ impl MigrationTrait for Migration {
       .collect::<Vec<u8>>();
 
     let admin_username = "admin";
+    let admin_name = "Admin";
     let admin_password = "admin";
     let admin_email = "hailong2004ptcnn@gmail.com";
     let admin_hashed_pw = argon2::hash_raw(admin_password.as_bytes(), &salt, &config).unwrap();
@@ -77,6 +79,7 @@ impl MigrationTrait for Migration {
       .into_table(Users::Table)
       .columns(vec![
         Users::Username,
+        Users::Name,
         Users::Email,
         Users::Phone,
         Users::Salt,
@@ -86,6 +89,7 @@ impl MigrationTrait for Migration {
       ])
       .values_panic([
         admin_username.into(),
+        admin_name.into(),
         admin_email.into(),
         "0927146787".into(),
         salt.into(),
@@ -119,6 +123,7 @@ impl MigrationTrait for Migration {
 pub enum Users {
   Table,
   Id,
+  Name,
   Username,
   Email,
   Salt,
