@@ -1,4 +1,5 @@
 pub(crate) mod get_info;
+mod refresh_token;
 mod types;
 
 use crate::entities::sea_orm_active_enums::*;

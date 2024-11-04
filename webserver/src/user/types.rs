@@ -13,3 +13,12 @@ pub struct BasicUserInfo {
   #[schema(value_type = String, examples("manager", "tenant"))]
   pub role: UserRole,
 }
+
+#[derive(serde::Serialize, serde::Deserialize, FromQueryResult, DerivePartialModel, ToSchema)]
+#[sea_orm(entity = "Users")]
+pub struct UpdateUserInfo {
+  pub name: String,
+  pub username: String,
+  pub email: String,
+  pub phone: String,
+}

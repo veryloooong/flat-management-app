@@ -27,26 +27,6 @@ import { invoke } from '@tauri-apps/api/core'
 
 const updateUserInfoSchema = z
   .object({
-    username: z
-      .string()
-      .toLowerCase()
-      .max(32, 'Tên đăng nhập không được dài quá 32 ký tự')
-      .regex(
-        /^[a-zA-Z0-9_]+$/,
-        'Tên đăng nhập chỉ được chứa ký tự chữ cái, chữ số và dấu gạch dưới',
-      )
-      .refine((data) => {
-        // Username must not be only numbers
-        return !/^\d+$/.test(data)
-      }, 'Tên đăng nhập không được chỉ chứa ký tự số')
-      .refine((data) => {
-        // Username must not be only underscores
-        return !/^_+$/.test(data)
-      }, 'Tên đăng nhập không được chỉ chứa dấu gạch dưới')
-      .refine((data) => {
-        // Username must not be reserved
-        return !['admin', 'root', 'superuser'].includes(data)
-      }, 'Tên đăng nhập không hợp lệ'),
     name: z.string().min(2, 'Tên không hợp lệ'),
     email: z.string().email('Email không hợp lệ'),
     phone: z.string(),
@@ -55,24 +35,7 @@ const updateUserInfoSchema = z
 
 const updatePasswordSchema = z
   .object({
-    oldPassword: z.string()
-      .min(8, 'Mật khẩu phải chứa ít nhất 8 ký tự')
-      .refine((value) => {
-        // Password must contain at least one uppercase letter
-        return /[A-Z]/.test(value)
-      }, 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa')
-      .refine((value) => {
-        // Password must contain at least one lowercase letter
-        return /[a-z]/.test(value)
-      }, 'Mật khẩu phải chứa ít nhất một chữ cái viết thường')
-      .refine((value) => {
-        // Password must contain at least one number
-        return /[0-9]/.test(value)
-      }, 'Mật khẩu phải chứa ít nhất một chữ số')
-      .refine((value) => {
-        // Password must contain at least one special character
-        return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
-      }, 'Mật khẩu phải chứa ít nhất một ký tự đặc biệt'),
+    oldPassword: z.string(),
     newPassword: z.string()
       .min(8, 'Mật khẩu phải chứa ít nhất 8 ký tự')
       .refine((value) => {
@@ -109,7 +72,6 @@ function AccountEditPage(): JSX.Element {
     resolver: zodResolver(updateUserInfoSchema),
     defaultValues: {
       name: userInfo.name,
-      username: userInfo.username,
       email: userInfo.email,
       phone: userInfo.phone,
       type: userInfo.role === 'admin' ? undefined : userInfo.role,
@@ -126,15 +88,25 @@ function AccountEditPage(): JSX.Element {
   })
 
   async function onSubmitUpdateUserInfoForm(data: z.infer<typeof updateUserInfoSchema>) {
-    await invoke('update_user_info', data);
-
     console.log(data)
+    invoke('update_user_info', data)
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
-  async function onSubmitUpdatePasswordForm(data: z.infer<typeof updatePasswordSchema>) {
-    await invoke('update_password', data);
-
+  function onSubmitUpdatePasswordForm(data: z.infer<typeof updatePasswordSchema>) {
     console.log(data)
+    invoke('update_password', data)
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   return (
@@ -157,7 +129,7 @@ function AccountEditPage(): JSX.Element {
                         <FormControl>
                           <Input {...field} placeholder="Nhập họ và tên" required />
                         </FormControl>
-                        <FormMessage>{updateUserInfoForm.formState.errors.username?.message}</FormMessage>
+                        <FormMessage>{updateUserInfoForm.formState.errors.name?.message}</FormMessage>
                       </FormItem>
                     )}
                   />

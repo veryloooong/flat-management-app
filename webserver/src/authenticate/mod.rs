@@ -111,13 +111,17 @@ pub(crate) async fn account_login(
     chrono::Utc::now()
   );
 
+  // expiry times
+  let access_token_expiry = Duration::from_mins(1);
+  let refresh_token_expiry = Duration::from_hours(24);
+
   // Create JWT
   let custom_claims = AccessTokenClaims {
     username: user_info.username.clone(),
     id: user_info.id,
     role: user_info.role.clone(),
   };
-  let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_mins(15));
+  let claims = Claims::with_custom_claims(custom_claims.clone(), access_token_expiry);
   let access_token = jwt_access_secret.authenticate(claims).map_err(|e| {
     log::error!("Error creating access token: {:?}", e);
     server_error.clone()
@@ -129,7 +133,7 @@ pub(crate) async fn account_login(
     role: user_info.role.clone(),
     refresh_token_version: user_info.refresh_token_version,
   };
-  let claims = Claims::with_custom_claims(custom_claims.clone(), Duration::from_hours(24));
+  let claims = Claims::with_custom_claims(custom_claims.clone(), refresh_token_expiry);
   let refresh_token = jwt_refresh_secret.authenticate(claims).map_err(|e| {
     log::error!("Error creating refresh token: {:?}", e);
     server_error
@@ -138,7 +142,7 @@ pub(crate) async fn account_login(
   let response = TokenResponse {
     access_token,
     refresh_token,
-    expires_in: 15 * 60,
+    expires_in: access_token_expiry.as_secs() as i64,
     token_type: "Bearer".to_string(),
   };
 
