@@ -22,3 +22,9 @@ pub struct UpdateUserInfo {
   pub email: String,
   pub phone: String,
 }
+
+#[derive(serde::Serialize, serde::Deserialize, ToSchema)]
+pub struct UpdatePasswordInfo {
+  pub old_password: String,
+  pub new_password: String,
+}

@@ -60,3 +60,17 @@ pub(crate) struct AccountRecoveryInfo {
   pub email: Option<String>,
   pub phone: Option<String>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct UpdateUserInfo {
+  pub name: String,
+  pub username: String,
+  pub email: String,
+  pub phone: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub(crate) struct UpdatePasswordInfo {
+  pub old_password: String,
+  pub new_password: String,
+}

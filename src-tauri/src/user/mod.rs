@@ -1,4 +1,4 @@
-pub(crate) mod get_info;
+pub(crate) mod info;
 mod refresh_token;
 mod types;
 
