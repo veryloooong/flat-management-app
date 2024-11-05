@@ -1,3 +1,4 @@
+mod admin;
 mod authenticate;
 mod entities;
 pub mod prelude;

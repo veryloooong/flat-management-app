@@ -18,7 +18,9 @@ use crate::router::tags::AUTH;
   tag = AUTH,
   responses(
     (status = OK, description = "Login successful", body = TokenResponse),
+    (status = UNAUTHORIZED, description = "Invalid credentials", body = AccessTokenError),
     (status = BAD_REQUEST, description = "Invalid credentials", body = AccessTokenError),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
   )
 )]
 pub(crate) async fn account_login(

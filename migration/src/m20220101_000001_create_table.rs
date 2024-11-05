@@ -1,6 +1,6 @@
 use extension::postgres::Type;
 use sea_orm::{ActiveEnum, DbBackend, DeriveActiveEnum, EnumIter, Schema};
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::{manager, prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -69,6 +69,7 @@ impl MigrationTrait for Migration {
       .take(16)
       .collect::<Vec<u8>>();
 
+    // insert admin user
     let admin_username = "admin";
     let admin_name = "Admin";
     let admin_password = "admin";
@@ -92,10 +93,76 @@ impl MigrationTrait for Migration {
         admin_name.into(),
         admin_email.into(),
         "0927146787".into(),
-        salt.into(),
+        salt.clone().into(),
         admin_hashed_pw.into(),
         SimpleExpr::Custom("'admin'::user_role".to_string()),
         SimpleExpr::Custom("'active'::user_status".to_string()),
+      ])
+      .to_owned();
+
+    manager.exec_stmt(insert_stmt).await?;
+
+    // insert manager user
+    let manager_username = "manager";
+    let manager_name = "Manager";
+    let manager_password = "manager";
+    let manager_email = "long.lh224873@sis.hust.edu.vn";
+    let manager_hashed_pw = argon2::hash_raw(manager_password.as_bytes(), &salt, &config).unwrap();
+
+    let insert_stmt = Query::insert()
+      .into_table(Users::Table)
+      .columns(vec![
+        Users::Username,
+        Users::Name,
+        Users::Email,
+        Users::Phone,
+        Users::Salt,
+        Users::Password,
+        Users::Role,
+        Users::Status,
+      ])
+      .values_panic([
+        manager_username.into(),
+        manager_name.into(),
+        manager_email.into(),
+        "0927146787".into(),
+        salt.clone().into(),
+        manager_hashed_pw.into(),
+        SimpleExpr::Custom("'manager'::user_role".to_string()),
+        SimpleExpr::Custom("'active'::user_status".to_string()),
+      ])
+      .to_owned();
+
+    manager.exec_stmt(insert_stmt).await?;
+
+    // insert inactive tenant user
+    let tenant_username = "tenant";
+    let tenant_name = "Tenant";
+    let tenant_password = "tenant";
+    let tenant_email = "thebomberman9999@gmail.com";
+    let tenant_hashed_pw = argon2::hash_raw(tenant_password.as_bytes(), &salt, &config).unwrap();
+
+    let insert_stmt = Query::insert()
+      .into_table(Users::Table)
+      .columns(vec![
+        Users::Username,
+        Users::Name,
+        Users::Email,
+        Users::Phone,
+        Users::Salt,
+        Users::Password,
+        Users::Role,
+        Users::Status,
+      ])
+      .values_panic([
+        tenant_username.into(),
+        tenant_name.into(),
+        tenant_email.into(),
+        "0927146787".into(),
+        salt.clone().into(),
+        tenant_hashed_pw.into(),
+        SimpleExpr::Custom("'tenant'::user_role".to_string()),
+        SimpleExpr::Custom("'inactive'::user_status".to_string()),
       ])
       .to_owned();
 

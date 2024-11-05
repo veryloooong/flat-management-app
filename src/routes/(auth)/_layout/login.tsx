@@ -57,7 +57,7 @@ function LoginPage(): JSX.Element {
         // handle login error
         toast({
           title: 'Đăng nhập thất bại',
-          description: 'Vui lòng kiểm tra lại thông tin đăng nhập',
+          description: 'Vui lòng kiểm tra lại thông tin đăng nhập hoặc thử lại sau',
           duration: 5000,
           variant: 'destructive'
         })

@@ -8,6 +8,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
+  admin,
   authenticate::{self, validate_token::*},
   user,
 };
@@ -16,6 +17,7 @@ pub mod tags {
   pub const AUTH: &str = "Authentication";
   pub const USER: &str = "User";
   pub const MISC: &str = "Miscellaneous";
+  pub const ADMIN: &str = "Admin";
 }
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
@@ -25,7 +27,8 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     tags(
       (name = tags::AUTH, description = "Authentication related endpoints"),
       (name = tags::USER, description = "User related endpoints"),
-      (name = tags::MISC, description = "Other endpoints")
+      (name = tags::MISC, description = "Other endpoints"),
+      (name = tags::ADMIN, description = "Admin only endpoints"),
     )
   )]
   struct ApiDoc;
@@ -57,10 +60,18 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
       validate_request,
     ));
 
+  let admin_router = OpenApiRouter::new()
+    .routes(routes!(admin::get_all_users))
+    .layer(middleware::from_fn_with_state(
+      state.clone(),
+      validate_request,
+    ));
+
   let (auth_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
     .routes(routes!(health_check))
     .nest("/auth", authenticate_router)
     .nest("/user", user_router)
+    .nest("/admin", admin_router)
     .split_for_parts();
 
   Router::new()

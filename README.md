@@ -31,17 +31,18 @@ git clone https://github.com/veryloooong/flat-management-app && cd flat-manageme
 ```bash
 npm install
 cargo install sea-orm-cli # for db migration
+cargo install --locked bacon # for watching
 ```
 - Make an `.env` file, with keys following the `.env.example` file.
 - Initiate database migration.
 ```bash
-sea migrate refresh
+sea-orm-cli migrate refresh
 ```
 - Run in dev mode: `npm run tauri dev`
 - Build for prod: `npm run tauri build`
 - Run the webserver:
   - Go to webserver directory: `cd webserver`
-  - Run the server: `cargo run`
+  - Run the server: `bacon run`
 
 ## Credits
 
