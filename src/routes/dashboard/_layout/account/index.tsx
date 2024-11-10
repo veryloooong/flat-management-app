@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 function AccountPage(): JSX.Element {
   const userInfo = Route.useLoaderData();
@@ -53,8 +53,15 @@ function AccountPage(): JSX.Element {
 
 export const Route = createFileRoute('/dashboard/_layout/account/')({
   component: AccountPage,
-  // loader: async () => await getBasicUserInfo(),
-  loader: ({ context: { userInfo } }) => {
+  loader: async ({ context }) => {
+    const userInfo = await context.authentication.getUserInfo();
+
+    if (!userInfo) {
+      throw redirect({
+        to: '/login'
+      })
+    }
+
     return userInfo;
   }
 })

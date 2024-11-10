@@ -1,9 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { Fragment } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import snakecaseKeys from 'snakecase-keys'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -15,22 +16,16 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { PasswordInput } from '@/components/ui/password-input'
 import { invoke } from '@tauri-apps/api/core'
+import { toast } from '@/hooks/use-toast'
+import { useAuth } from '@/lib/auth'
 
 const updateUserInfoSchema = z
   .object({
     name: z.string().min(2, 'Tên không hợp lệ'),
     email: z.string().email('Email không hợp lệ'),
     phone: z.string(),
-    type: z.enum(['manager', 'tenant']),
   })
 
 const updatePasswordSchema = z
@@ -67,6 +62,8 @@ const updatePasswordSchema = z
 
 function AccountEditPage(): JSX.Element {
   const userInfo = Route.useLoaderData();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const updateUserInfoForm = useForm<z.infer<typeof updateUserInfoSchema>>({
     resolver: zodResolver(updateUserInfoSchema),
@@ -74,7 +71,6 @@ function AccountEditPage(): JSX.Element {
       name: userInfo.name,
       email: userInfo.email,
       phone: userInfo.phone,
-      type: userInfo.role === 'admin' ? undefined : userInfo.role,
     },
   })
 
@@ -87,25 +83,53 @@ function AccountEditPage(): JSX.Element {
     }
   })
 
-  async function onSubmitUpdateUserInfoForm(data: z.infer<typeof updateUserInfoSchema>) {
-    console.log(data)
-    invoke('update_user_info', data)
-      .then((res) => {
-        console.log(res)
+  function onSubmitUpdateUserInfoForm(data: z.infer<typeof updateUserInfoSchema>) {
+    invoke('update_user_info', { info: snakecaseKeys(data) })
+      .then((_) => {
+        toast({
+          title: 'Cập nhật thông tin thành công',
+          description: 'Thông tin tài khoản của bạn đã được cập nhật',
+          duration: 5000,
+        })
       })
-      .catch((err) => {
-        console.error(err)
+      .catch((_) => {
+        toast({
+          title: 'Cập nhật thông tin thất bại',
+          description: 'Vui lòng thử lại sau',
+          duration: 5000,
+        })
       })
   }
 
   function onSubmitUpdatePasswordForm(data: z.infer<typeof updatePasswordSchema>) {
-    console.log(data)
-    invoke('update_password', data)
-      .then((res) => {
-        console.log(res)
+    invoke('update_password', { passwordInfo: snakecaseKeys(data) })
+      .then((_) => {
+        toast({
+          title: 'Cập nhật mật khẩu thành công',
+          description: 'Mật khẩu của bạn đã được cập nhật. Vui lòng đăng nhập lại',
+          duration: 5000,
+        })
+
+        setTimeout(() => {
+          logout()
+            .then(() => {
+              navigate({
+                to: '/login',
+              })
+            })
+            .catch((_) => {
+              navigate({
+                to: '/login',
+              })
+            })
+        }, 5000)
       })
-      .catch((err) => {
-        console.error(err)
+      .catch((_) => {
+        toast({
+          title: 'Cập nhật mật khẩu thất bại',
+          description: 'Vui lòng thử lại sau',
+          duration: 5000,
+        })
       })
   }
 
@@ -162,33 +186,6 @@ function AccountEditPage(): JSX.Element {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="type"
-                    control={updateUserInfoForm.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Loại tài khoản <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Chọn loại tài khoản" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="manager">Quản lý</SelectItem>
-                            <SelectItem value="tenant">Hộ dân</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage>{updateUserInfoForm.formState.errors.type?.message}</FormMessage>
-                      </FormItem>
-                    )}
-                  />
-
                 </div>
                 <div className="flex justify-end mt-4">
                   <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
@@ -264,8 +261,15 @@ function AccountEditPage(): JSX.Element {
 
 export const Route = createFileRoute('/dashboard/_layout/account/edit')({
   component: AccountEditPage,
-  loader: ({ context: { userInfo } }) => {
+  loader: async ({ context }) => {
+    const userInfo = await context.authentication.getUserInfo();
+
+    if (!userInfo) {
+      throw redirect({
+        to: '/login'
+      })
+    }
+
     return userInfo;
   }
-
 })

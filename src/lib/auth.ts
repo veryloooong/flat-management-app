@@ -5,7 +5,16 @@ import { invoke } from "@tauri-apps/api/core";
 import { BasicUserInfo } from "./user";
 
 export const useAuth = () => {
-  const checkAuthentication = async () => {
+  const isAuthenticated = async () => {
+    try {
+      const res = await invoke('check_token');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  const getUserInfo = async () => {
     try {
       const res = await invoke('get_user_info');
       return res as BasicUserInfo;
@@ -35,7 +44,7 @@ export const useAuth = () => {
     }
   }
 
-  return { isAuthenticated: checkAuthentication, login, logout }
+  return { isAuthenticated, getUserInfo, login, logout }
 }
 
 export type AuthContext = ReturnType<typeof useAuth>;

@@ -1,5 +1,5 @@
 pub(crate) mod info;
-mod refresh_token;
+pub mod tokens;
 mod types;
 
 use crate::entities::sea_orm_active_enums::*;

@@ -72,8 +72,6 @@ export const Route = createFileRoute('/dashboard/_layout')({
     if (!userInfo) {
       throw redirect({ to: '/login' });
     }
-
-    return { userInfo };
   },
   component: DashboardLayoutPage,
 })

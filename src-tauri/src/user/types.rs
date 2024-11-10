@@ -64,7 +64,6 @@ pub(crate) struct AccountRecoveryInfo {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct UpdateUserInfo {
   pub name: String,
-  pub username: String,
   pub email: String,
   pub phone: String,
 }

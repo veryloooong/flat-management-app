@@ -142,7 +142,6 @@ pub async fn update_user_info(
   let mut user: users::ActiveModel = user.into();
 
   user.name = Set(info.name);
-  user.username = Set(info.username);
   user.email = Set(info.email);
   user.phone = Set(info.phone);
 

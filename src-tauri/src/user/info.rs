@@ -4,7 +4,7 @@ use tokio::sync::Mutex;
 use crate::{user::types::BasicAccountInfo, AppState};
 
 use super::{
-  refresh_token::get_new_access_token,
+  tokens::get_new_access_token,
   types::{UpdatePasswordInfo, UpdateUserInfo},
 };
 

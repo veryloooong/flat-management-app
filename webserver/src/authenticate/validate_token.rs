@@ -59,6 +59,28 @@ pub async fn validate_request(
   return Ok(next.run(req).await);
 }
 
+/// Check if the token is valid.
+#[utoipa::path(
+  get,
+  path = "/check",
+  summary = "Check if the token is valid",
+  tag = tags::MISC,
+  responses(
+    (status = OK, description = "Token is valid"),
+    (status = UNAUTHORIZED, description = "Invalid token", body = AccessTokenError),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+#[allow(unused_variables)]
+pub async fn check_token(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+) -> StatusCode {
+  StatusCode::OK
+}
+
 /// Grant a new access token by providing a refresh token.
 #[utoipa::path(
   post,
@@ -137,12 +159,14 @@ pub async fn grant_new_access_token(
     ));
   }
 
+  let access_token_expiry = Duration::from_mins(15);
+
   let access_token_claims = AccessTokenClaims {
     username: user.username,
     id: user.id,
     role: user.role,
   };
-  let claims = Claims::with_custom_claims(access_token_claims, Duration::from_mins(15));
+  let claims = Claims::with_custom_claims(access_token_claims, access_token_expiry);
   let access_token = jwt_access_secret.authenticate(claims).map_err(|e| {
     log::error!("Error creating access token: {:?}", e);
     server_error
@@ -151,7 +175,7 @@ pub async fn grant_new_access_token(
   let response = TokenResponse {
     access_token,
     refresh_token: req.refresh_token,
-    expires_in: 15 * 60,
+    expires_in: access_token_expiry.as_secs() as i64,
     token_type: "Bearer".to_string(),
   };
 

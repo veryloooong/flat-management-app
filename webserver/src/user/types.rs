@@ -18,7 +18,6 @@ pub struct BasicUserInfo {
 #[sea_orm(entity = "Users")]
 pub struct UpdateUserInfo {
   pub name: String,
-  pub username: String,
   pub email: String,
   pub phone: String,
 }
