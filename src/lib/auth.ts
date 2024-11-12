@@ -7,7 +7,16 @@ import { BasicUserInfo } from "./user";
 export const useAuth = () => {
   const isAuthenticated = async () => {
     try {
-      const res = await invoke('check_token');
+      await invoke('check_token');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  const isAdmin = async () => {
+    try {
+      await invoke('check_admin');
       return true;
     } catch (error) {
       return false;
@@ -18,7 +27,6 @@ export const useAuth = () => {
     try {
       const res = await invoke('get_user_info');
       return res as BasicUserInfo;
-      // return res as boolean;
     } catch (error) {
       return undefined;
     }
@@ -40,11 +48,11 @@ export const useAuth = () => {
         to: '/login'
       })
     } catch (error) {
-      throw error;
+      // throw error;
     }
   }
 
-  return { isAuthenticated, getUserInfo, login, logout }
+  return { isAuthenticated, getUserInfo, login, logout, isAdmin }
 }
 
 export type AuthContext = ReturnType<typeof useAuth>;

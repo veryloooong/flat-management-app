@@ -1,10 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 function DashboardPage(): JSX.Element {
   return (
-    <div>
+    <div className="w-screen">
       <h1>Dashboard</h1>
       <p>Welcome</p>
+      <div>
+        <Link to="/dashboard/admin/accounts">
+          <Button>Quản lý các tài khoản</Button>
+        </Link>
+      </div>
     </div>
   )
 }

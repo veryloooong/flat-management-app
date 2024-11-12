@@ -5,6 +5,7 @@ use reqwest::Client as ReqwestClient;
 use tauri::Manager;
 use tokio::sync::Mutex;
 
+mod admin;
 mod entities;
 mod user;
 
@@ -57,6 +58,7 @@ async fn main() {
       user::info::update_user_info,
       user::info::update_password,
       user::tokens::check_token,
+      admin::check_admin,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

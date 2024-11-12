@@ -12,6 +12,8 @@ pub struct BasicUserInfo {
   pub phone: String,
   #[schema(value_type = String, examples("manager", "tenant"))]
   pub role: UserRole,
+  #[schema(value_type = String, examples("active", "inactive"))]
+  pub status: UserStatus,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, FromQueryResult, DerivePartialModel, ToSchema)]

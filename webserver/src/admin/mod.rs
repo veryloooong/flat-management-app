@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 use tags::ADMIN;
 
+/// Get the list of all users.
 #[utoipa::path(
   get,
   path = "/users",
@@ -57,4 +58,40 @@ pub async fn get_all_users(
     HeaderMap::new(),
     serde_json::to_string(&users).unwrap(),
   ))
+}
+
+/// Check if the user is an admin.
+#[utoipa::path(
+  get,
+  path = "/check",
+  tag = ADMIN,
+  responses(
+    (status = OK, description = "Admin check successful"),
+    (status = UNAUTHORIZED, description = "Invalid token"),
+    (status = FORBIDDEN, description = "Forbidden"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn check_admin(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+) -> StatusCode {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return StatusCode::UNAUTHORIZED;
+    }
+  };
+
+  let user_role = claims.custom.role;
+
+  if user_role != UserRole::Admin {
+    return StatusCode::FORBIDDEN;
+  }
+
+  StatusCode::OK
 }
