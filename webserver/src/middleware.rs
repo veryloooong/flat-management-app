@@ -54,3 +54,21 @@ pub async fn validate_request(
 
   return Ok(next.run(req).await);
 }
+
+pub async fn admin_middleware(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+  req: Request,
+  next: Next,
+) {
+  todo!();
+}
+
+pub async fn manager_middleware(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+  req: Request,
+  next: Next,
+) {
+  todo!();
+}

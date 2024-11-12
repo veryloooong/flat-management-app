@@ -113,7 +113,7 @@ pub(crate) async fn account_login(
   );
 
   // expiry times
-  let access_token_expiry = Duration::from_mins(1);
+  let access_token_expiry = Duration::from_mins(15);
   let refresh_token_expiry = Duration::from_hours(24);
 
   // Create JWT
