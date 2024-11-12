@@ -18,6 +18,7 @@ pub mod tags {
   pub const USER: &str = "User";
   pub const MISC: &str = "Miscellaneous";
   pub const ADMIN: &str = "Admin";
+  pub const MANAGER: &str = "Manager";
 }
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
@@ -26,9 +27,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     modifiers(&SecurityAddon),
     tags(
       (name = tags::AUTH, description = "Authentication related endpoints"),
+      (name = tags::MANAGER, description = "Management related endpoints"),
       (name = tags::USER, description = "User related endpoints"),
-      (name = tags::MISC, description = "Other endpoints"),
       (name = tags::ADMIN, description = "Admin only endpoints"),
+      (name = tags::MISC, description = "Other endpoints"),
     )
   )]
   struct ApiDoc;
@@ -58,7 +60,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(check_token))
     .layer(middleware::from_fn_with_state(
       state.clone(),
-      validate_request,
+      crate::middleware::validate_request,
     ));
 
   let admin_router = OpenApiRouter::new()
@@ -66,7 +68,14 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(admin::check_admin))
     .layer(middleware::from_fn_with_state(
       state.clone(),
-      validate_request,
+      crate::middleware::validate_request,
+    ));
+
+  let manager_router = OpenApiRouter::new()
+    .routes(routes!(crate::manager::get_fees))
+    .layer(middleware::from_fn_with_state(
+      state.clone(),
+      crate::middleware::validate_request,
     ));
 
   let (auth_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
@@ -74,6 +83,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .nest("/auth", authenticate_router)
     .nest("/user", user_router)
     .nest("/admin", admin_router)
+    .nest("/manager", manager_router)
     .split_for_parts();
 
   Router::new()

@@ -7,3 +7,11 @@ export type BasicUserInfo = {
   role: 'admin' | 'manager' | 'tenant',
   status: 'active' | 'inactive',
 }
+
+export type FeeInfo = {
+  id: number,
+  name: string,
+  amount: number,
+  // type: 'monthly' | 'quarterly' | 'yearly',
+  // status: 'active' | 'inactive',
+}

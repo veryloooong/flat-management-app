@@ -1,3 +1,5 @@
+use sea_orm::FromQueryResult;
+
 use crate::prelude::*;
 
 /// Represents username / password for login
@@ -64,4 +66,15 @@ pub(crate) struct RefreshTokenClaims {
   pub id: i32,
   pub role: UserRole,
   pub refresh_token_version: i32,
+}
+
+#[derive(
+  Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema, DerivePartialModel, FromQueryResult,
+)]
+#[serde(rename_all = "snake_case")]
+#[sea_orm(entity = "Fees")]
+pub struct FeesInfo {
+  pub id: i32,
+  pub name: String,
+  pub amount: i64,
 }

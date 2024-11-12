@@ -1,4 +1,3 @@
-pub mod types;
 pub mod validate_token;
 
 use crate::prelude::*;

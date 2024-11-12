@@ -1,10 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 
-import { BasicUserInfo } from './types'
+import { BasicUserInfo, FeeInfo } from './types'
+
+const CheckboxCell = () => {
+  return <Checkbox />
+}
 
 // TODO: Add editable columns
-export const columns: ColumnDef<BasicUserInfo>[] = [
+export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
   {
     accessorKey: 'name',
     header: 'Họ và tên',
@@ -28,5 +32,17 @@ export const columns: ColumnDef<BasicUserInfo>[] = [
   {
     accessorKey: 'status',
     header: 'Đã kích hoạt',
+    cell: CheckboxCell,
+  }
+]
+
+export const feeColumns: ColumnDef<FeeInfo>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Tên',
+  },
+  {
+    accessorKey: 'amount',
+    header: 'Số tiền',
   }
 ]

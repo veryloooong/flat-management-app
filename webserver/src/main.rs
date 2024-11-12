@@ -1,8 +1,11 @@
 mod admin;
 mod authenticate;
 mod entities;
+mod manager;
+mod middleware;
 pub mod prelude;
 mod router;
+pub mod types;
 mod user;
 
 use crate::prelude::*;

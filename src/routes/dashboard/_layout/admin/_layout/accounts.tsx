@@ -1,18 +1,25 @@
 import { BasicUserInfo } from '@/lib/types';
 import { createFileRoute } from '@tanstack/react-router'
 import { invoke } from '@tauri-apps/api/core'
-import { columns } from '@/lib/columns';
+import { userInfoColumns } from '@/lib/columns';
 import { DataTable } from '@/components/ui/data-table';
+import { Button } from '@/components/ui/button';
 
 function AdminAccountsPage(): JSX.Element {
   const users = Route.useLoaderData();
 
   return (
     <div className="w-screen pt-8">
-      <h1 className='text-center'>Các tài khoản người dùng</h1>
+      <h1 className="text-center">Các tài khoản người dùng</h1>
 
-      <div className="w-4/5 mx-auto mt-8">
-        <DataTable columns={columns} data={users} />
+      <div className="w-4/5 mx-auto mt-8 flex flex-col gap-4">
+        <DataTable columns={userInfoColumns} data={users} />
+        <Button
+          className="w-fit self-end bg-main-palette-4 hover:bg-main-palette-5"
+          onClick={() => console.log("TODO update account activation status")}
+        >
+          Cập nhật
+        </Button>
       </div>
     </div>
   )

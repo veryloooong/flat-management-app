@@ -10,6 +10,9 @@ function DashboardPage(): JSX.Element {
         <Link to="/dashboard/admin/accounts">
           <Button>Quản lý các tài khoản</Button>
         </Link>
+        <Link to="/dashboard/fees">
+          <Button>Quản lý các khoản thu</Button>
+        </Link>
       </div>
     </div>
   )

@@ -20,6 +20,7 @@ import { Route as DashboardLayoutIndexImport } from './routes/dashboard/_layout/
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout/login'
+import { Route as DashboardLayoutFeesIndexImport } from './routes/dashboard/_layout/fees/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
 import { Route as DashboardLayoutAdminLayoutImport } from './routes/dashboard/_layout/admin/_layout'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
@@ -81,6 +82,11 @@ const authLayoutPasswordResetRoute = authLayoutPasswordResetImport.update({
 const authLayoutLoginRoute = authLayoutLoginImport.update({
   path: '/login',
   getParentRoute: () => authLayoutRoute,
+} as any)
+
+const DashboardLayoutFeesIndexRoute = DashboardLayoutFeesIndexImport.update({
+  path: '/fees/',
+  getParentRoute: () => DashboardLayoutRoute,
 } as any)
 
 const DashboardLayoutAccountIndexRoute =
@@ -204,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutAccountIndexImport
       parentRoute: typeof DashboardLayoutImport
     }
+    '/dashboard/_layout/fees/': {
+      id: '/dashboard/_layout/fees/'
+      path: '/fees'
+      fullPath: '/dashboard/fees'
+      preLoaderRoute: typeof DashboardLayoutFeesIndexImport
+      parentRoute: typeof DashboardLayoutImport
+    }
     '/dashboard/_layout/admin/_layout/accounts': {
       id: '/dashboard/_layout/admin/_layout/accounts'
       path: '/accounts'
@@ -273,6 +286,7 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
+  DashboardLayoutFeesIndexRoute: typeof DashboardLayoutFeesIndexRoute
 }
 
 const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
@@ -280,6 +294,7 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
+  DashboardLayoutFeesIndexRoute: DashboardLayoutFeesIndexRoute,
 }
 
 const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
@@ -308,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
+  '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
 }
 
@@ -320,6 +336,7 @@ export interface FileRoutesByTo {
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
+  '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
 }
 
@@ -337,6 +354,7 @@ export interface FileRoutesById {
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
   '/dashboard/_layout/admin/_layout': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
+  '/dashboard/_layout/fees/': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/_layout/admin/_layout/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
 }
 
@@ -352,6 +370,7 @@ export interface FileRouteTypes {
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/account'
+    | '/dashboard/fees'
     | '/dashboard/admin/accounts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -363,6 +382,7 @@ export interface FileRouteTypes {
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/account'
+    | '/dashboard/fees'
     | '/dashboard/admin/accounts'
   id:
     | '__root__'
@@ -378,6 +398,7 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/admin'
     | '/dashboard/_layout/admin/_layout'
     | '/dashboard/_layout/account/'
+    | '/dashboard/_layout/fees/'
     | '/dashboard/_layout/admin/_layout/accounts'
   fileRoutesById: FileRoutesById
 }
@@ -439,7 +460,8 @@ export const routeTree = rootRoute
         "/dashboard/_layout/",
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
-        "/dashboard/_layout/account/"
+        "/dashboard/_layout/account/",
+        "/dashboard/_layout/fees/"
       ]
     },
     "/_layout/login": {
@@ -478,6 +500,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/_layout/account/": {
       "filePath": "dashboard/_layout/account/index.tsx",
+      "parent": "/dashboard/_layout"
+    },
+    "/dashboard/_layout/fees/": {
+      "filePath": "dashboard/_layout/fees/index.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/admin/_layout/accounts": {

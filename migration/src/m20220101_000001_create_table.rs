@@ -1,6 +1,6 @@
 use extension::postgres::Type;
 use sea_orm::{ActiveEnum, DbBackend, DeriveActiveEnum, EnumIter, Schema};
-use sea_orm_migration::{manager, prelude::*, schema::*};
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
