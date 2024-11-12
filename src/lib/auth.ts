@@ -2,7 +2,7 @@
 
 import { redirect } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
-import { BasicUserInfo } from "./user";
+import { BasicUserInfo } from "@/lib/types";
 
 export const useAuth = () => {
   const isAuthenticated = async () => {

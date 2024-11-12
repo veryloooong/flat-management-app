@@ -1,4 +1,4 @@
-use super::UserRole;
+use super::{UserRole, UserStatus};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -27,6 +27,7 @@ pub(crate) struct BasicAccountInfo {
   pub email: String,
   pub phone: String,
   pub role: UserRole,
+  pub status: UserStatus,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

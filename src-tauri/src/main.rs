@@ -59,6 +59,7 @@ async fn main() {
       user::info::update_password,
       user::tokens::check_token,
       admin::check_admin,
+      admin::get_all_users
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

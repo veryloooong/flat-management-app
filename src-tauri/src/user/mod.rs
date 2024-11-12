@@ -1,6 +1,6 @@
 pub(crate) mod info;
 pub mod tokens;
-mod types;
+pub mod types;
 
 use crate::entities::sea_orm_active_enums::*;
 use crate::AppState;

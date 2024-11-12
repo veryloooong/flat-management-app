@@ -29,27 +29,52 @@ pub async fn get_new_access_token(
 #[tauri::command]
 pub async fn check_token<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), String> {
   let state = app.state::<Mutex<AppState>>();
-  let state = state.lock().await;
-  let server_url = &state.server_url;
-  let client = &state.client;
-  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let mut state = state.lock().await;
 
   log::debug!("Checking token");
 
-  let response = client
-    .get(format!("{}/user/check", server_url))
-    .bearer_auth(access_token)
-    .send()
-    .await
-    .map_err(|e| {
-      log::error!("Failed to send check token request: {}", e);
-      "Failed to send check token request".to_string()
-    })?;
+  // loop to get a new access token if the current one is invalid
+  loop {
+    let server_url = &state.server_url;
+    let client = &state.client;
+    let access_token = state.access_token.clone().ok_or("Not logged in")?;
+    let refresh_token = state.refresh_token.clone().ok_or("Not logged in")?;
 
-  if !response.status().is_success() {
-    log::error!("Failed to check token: {:?}", response);
-    return Err("Failed to check token".to_string());
+    let response = client
+      .get(format!("{}/user/check", server_url))
+      .bearer_auth(access_token)
+      .send()
+      .await
+      .map_err(|e| {
+        log::error!("Failed to send check token request: {}", e);
+        "Failed to send check token request".to_string()
+      })?;
+
+    if response.status().is_success() {
+      break;
+    }
+
+    log::warn!("Token is invalid, getting a new one");
+
+    let new_token = get_new_access_token(client, server_url, &refresh_token).await?;
+
+    state.access_token = Some(new_token.access_token.clone());
+    state.refresh_token = Some(new_token.refresh_token.clone());
   }
+  // let response = client
+  //   .get(format!("{}/user/check", server_url))
+  //   .bearer_auth(access_token)
+  //   .send()
+  //   .await
+  //   .map_err(|e| {
+  //     log::error!("Failed to send check token request: {}", e);
+  //     "Failed to send check token request".to_string()
+  //   })?;
+
+  // if !response.status().is_success() {
+  //   log::error!("Failed to check token: {:?}", response);
+  //   return Err("Failed to check token".to_string());
+  // }
 
   Ok(())
 }
