@@ -1,3 +1,4 @@
+pub mod recover_password;
 pub mod validate_token;
 
 use crate::prelude::*;

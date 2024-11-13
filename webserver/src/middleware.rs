@@ -60,8 +60,48 @@ pub async fn admin_middleware(
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   req: Request,
   next: Next,
-) {
-  todo!();
+) -> Result<impl IntoResponse, impl IntoResponse> {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  let invalid_token_error = AccessTokenError {
+    error: "invalid_token".to_string(),
+    error_description: "invalid token".to_string(),
+  };
+
+  let mut response_headers = HeaderMap::new();
+
+  response_headers.append(
+    header::WWW_AUTHENTICATE,
+    serde_json::to_string(&invalid_token_error)
+      .unwrap()
+      .parse()
+      .unwrap(),
+  );
+
+  response_headers.append(header::CONTENT_TYPE, "application/json".parse().unwrap());
+
+  let token = bearer.token();
+
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(token, None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err((
+        StatusCode::UNAUTHORIZED,
+        response_headers,
+        json!(invalid_token_error).to_string(),
+      ))
+    }
+  };
+
+  if claims.custom.role != UserRole::Admin {
+    return Err((
+      StatusCode::UNAUTHORIZED,
+      response_headers,
+      json!(invalid_token_error).to_string(),
+    ));
+  }
+
+  return Ok(next.run(req).await);
 }
 
 pub async fn manager_middleware(
@@ -69,6 +109,46 @@ pub async fn manager_middleware(
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   req: Request,
   next: Next,
-) {
-  todo!();
+) -> Result<impl IntoResponse, impl IntoResponse> {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  let invalid_token_error = AccessTokenError {
+    error: "invalid_token".to_string(),
+    error_description: "invalid token".to_string(),
+  };
+
+  let mut response_headers = HeaderMap::new();
+
+  response_headers.append(
+    header::WWW_AUTHENTICATE,
+    serde_json::to_string(&invalid_token_error)
+      .unwrap()
+      .parse()
+      .unwrap(),
+  );
+
+  response_headers.append(header::CONTENT_TYPE, "application/json".parse().unwrap());
+
+  let token = bearer.token();
+
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(token, None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err((
+        StatusCode::UNAUTHORIZED,
+        response_headers,
+        json!(invalid_token_error).to_string(),
+      ))
+    }
+  };
+
+  if claims.custom.role == UserRole::Tenant {
+    return Err((
+      StatusCode::UNAUTHORIZED,
+      response_headers,
+      json!(invalid_token_error).to_string(),
+    ));
+  }
+
+  return Ok(next.run(req).await);
 }

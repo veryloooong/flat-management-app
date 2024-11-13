@@ -61,20 +61,6 @@ pub async fn check_token<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), Str
     state.access_token = Some(new_token.access_token.clone());
     state.refresh_token = Some(new_token.refresh_token.clone());
   }
-  // let response = client
-  //   .get(format!("{}/user/check", server_url))
-  //   .bearer_auth(access_token)
-  //   .send()
-  //   .await
-  //   .map_err(|e| {
-  //     log::error!("Failed to send check token request: {}", e);
-  //     "Failed to send check token request".to_string()
-  //   })?;
-
-  // if !response.status().is_success() {
-  //   log::error!("Failed to check token: {:?}", response);
-  //   return Err("Failed to check token".to_string());
-  // }
 
   Ok(())
 }

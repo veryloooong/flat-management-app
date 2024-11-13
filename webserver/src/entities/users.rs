@@ -26,6 +26,15 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+  #[sea_orm(has_many = "super::password_recovery_requests::Entity")]
+  PasswordRecoveryRequests,
+}
+
+impl Related<super::password_recovery_requests::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::PasswordRecoveryRequests.def()
+  }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

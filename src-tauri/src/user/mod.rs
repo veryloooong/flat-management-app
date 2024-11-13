@@ -42,8 +42,6 @@ pub(crate) async fn account_login<R: Runtime>(
       login_err.clone()
     })?;
 
-  log::debug!("Login successful, got tokens: {:?}", response);
-
   state.access_token = Some(response.access_token.clone());
   state.refresh_token = Some(response.refresh_token.clone());
 

@@ -51,6 +51,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
   let authenticate_router = OpenApiRouter::new()
     .routes(routes!(authenticate::account_login))
     .routes(routes!(authenticate::account_register))
+    .routes(routes!(authenticate::recover_password::recover_password))
     .routes(routes!(grant_new_access_token))
     .routes(routes!(authenticate::account_logout));
 
@@ -68,11 +69,23 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(admin::check_admin))
     .layer(middleware::from_fn_with_state(
       state.clone(),
+      crate::middleware::admin_middleware,
+    ))
+    .layer(middleware::from_fn_with_state(
+      state.clone(),
       crate::middleware::validate_request,
     ));
 
   let manager_router = OpenApiRouter::new()
-    .routes(routes!(crate::manager::get_fees))
+    .routes(routes!(
+      crate::manager::get_fees,
+      crate::manager::add_fee,
+      crate::manager::remove_fee
+    ))
+    .layer(middleware::from_fn_with_state(
+      state.clone(),
+      crate::middleware::manager_middleware,
+    ))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::validate_request,

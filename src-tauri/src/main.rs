@@ -7,6 +7,7 @@ use tokio::sync::Mutex;
 
 mod admin;
 mod entities;
+mod manager;
 mod user;
 
 #[tauri::command]
@@ -59,7 +60,10 @@ async fn main() {
       user::info::update_password,
       user::tokens::check_token,
       admin::check_admin,
-      admin::get_all_users
+      admin::get_all_users,
+      crate::manager::get_fees,
+      crate::manager::add_fee,
+      crate::manager::remove_fee
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

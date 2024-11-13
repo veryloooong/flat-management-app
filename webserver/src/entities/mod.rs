@@ -3,5 +3,6 @@
 pub mod prelude;
 
 pub mod fees;
+pub mod password_recovery_requests;
 pub mod sea_orm_active_enums;
 pub mod users;

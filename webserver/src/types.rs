@@ -59,6 +59,21 @@ pub(crate) struct AccessTokenClaims {
   pub role: UserRole,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, ToSchema)]
+pub enum RecoverPasswordMethod {
+  Email,
+  Phone,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
+pub(crate) struct RecoverPasswordInfo {
+  pub username: String,
+  #[schema(value_type = String, examples("email", "phone"))]
+  pub method: RecoverPasswordMethod,
+  pub email: Option<String>,
+  pub phone: Option<String>,
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) struct RefreshTokenClaims {
@@ -75,6 +90,12 @@ pub(crate) struct RefreshTokenClaims {
 #[sea_orm(entity = "Fees")]
 pub struct FeesInfo {
   pub id: i32,
+  pub name: String,
+  pub amount: i64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
+pub struct AddFeeInfo {
   pub name: String,
   pub amount: i64,
 }

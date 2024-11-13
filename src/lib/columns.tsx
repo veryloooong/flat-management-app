@@ -28,6 +28,17 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
   {
     accessorKey: 'role',
     header: 'Vai trò',
+    cell: (cell) => {
+      const role = cell.getValue() as string;
+
+      return (
+        <span>
+          {role === 'admin' ? 'Quản trị viên' :
+            role === 'manager' ? 'Quản lý' :
+              role === 'tenant' ? 'Người thuê' : 'Khách'}
+        </span>
+      )
+    }
   },
   {
     accessorKey: 'status',

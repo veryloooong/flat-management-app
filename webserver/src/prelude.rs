@@ -1,7 +1,7 @@
 //! Contains all the dependencies and imports that are used in the entire project.
 
 // Importing the necessary dependencies
-pub use axum::extract::{Request, State};
+pub use axum::extract::{Path, Request, State};
 pub use axum::http::{header, HeaderMap, StatusCode};
 pub use axum::middleware::Next;
 pub use axum::response::IntoResponse;
