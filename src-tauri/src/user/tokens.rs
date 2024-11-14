@@ -31,8 +31,6 @@ pub async fn check_token<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), Str
   let state = app.state::<Mutex<AppState>>();
   let mut state = state.lock().await;
 
-  log::debug!("Checking token");
-
   // loop to get a new access token if the current one is invalid
   loop {
     let server_url = &state.server_url;
@@ -53,8 +51,6 @@ pub async fn check_token<R: Runtime>(app: tauri::AppHandle<R>) -> Result<(), Str
     if response.status().is_success() {
       break;
     }
-
-    log::warn!("Token is invalid, getting a new one");
 
     let new_token = get_new_access_token(client, server_url, &refresh_token).await?;
 

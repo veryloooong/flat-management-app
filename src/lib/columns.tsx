@@ -2,6 +2,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 
 import { BasicUserInfo, FeeInfo } from './types'
+import { Link } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 
 const CheckboxCell = () => {
   return <Checkbox />
@@ -49,11 +51,56 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
 
 export const feeColumns: ColumnDef<FeeInfo>[] = [
   {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox checked={
+        table.getIsAllPageRowsSelected() ||
+        (table.getIsSomePageRowsSelected() && "indeterminate")
+      }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+  },
+  {
     accessorKey: 'name',
     header: 'Tên',
   },
   {
     accessorKey: 'amount',
     header: 'Số tiền',
+  },
+  {
+    accessorKey: 'collectFee',
+    header: 'Thu phí',
+    cell: () => {
+      return (
+        <Link to='/dashboard/manager/collect'>
+          <Button className='bg-main-palette-5 hover:bg-main-palette-6'>Thu phí</Button>
+        </Link>
+      )
+    }
+  },
+  {
+    accessorKey: 'getFeeInfo',
+    header: 'Thông tin',
+    cell: ({ row }) => {
+      const feeId = row.original.id.toString();
+
+      return (
+        <Link to='/dashboard/manager/info/$feeId' params={
+          { feeId }
+        }>
+          <Button className='bg-main-palette-5 hover:bg-main-palette-6'>Thông tin</Button>
+        </Link>
+      )
+    }
   }
 ]

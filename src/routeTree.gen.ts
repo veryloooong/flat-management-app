@@ -20,10 +20,13 @@ import { Route as DashboardLayoutIndexImport } from './routes/dashboard/_layout/
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout/login'
-import { Route as DashboardLayoutFeesIndexImport } from './routes/dashboard/_layout/fees/index'
+import { Route as DashboardLayoutManagerIndexImport } from './routes/dashboard/_layout/manager/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
+import { Route as DashboardLayoutManagerCollectImport } from './routes/dashboard/_layout/manager/collect'
+import { Route as DashboardLayoutManagerAddImport } from './routes/dashboard/_layout/manager/add'
 import { Route as DashboardLayoutAdminLayoutImport } from './routes/dashboard/_layout/admin/_layout'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
+import { Route as DashboardLayoutManagerInfoFeeIdImport } from './routes/dashboard/_layout/manager/info.$feeId'
 import { Route as DashboardLayoutAdminLayoutAccountsImport } from './routes/dashboard/_layout/admin/_layout/accounts'
 
 // Create Virtual Routes
@@ -84,16 +87,28 @@ const authLayoutLoginRoute = authLayoutLoginImport.update({
   getParentRoute: () => authLayoutRoute,
 } as any)
 
-const DashboardLayoutFeesIndexRoute = DashboardLayoutFeesIndexImport.update({
-  path: '/fees/',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
+const DashboardLayoutManagerIndexRoute =
+  DashboardLayoutManagerIndexImport.update({
+    path: '/manager/',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
 
 const DashboardLayoutAccountIndexRoute =
   DashboardLayoutAccountIndexImport.update({
     path: '/account/',
     getParentRoute: () => DashboardLayoutRoute,
   } as any)
+
+const DashboardLayoutManagerCollectRoute =
+  DashboardLayoutManagerCollectImport.update({
+    path: '/manager/collect',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
+
+const DashboardLayoutManagerAddRoute = DashboardLayoutManagerAddImport.update({
+  path: '/manager/add',
+  getParentRoute: () => DashboardLayoutRoute,
+} as any)
 
 const DashboardLayoutAdminLayoutRoute = DashboardLayoutAdminLayoutImport.update(
   {
@@ -108,6 +123,12 @@ const DashboardLayoutAccountEditRoute = DashboardLayoutAccountEditImport.update(
     getParentRoute: () => DashboardLayoutRoute,
   } as any,
 )
+
+const DashboardLayoutManagerInfoFeeIdRoute =
+  DashboardLayoutManagerInfoFeeIdImport.update({
+    path: '/manager/info/$feeId',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
 
 const DashboardLayoutAdminLayoutAccountsRoute =
   DashboardLayoutAdminLayoutAccountsImport.update({
@@ -203,6 +224,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutAdminLayoutImport
       parentRoute: typeof DashboardLayoutAdminRoute
     }
+    '/dashboard/_layout/manager/add': {
+      id: '/dashboard/_layout/manager/add'
+      path: '/manager/add'
+      fullPath: '/dashboard/manager/add'
+      preLoaderRoute: typeof DashboardLayoutManagerAddImport
+      parentRoute: typeof DashboardLayoutImport
+    }
+    '/dashboard/_layout/manager/collect': {
+      id: '/dashboard/_layout/manager/collect'
+      path: '/manager/collect'
+      fullPath: '/dashboard/manager/collect'
+      preLoaderRoute: typeof DashboardLayoutManagerCollectImport
+      parentRoute: typeof DashboardLayoutImport
+    }
     '/dashboard/_layout/account/': {
       id: '/dashboard/_layout/account/'
       path: '/account'
@@ -210,11 +245,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutAccountIndexImport
       parentRoute: typeof DashboardLayoutImport
     }
-    '/dashboard/_layout/fees/': {
-      id: '/dashboard/_layout/fees/'
-      path: '/fees'
-      fullPath: '/dashboard/fees'
-      preLoaderRoute: typeof DashboardLayoutFeesIndexImport
+    '/dashboard/_layout/manager/': {
+      id: '/dashboard/_layout/manager/'
+      path: '/manager'
+      fullPath: '/dashboard/manager'
+      preLoaderRoute: typeof DashboardLayoutManagerIndexImport
       parentRoute: typeof DashboardLayoutImport
     }
     '/dashboard/_layout/admin/_layout/accounts': {
@@ -223,6 +258,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/accounts'
       preLoaderRoute: typeof DashboardLayoutAdminLayoutAccountsImport
       parentRoute: typeof DashboardLayoutAdminLayoutImport
+    }
+    '/dashboard/_layout/manager/info/$feeId': {
+      id: '/dashboard/_layout/manager/info/$feeId'
+      path: '/manager/info/$feeId'
+      fullPath: '/dashboard/manager/info/$feeId'
+      preLoaderRoute: typeof DashboardLayoutManagerInfoFeeIdImport
+      parentRoute: typeof DashboardLayoutImport
     }
   }
 }
@@ -285,16 +327,22 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutIndexRoute: typeof DashboardLayoutIndexRoute
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
+  DashboardLayoutManagerAddRoute: typeof DashboardLayoutManagerAddRoute
+  DashboardLayoutManagerCollectRoute: typeof DashboardLayoutManagerCollectRoute
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
-  DashboardLayoutFeesIndexRoute: typeof DashboardLayoutFeesIndexRoute
+  DashboardLayoutManagerIndexRoute: typeof DashboardLayoutManagerIndexRoute
+  DashboardLayoutManagerInfoFeeIdRoute: typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
 const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutIndexRoute: DashboardLayoutIndexRoute,
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
+  DashboardLayoutManagerAddRoute: DashboardLayoutManagerAddRoute,
+  DashboardLayoutManagerCollectRoute: DashboardLayoutManagerCollectRoute,
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
-  DashboardLayoutFeesIndexRoute: DashboardLayoutFeesIndexRoute,
+  DashboardLayoutManagerIndexRoute: DashboardLayoutManagerIndexRoute,
+  DashboardLayoutManagerInfoFeeIdRoute: DashboardLayoutManagerInfoFeeIdRoute,
 }
 
 const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
@@ -322,9 +370,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
+  '/dashboard/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
-  '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
+  '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
+  '/dashboard/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -335,9 +386,12 @@ export interface FileRoutesByTo {
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
+  '/dashboard/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
-  '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
+  '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
+  '/dashboard/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
 export interface FileRoutesById {
@@ -353,9 +407,12 @@ export interface FileRoutesById {
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
   '/dashboard/_layout/admin/_layout': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/_layout/manager/add': typeof DashboardLayoutManagerAddRoute
+  '/dashboard/_layout/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
-  '/dashboard/_layout/fees/': typeof DashboardLayoutFeesIndexRoute
+  '/dashboard/_layout/manager/': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/_layout/admin/_layout/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
+  '/dashboard/_layout/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
 export interface FileRouteTypes {
@@ -369,9 +426,12 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
+    | '/dashboard/manager/add'
+    | '/dashboard/manager/collect'
     | '/dashboard/account'
-    | '/dashboard/fees'
+    | '/dashboard/manager'
     | '/dashboard/admin/accounts'
+    | '/dashboard/manager/info/$feeId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -381,9 +441,12 @@ export interface FileRouteTypes {
     | '/register'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
+    | '/dashboard/manager/add'
+    | '/dashboard/manager/collect'
     | '/dashboard/account'
-    | '/dashboard/fees'
+    | '/dashboard/manager'
     | '/dashboard/admin/accounts'
+    | '/dashboard/manager/info/$feeId'
   id:
     | '__root__'
     | '/'
@@ -397,9 +460,12 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/account/edit'
     | '/dashboard/_layout/admin'
     | '/dashboard/_layout/admin/_layout'
+    | '/dashboard/_layout/manager/add'
+    | '/dashboard/_layout/manager/collect'
     | '/dashboard/_layout/account/'
-    | '/dashboard/_layout/fees/'
+    | '/dashboard/_layout/manager/'
     | '/dashboard/_layout/admin/_layout/accounts'
+    | '/dashboard/_layout/manager/info/$feeId'
   fileRoutesById: FileRoutesById
 }
 
@@ -460,8 +526,11 @@ export const routeTree = rootRoute
         "/dashboard/_layout/",
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
+        "/dashboard/_layout/manager/add",
+        "/dashboard/_layout/manager/collect",
         "/dashboard/_layout/account/",
-        "/dashboard/_layout/fees/"
+        "/dashboard/_layout/manager/",
+        "/dashboard/_layout/manager/info/$feeId"
       ]
     },
     "/_layout/login": {
@@ -498,17 +567,29 @@ export const routeTree = rootRoute
         "/dashboard/_layout/admin/_layout/accounts"
       ]
     },
+    "/dashboard/_layout/manager/add": {
+      "filePath": "dashboard/_layout/manager/add.tsx",
+      "parent": "/dashboard/_layout"
+    },
+    "/dashboard/_layout/manager/collect": {
+      "filePath": "dashboard/_layout/manager/collect.tsx",
+      "parent": "/dashboard/_layout"
+    },
     "/dashboard/_layout/account/": {
       "filePath": "dashboard/_layout/account/index.tsx",
       "parent": "/dashboard/_layout"
     },
-    "/dashboard/_layout/fees/": {
-      "filePath": "dashboard/_layout/fees/index.tsx",
+    "/dashboard/_layout/manager/": {
+      "filePath": "dashboard/_layout/manager/index.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/admin/_layout/accounts": {
       "filePath": "dashboard/_layout/admin/_layout/accounts.tsx",
       "parent": "/dashboard/_layout/admin/_layout"
+    },
+    "/dashboard/_layout/manager/info/$feeId": {
+      "filePath": "dashboard/_layout/manager/info.$feeId.tsx",
+      "parent": "/dashboard/_layout"
     }
   }
 }

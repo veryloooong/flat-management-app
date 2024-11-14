@@ -67,7 +67,6 @@ pub enum RecoverPasswordMethod {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
 pub(crate) struct RecoverPasswordInfo {
-  pub username: String,
   #[schema(value_type = String, examples("email", "phone"))]
   pub method: RecoverPasswordMethod,
   pub email: Option<String>,

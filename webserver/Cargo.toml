@@ -33,3 +33,4 @@ axum-extra = { version = "0.9.4", features = ["typed-header", "cookie"] }
 utoipa = { version = "5.1.1", features = ["axum_extras", "chrono"] }
 utoipa-swagger-ui = { version = "8.0.1", features = ["axum"] }
 utoipa-axum = "0.1.1"
+uuid = { version = "1.11.0", features = ["serde", "v4"] }

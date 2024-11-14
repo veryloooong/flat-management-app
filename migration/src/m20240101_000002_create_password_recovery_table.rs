@@ -13,11 +13,7 @@ impl MigrationTrait for Migration {
         Table::create()
           .table(PasswordRecoveryRequests::Table)
           .if_not_exists()
-          .col(
-            string(PasswordRecoveryRequests::Id)
-              .not_null()
-              .primary_key(),
-          )
+          .col(uuid(PasswordRecoveryRequests::Id).not_null().primary_key())
           .col(integer(PasswordRecoveryRequests::UserId).not_null())
           .col(date_time(PasswordRecoveryRequests::RecoveryTime).not_null())
           .foreign_key(

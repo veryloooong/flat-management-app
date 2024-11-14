@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "password_recovery_requests")]
 pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
-  pub id: String,
+  pub id: Uuid,
   pub user_id: i32,
   pub recovery_time: DateTime,
 }
