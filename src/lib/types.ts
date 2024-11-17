@@ -8,7 +8,7 @@ export type BasicUserInfo = {
   status: 'active' | 'inactive',
 }
 
-export type FeeInfo = {
+export type BasicFeeInfo = {
   id: number,
   name: string,
   amount: number,
@@ -16,7 +16,7 @@ export type FeeInfo = {
   // status: 'active' | 'inactive',
 }
 
-export type DetailedFeeInfo = FeeInfo & {
+export type DetailedFeeInfo = BasicFeeInfo & {
   created_at: string,
   collected_at: string,
 }

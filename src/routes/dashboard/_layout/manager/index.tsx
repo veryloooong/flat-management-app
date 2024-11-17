@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { feeColumns } from '@/lib/columns';
-import { FeeInfo } from '@/lib/types';
+import { BasicFeeInfo } from '@/lib/types';
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -25,7 +25,7 @@ export const Route = createFileRoute('/dashboard/_layout/manager/')({
   component: FeesPage,
   loader: async (_) => {
     try {
-      const fees = await invoke('get_fees') as FeeInfo[];
+      const fees = await invoke('get_fees') as BasicFeeInfo[];
       return fees;
     } catch {
       return [];

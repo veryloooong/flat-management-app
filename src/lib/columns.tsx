@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 
-import { BasicUserInfo, FeeInfo } from './types'
+import { BasicUserInfo, BasicFeeInfo } from './types'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
@@ -76,7 +76,7 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
   }
 ]
 
-export const feeColumns: ColumnDef<FeeInfo>[] = [
+export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
   {
     id: 'select',
     header: ({ table }) => (
