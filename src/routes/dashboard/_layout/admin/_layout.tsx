@@ -1,6 +1,7 @@
 import { toast } from '@/hooks/use-toast';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
+// TODO: add more admin functions
 export const Route = createFileRoute('/dashboard/_layout/admin/_layout')({
   component: () => <Outlet />,
   beforeLoad: async ({ context }) => {

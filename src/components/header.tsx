@@ -1,27 +1,80 @@
 import { useAuth } from "@/lib/auth"
-import { Link } from "@tanstack/react-router";
-import { BellIcon, HomeIcon, UserIcon } from "lucide-react";
+import { Link, useLocation } from "@tanstack/react-router";
+import { BellIcon, CircleDollarSignIcon, HomeIcon, NewspaperIcon, SettingsIcon, UserIcon, UsersIcon } from "lucide-react";
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList
+} from '@/components/ui/navigation-menu'
+import { useEffect, useState } from "react";
 
-export const Header = (): JSX.Element => {
-  const { logout } = useAuth();
+const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
 
   return (
-    <header className="w-full h-20 bg-main-palette-5 flex items-center justify-between">
-      {/* Link với biểu tượng ngôi nhà bên trái */}
-      <div className="flex items-center ml-7">
-        <Link to="/dashboard" className="flex items-center">
-          <HomeIcon className="w-10 h-10 text-white" />
+    <NavigationMenuItem>
+      <NavigationMenuLink>
+        <Link to={to} className={`flex flex-row items-center gap-2 ${isActive ? 'text-white underline' : 'text-gray-300'}`}>
+          {children}
         </Link>
-      </div>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  )
+}
+
+export const Header = (): JSX.Element => {
+  const { logout, isAdmin } = useAuth();
+  const [admin, setAdmin] = useState(false);
+
+  // check if user is admin by calling isAdmin function asynchrously
+  useEffect(() => {
+    isAdmin().then(setAdmin);
+  }, [isAdmin]);
+
+  return (
+    <header className="w-full h-20 bg-main-palette-5 flex items-center justify-start gap-8 px-6">
+      {/* Các tab */}
+      <NavigationMenu className="text-white flex-grow mr-auto">
+        <NavigationMenuList className="flex flex-row gap-8">
+          <NavLink to="/dashboard">
+            <HomeIcon size={24} />
+            <span>Trang chủ</span>
+          </NavLink>
+          <NavLink to="/dashboard/manager">
+            <CircleDollarSignIcon size={24} />
+            <span>Khoản thu</span>
+          </NavLink>
+          <NavLink to="/dashboard/homes">
+            <UsersIcon size={24} />
+            <span>Hộ dân</span>
+          </NavLink>
+          <NavLink to="/dashboard/news">
+            <NewspaperIcon size={24} />
+            <span>Tin tức</span>
+          </NavLink>
+          <NavLink to="/dashboard/settings">
+            <SettingsIcon size={24} />
+            <span>Cài đặt</span>
+          </NavLink>
+          {admin && (
+            <NavLink to="/dashboard/admin/accounts">
+              <UsersIcon size={24} />
+              <span>Quản trị viên</span>
+            </NavLink>
+          )}
+        </NavigationMenuList>
+      </NavigationMenu>
 
       {/* Icons */}
-      <div className="flex items-center gap-4 mr-6 relative">
+      <div className="flex items-center gap-4 relative">
         {/* Icon Notification */}
         <div className="relative">
           <BellIcon

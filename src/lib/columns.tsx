@@ -4,10 +4,18 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { BasicUserInfo, FeeInfo } from './types'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 
-const CheckboxCell = () => {
-  return <Checkbox />
-}
+const statusOptions = [
+  { value: 'active', label: 'Đã kích hoạt' },
+  { value: 'inactive', label: 'Chưa kích hoạt' }
+]
 
 // TODO: Add editable columns
 export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
@@ -44,8 +52,28 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Đã kích hoạt',
-    cell: CheckboxCell,
+    header: 'Trạng thái',
+    cell: ({ cell }) => {
+      const status = cell.getValue() as string;
+
+      return (
+        <Select>
+          <SelectTrigger className='w-[150px]'>
+            <SelectValue placeholder={
+              // Find the label of the selected value
+              statusOptions.find((option) => option.value === status)?.label
+            } />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )
+    }
   }
 ]
 
