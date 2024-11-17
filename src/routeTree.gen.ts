@@ -25,7 +25,6 @@ import { Route as DashboardLayoutNewsIndexImport } from './routes/dashboard/_lay
 import { Route as DashboardLayoutManagerIndexImport } from './routes/dashboard/_layout/manager/index'
 import { Route as DashboardLayoutHomesIndexImport } from './routes/dashboard/_layout/homes/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
-import { Route as DashboardLayoutManagerCollectImport } from './routes/dashboard/_layout/manager/collect'
 import { Route as DashboardLayoutManagerAddImport } from './routes/dashboard/_layout/manager/add'
 import { Route as DashboardLayoutAdminLayoutImport } from './routes/dashboard/_layout/admin/_layout'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
@@ -114,12 +113,6 @@ const DashboardLayoutHomesIndexRoute = DashboardLayoutHomesIndexImport.update({
 const DashboardLayoutAccountIndexRoute =
   DashboardLayoutAccountIndexImport.update({
     path: '/account/',
-    getParentRoute: () => DashboardLayoutRoute,
-  } as any)
-
-const DashboardLayoutManagerCollectRoute =
-  DashboardLayoutManagerCollectImport.update({
-    path: '/manager/collect',
     getParentRoute: () => DashboardLayoutRoute,
   } as any)
 
@@ -256,13 +249,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutManagerAddImport
       parentRoute: typeof DashboardLayoutImport
     }
-    '/dashboard/_layout/manager/collect': {
-      id: '/dashboard/_layout/manager/collect'
-      path: '/manager/collect'
-      fullPath: '/dashboard/manager/collect'
-      preLoaderRoute: typeof DashboardLayoutManagerCollectImport
-      parentRoute: typeof DashboardLayoutImport
-    }
     '/dashboard/_layout/account/': {
       id: '/dashboard/_layout/account/'
       path: '/account'
@@ -368,7 +354,6 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
   DashboardLayoutManagerAddRoute: typeof DashboardLayoutManagerAddRoute
-  DashboardLayoutManagerCollectRoute: typeof DashboardLayoutManagerCollectRoute
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
   DashboardLayoutHomesIndexRoute: typeof DashboardLayoutHomesIndexRoute
   DashboardLayoutManagerIndexRoute: typeof DashboardLayoutManagerIndexRoute
@@ -382,7 +367,6 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
   DashboardLayoutManagerAddRoute: DashboardLayoutManagerAddRoute,
-  DashboardLayoutManagerCollectRoute: DashboardLayoutManagerCollectRoute,
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
   DashboardLayoutHomesIndexRoute: DashboardLayoutHomesIndexRoute,
   DashboardLayoutManagerIndexRoute: DashboardLayoutManagerIndexRoute,
@@ -417,7 +401,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
-  '/dashboard/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
@@ -436,7 +419,6 @@ export interface FileRoutesByTo {
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
-  '/dashboard/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
@@ -460,7 +442,6 @@ export interface FileRoutesById {
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
   '/dashboard/_layout/admin/_layout': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/_layout/manager/add': typeof DashboardLayoutManagerAddRoute
-  '/dashboard/_layout/manager/collect': typeof DashboardLayoutManagerCollectRoute
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/_layout/homes/': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/_layout/manager/': typeof DashboardLayoutManagerIndexRoute
@@ -482,7 +463,6 @@ export interface FileRouteTypes {
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/manager/add'
-    | '/dashboard/manager/collect'
     | '/dashboard/account'
     | '/dashboard/homes'
     | '/dashboard/manager'
@@ -500,7 +480,6 @@ export interface FileRouteTypes {
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/manager/add'
-    | '/dashboard/manager/collect'
     | '/dashboard/account'
     | '/dashboard/homes'
     | '/dashboard/manager'
@@ -522,7 +501,6 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/admin'
     | '/dashboard/_layout/admin/_layout'
     | '/dashboard/_layout/manager/add'
-    | '/dashboard/_layout/manager/collect'
     | '/dashboard/_layout/account/'
     | '/dashboard/_layout/homes/'
     | '/dashboard/_layout/manager/'
@@ -591,7 +569,6 @@ export const routeTree = rootRoute
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
         "/dashboard/_layout/manager/add",
-        "/dashboard/_layout/manager/collect",
         "/dashboard/_layout/account/",
         "/dashboard/_layout/homes/",
         "/dashboard/_layout/manager/",
@@ -639,10 +616,6 @@ export const routeTree = rootRoute
     },
     "/dashboard/_layout/manager/add": {
       "filePath": "dashboard/_layout/manager/add.tsx",
-      "parent": "/dashboard/_layout"
-    },
-    "/dashboard/_layout/manager/collect": {
-      "filePath": "dashboard/_layout/manager/collect.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/account/": {

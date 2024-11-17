@@ -98,22 +98,21 @@ pub(crate) async fn account_recovery<R: Runtime>(
   let recovery_err = "Recovery failed".to_string();
 
   let response = client
-    .post(&format!("{}/auth/recovery", server_url))
+    .post(&format!("{}/auth/recover", server_url))
     .json(&recovery_info)
     .send()
     .await
     .map_err(|e| {
       log::error!("Failed to send recovery request: {}", e);
       recovery_err.clone()
-    })?
-    .text()
-    .await
-    .map_err(|e| {
-      log::error!("Failed to parse recovery response: {}", e);
-      recovery_err.clone()
     })?;
 
-  log::debug!("Recovery successful: {}", response);
+  if response.status().is_success() {
+    log::debug!("Recovery successful");
+  } else {
+    log::error!("Recovery failed: {:?}", response);
+    return Err(recovery_err);
+  }
 
   Ok("recovery".to_string())
 }

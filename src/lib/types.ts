@@ -15,3 +15,8 @@ export type FeeInfo = {
   // type: 'monthly' | 'quarterly' | 'yearly',
   // status: 'active' | 'inactive',
 }
+
+export type DetailedFeeInfo = FeeInfo & {
+  created_at: string,
+  collected_at: string,
+}

@@ -10,9 +10,30 @@ pub struct Model {
   pub id: i32,
   pub name: String,
   pub amount: i64,
+  pub is_required: bool,
+  pub created_at: Date,
+  pub collected_at: Date,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+  #[sea_orm(has_many = "super::fees_room::Entity")]
+  FeesRoom,
+}
+
+impl Related<super::fees_room::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::FeesRoom.def()
+  }
+}
+
+impl Related<super::rooms::Entity> for Entity {
+  fn to() -> RelationDef {
+    super::fees_room::Relation::Rooms.def()
+  }
+  fn via() -> Option<RelationDef> {
+    Some(super::fees_room::Relation::Fees.def().rev())
+  }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -56,7 +56,6 @@ pub enum AccountRecoveryMethod {
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct AccountRecoveryInfo {
-  pub username: String,
   pub method: AccountRecoveryMethod,
   pub email: Option<String>,
   pub phone: Option<String>,

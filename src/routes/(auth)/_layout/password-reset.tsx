@@ -23,9 +23,9 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from '@/hooks/use-toast'
 
 const forgotPasswordFormSchema = z.object({
-  username: z.string(),
   email: z.string().email(),
   phone: z.string(),
   method: z.enum(['email', 'phone']),
@@ -35,7 +35,6 @@ function ForgotPasswordPage(): JSX.Element {
   const form = useForm<z.infer<typeof forgotPasswordFormSchema>>({
     resolver: zodResolver(forgotPasswordFormSchema),
     defaultValues: {
-      username: '',
       email: '',
       phone: '',
       method: 'email',
@@ -44,8 +43,19 @@ function ForgotPasswordPage(): JSX.Element {
 
   function onSubmit(data: z.infer<typeof forgotPasswordFormSchema>) {
     invoke('account_recovery', { recoveryInfo: data })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err))
+      .then((_) => {
+        toast({
+          title: 'Thành công',
+          description: 'Mã xác nhận đã được gửi đến email hoặc số điện thoại của bạn.',
+        })
+      })
+      .catch((_) => {
+        toast({
+          title: 'Lỗi',
+          description: 'Có lỗi xảy ra khi gửi yêu cầu khôi phục mật khẩu. Vui lòng thử lại sau.',
+          variant: 'destructive'
+        })
+      })
   }
 
   return (
@@ -57,19 +67,6 @@ function ForgotPasswordPage(): JSX.Element {
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
-          <FormField
-            name="username"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tên đăng nhập <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input {...field} maxLength={32} required />
-                </FormControl>
-                <FormMessage>{form.formState.errors.username?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
           <FormField
             name="method"
             control={form.control}

@@ -60,7 +60,6 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
         <Select>
           <SelectTrigger className='w-[150px]'>
             <SelectValue placeholder={
-              // Find the label of the selected value
               statusOptions.find((option) => option.value === status)?.label
             } />
           </SelectTrigger>
@@ -106,17 +105,6 @@ export const feeColumns: ColumnDef<FeeInfo>[] = [
     header: 'Số tiền',
   },
   {
-    accessorKey: 'collectFee',
-    header: 'Thu phí',
-    cell: () => {
-      return (
-        <Link to='/dashboard/manager/collect'>
-          <Button className='bg-main-palette-5 hover:bg-main-palette-6'>Thu phí</Button>
-        </Link>
-      )
-    }
-  },
-  {
     accessorKey: 'getFeeInfo',
     header: 'Thông tin',
     cell: ({ row }) => {
@@ -124,7 +112,7 @@ export const feeColumns: ColumnDef<FeeInfo>[] = [
 
       return (
         <Link to='/dashboard/manager/info/$feeId' params={
-          { feeId }
+          { feeId: feeId }
         }>
           <Button className='bg-main-palette-5 hover:bg-main-palette-6'>Thông tin</Button>
         </Link>

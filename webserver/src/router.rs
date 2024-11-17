@@ -77,10 +77,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     ));
 
   let manager_router = OpenApiRouter::new()
+    .routes(routes!(crate::manager::get_fees, crate::manager::add_fee))
     .routes(routes!(
-      crate::manager::get_fees,
-      crate::manager::add_fee,
-      crate::manager::remove_fee
+      crate::manager::remove_fee,
+      crate::manager::get_one_fee
     ))
     .layer(middleware::from_fn_with_state(
       state.clone(),

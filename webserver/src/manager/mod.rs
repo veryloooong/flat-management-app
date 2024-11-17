@@ -1,5 +1,24 @@
 use crate::{entities::fees, prelude::*};
 
+pub mod types {
+  use crate::Fees;
+  use chrono::NaiveDate as Date;
+  use sea_orm::{DerivePartialModel, FromQueryResult};
+  use serde::{Deserialize, Serialize};
+  use utoipa::ToSchema;
+
+  #[derive(Debug, Serialize, Deserialize, DerivePartialModel, FromQueryResult, ToSchema)]
+  #[sea_orm(entity = "Fees")]
+  pub struct DetailedFeeInfo {
+    pub id: i32,
+    pub name: String,
+    pub amount: i64,
+    pub is_required: bool,
+    pub created_at: Date,
+    pub collected_at: Date,
+  }
+}
+
 #[utoipa::path(
   get,
   path = "/fees",
@@ -113,19 +132,54 @@ pub async fn remove_fee(State(state): State<AppState>, Path(id): Path<i32>) -> S
       return StatusCode::NO_CONTENT;
     }
   }
+}
 
-  // match Fees::delete()
-  //   .filter(fees::Column::Id.eq(id))
-  //   .exec(&state.db)
-  //   .await
-  // {
-  //   Ok(res) => {
-  //     log::info!("Fee removed: {:?}", res);
-  //     StatusCode::NO_CONTENT
-  //   }
-  //   Err(e) => {
-  //     log::error!("Error: {:?}", e);
-  //     StatusCode::INTERNAL_SERVER_ERROR
-  //   }
-  // }
+#[utoipa::path(
+  get,
+  path = "/fees/{id}",
+  summary = "Get a fee",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Fee retrieved", body = types::DetailedFeeInfo),
+    (status = NOT_FOUND, description = "Fee not found"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+    (status = UNAUTHORIZED, description = "Unauthorized"),
+    (status = FORBIDDEN, description = "Forbidden"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_one_fee(
+  State(state): State<AppState>,
+  Path(id): Path<i32>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+  let fee = match Fees::find_by_id(id)
+    .into_partial_model::<types::DetailedFeeInfo>()
+    .one(&state.db)
+    .await
+  {
+    Ok(fee) => fee,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return Err((
+        StatusCode::INTERNAL_SERVER_ERROR,
+        HeaderMap::new(),
+        "".to_string(),
+      ));
+    }
+  };
+
+  let fee = match fee {
+    Some(fee) => fee,
+    None => {
+      return Ok((StatusCode::NOT_FOUND, HeaderMap::new(), "".to_string()));
+    }
+  };
+
+  Ok((
+    StatusCode::OK,
+    HeaderMap::new(),
+    serde_json::to_string(&fee).unwrap(),
+  ))
 }

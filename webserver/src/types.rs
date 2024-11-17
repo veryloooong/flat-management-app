@@ -61,11 +61,14 @@ pub(crate) struct AccessTokenClaims {
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, ToSchema)]
 pub enum RecoverPasswordMethod {
+  #[serde(rename = "email")]
   Email,
+  #[serde(rename = "phone")]
   Phone,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
 pub(crate) struct RecoverPasswordInfo {
   #[schema(value_type = String, examples("email", "phone"))]
   pub method: RecoverPasswordMethod,

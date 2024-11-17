@@ -29,11 +29,28 @@ pub struct Model {
 pub enum Relation {
   #[sea_orm(has_many = "super::password_recovery_requests::Entity")]
   PasswordRecoveryRequests,
+  #[sea_orm(has_one = "super::room_tenant::Entity")]
+  RoomTenant,
 }
 
 impl Related<super::password_recovery_requests::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::PasswordRecoveryRequests.def()
+  }
+}
+
+impl Related<super::room_tenant::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::RoomTenant.def()
+  }
+}
+
+impl Related<super::rooms::Entity> for Entity {
+  fn to() -> RelationDef {
+    super::room_tenant::Relation::Rooms.def()
+  }
+  fn via() -> Option<RelationDef> {
+    Some(super::room_tenant::Relation::Users.def().rev())
   }
 }
 
