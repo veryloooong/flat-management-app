@@ -140,7 +140,7 @@ function AccountEditPage(): JSX.Element {
         <div className=" max-w-4xl w-full m-5 p-1">
           <Form {...updateUserInfoForm}>
             <form onSubmit={updateUserInfoForm.handleSubmit(onSubmitUpdateUserInfoForm)} className="flex flex-col m-12 text-main-palette-6">
-              <p className="flex justify-center font-mono text-3xl">Tài khoản cá nhân</p>
+              <p className="flex justify-center text-3xl">Tài khoản cá nhân</p>
               {/* Account Information Section */}
               <div className="border-b pb-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,7 +200,7 @@ function AccountEditPage(): JSX.Element {
 
           <Form {...updatePasswordForm}>
             <form onSubmit={updatePasswordForm.handleSubmit(onSubmitUpdatePasswordForm)} className="flex flex-col m-12 text-main-palette-6">
-              <p className="flex justify-center font-mono text-3xl">Thay đổi mật khẩu</p>
+              <p className="flex justify-center text-3xl">Thay đổi mật khẩu</p>
               <div className="border-b pb-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
