@@ -1,6 +1,7 @@
+import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { DetailedFeeInfo } from '@/lib/types';
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { invoke } from '@tauri-apps/api/core'
 
 function ShowFeeInfoPage(): JSX.Element {
@@ -8,6 +9,9 @@ function ShowFeeInfoPage(): JSX.Element {
 
   return (
     <div>
+      <Link to='/dashboard/manager'>
+        <Button>Quay lại</Button>
+      </Link>
       <h1>Thông tin khoản thu</h1>
       <div>
         <p>ID: {feeInfo.id}</p>
@@ -15,6 +19,7 @@ function ShowFeeInfoPage(): JSX.Element {
         <p>Giá: {feeInfo.amount}</p>
         <p>Ngày tạo: {feeInfo.created_at}</p>
         <p>Ngày thu: {feeInfo.collected_at}</p>
+        <p>Bắt buộc: {feeInfo.is_required}</p>
       </div>
     </div>
   )

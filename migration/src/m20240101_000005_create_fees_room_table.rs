@@ -32,13 +32,15 @@ impl MigrationTrait for Migration {
             ForeignKey::create()
               .name("fk_fees_room_room_number")
               .from(FeesRoom::Table, FeesRoom::RoomNumber)
-              .to(Rooms::Table, Rooms::RoomNumber),
+              .to(Rooms::Table, Rooms::RoomNumber)
+              .on_delete(ForeignKeyAction::SetDefault),
           )
           .foreign_key(
             ForeignKey::create()
               .name("fk_fees_room_fee_id")
               .from(FeesRoom::Table, FeesRoom::FeeId)
-              .to(Fees::Table, Fees::Id),
+              .to(Fees::Table, Fees::Id)
+              .on_delete(ForeignKeyAction::Cascade),
           )
           .to_owned(),
       )

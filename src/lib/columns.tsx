@@ -118,5 +118,20 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
         </Link>
       )
     }
+  },
+  {
+    accessorKey: 'deleteFee',
+    header: 'Xoá',
+    cell: ({ row }) => {
+      const feeId = row.original.id.toString();
+
+      return (
+        <Link to='/dashboard/manager/delete/$feeId' params={
+          { feeId: feeId }
+        }>
+          <Button className='bg-red-400 hover:bg-red-500'>Xoá</Button>
+        </Link>
+      )
+    }
   }
 ]
