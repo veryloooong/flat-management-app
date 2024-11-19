@@ -16,6 +16,9 @@ function FeesPage(): JSX.Element {
         <Link to='/dashboard/manager/add'>
           <Button className='mt-4'>Thêm khoản thu</Button>
         </Link>
+        <Link to='/dashboard/manager/delete'>
+          <Button className='flex space-x-4 mt-4'>Xoá khoản thu</Button>
+        </Link>
       </div>
     </div>
   )
