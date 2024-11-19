@@ -1,5 +1,4 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Checkbox } from '@/components/ui/checkbox'
 
 import { BasicUserInfo, BasicFeeInfo } from './types'
 import { Link } from '@tanstack/react-router'
@@ -78,31 +77,16 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
 
 export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
   {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox checked={
-        table.getIsAllPageRowsSelected() ||
-        (table.getIsSomePageRowsSelected() && "indeterminate")
-      }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-  },
-  {
     accessorKey: 'name',
     header: 'Tên',
   },
   {
     accessorKey: 'amount',
     header: 'Số tiền',
+  },
+  {
+    accessorKey: 'collected_at',
+    header: 'Ngày thu',
   },
   {
     accessorKey: 'getFeeInfo',

@@ -19,7 +19,7 @@ function ShowFeeInfoPage(): JSX.Element {
         <p>Giá: {feeInfo.amount}</p>
         <p>Ngày tạo: {feeInfo.created_at}</p>
         <p>Ngày thu: {feeInfo.collected_at}</p>
-        <p>Bắt buộc: {feeInfo.is_required}</p>
+        <p>Bắt buộc: {feeInfo.is_required ? 'Có' : 'Không'}</p>
       </div>
     </div>
   )

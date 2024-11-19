@@ -78,7 +78,7 @@ function AddPage(): JSX.Element {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-xl font-bold mb-4">Tạo khoản thu</h2>
         <Form {...addFeeForm}>
-          <form onSubmit={addFeeForm.handleSubmit(onSubmitAddFeeForm)} className='flex flex-col gap-4' autoComplete='off'>
+          <form onSubmit={addFeeForm.handleSubmit(onSubmitAddFeeForm)} className='flex flex-col gap-4' autoComplete="off">
             <FormField
               name="name"
               control={addFeeForm.control}
@@ -86,7 +86,7 @@ function AddPage(): JSX.Element {
                 <FormItem>
                   <FormLabel>Tên khoản thu</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} autoComplete="off" />
                   </FormControl>
                   <FormMessage>{addFeeForm.formState.errors.name?.message}</FormMessage>
                 </FormItem>
@@ -99,7 +99,7 @@ function AddPage(): JSX.Element {
                 <FormItem>
                   <FormLabel>Số tiền</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field} type="number" autoComplete="off" />
                   </FormControl>
                   <FormMessage>{addFeeForm.formState.errors.amount?.message}</FormMessage>
                 </FormItem>
@@ -123,7 +123,7 @@ function AddPage(): JSX.Element {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            format(field.value, "dd/MM/yyyy")
                           ) : (
                             <span>Chọn ngày</span>
                           )}
