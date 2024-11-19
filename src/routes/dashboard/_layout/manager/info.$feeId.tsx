@@ -8,18 +8,13 @@ function ShowFeeInfoPage(): JSX.Element {
   const feeInfo: DetailedFeeInfo = Route.useLoaderData();
 
   return (
-    <div>
+    <div className='w-screen pt-8'>
       <Link to='/dashboard/manager'>
         <Button>Quay lại</Button>
       </Link>
-      <h1>Thông tin khoản thu</h1>
-      <div>
-        <p>ID: {feeInfo.id}</p>
-        <p>Tên khoản thu: {feeInfo.name}</p>
-        <p>Giá: {feeInfo.amount}</p>
-        <p>Ngày tạo: {feeInfo.created_at}</p>
-        <p>Ngày thu: {feeInfo.collected_at}</p>
-        <p>Bắt buộc: {feeInfo.is_required ? 'Có' : 'Không'}</p>
+      <h1 className='text-center'>Thông tin khoản thu</h1>
+      <div className='w-full'>
+        {/* TODO: Vũ hoàn thành giao diện thông tin khoản thu */}
       </div>
     </div>
   )
