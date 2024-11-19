@@ -1,17 +1,19 @@
+use sea_orm::prelude::Date;
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
 use crate::AppState;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct FeesInfo {
+pub struct BasicFeeInfo {
   pub id: i32,
   pub name: String,
   pub amount: i64,
+  pub collected_at: Date,
 }
 
 #[tauri::command]
-pub async fn get_fees<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<FeesInfo>, String> {
+pub async fn get_fees<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<BasicFeeInfo>, String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
 
@@ -19,7 +21,7 @@ pub async fn get_fees<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<FeesIn
   let server_url = &state.server_url;
   let client = &state.client;
 
-  let response: Vec<FeesInfo> = client
+  let response: Vec<BasicFeeInfo> = client
     .get(&format!("{}/manager/fees", server_url))
     .bearer_auth(jwt_access_token)
     .send()
@@ -38,12 +40,16 @@ pub async fn get_fees<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<FeesIn
   Ok(response)
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct AddFeeInfo {
+  pub name: String,
+  pub amount: i64,
+  pub is_required: bool,
+  pub collected_at: Date,
+}
+
 #[tauri::command]
-pub async fn add_fee<R: Runtime>(
-  app: tauri::AppHandle<R>,
-  name: String,
-  amount: i64,
-) -> Result<(), String> {
+pub async fn add_fee<R: Runtime>(app: tauri::AppHandle<R>, info: AddFeeInfo) -> Result<(), String> {
   let state = app.state::<Mutex<AppState>>();
   let state = state.lock().await;
 
@@ -54,10 +60,7 @@ pub async fn add_fee<R: Runtime>(
   let response = client
     .post(&format!("{}/manager/fees", server_url))
     .bearer_auth(jwt_access_token)
-    .json(&serde_json::json!({
-      "name": name,
-      "amount": amount,
-    }))
+    .json(&info)
     .send()
     .await
     .map_err(|e| {

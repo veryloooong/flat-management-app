@@ -12,11 +12,12 @@ export type BasicFeeInfo = {
   id: number,
   name: string,
   amount: number,
+  collected_at: string,
   // type: 'monthly' | 'quarterly' | 'yearly',
   // status: 'active' | 'inactive',
 }
 
 export type DetailedFeeInfo = BasicFeeInfo & {
+  is_required: boolean,
   created_at: string,
-  collected_at: string,
 }
