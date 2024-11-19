@@ -63,9 +63,12 @@ pub async fn recover_password(
 
   match recovery_request.insert(&state.db).await {
     Ok(res) => {
-      let token = res.id;
+      let _token = res.id;
 
       // TODO: Send email with password recovery link
+      // let email = user_info.email;
+
+      return Ok(StatusCode::OK);
     }
     Err(e) => {
       log::error!("Error: {:?}", e);

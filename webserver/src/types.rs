@@ -84,20 +84,3 @@ pub(crate) struct RefreshTokenClaims {
   pub role: UserRole,
   pub refresh_token_version: i32,
 }
-
-#[derive(
-  Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema, DerivePartialModel, FromQueryResult,
-)]
-#[serde(rename_all = "snake_case")]
-#[sea_orm(entity = "Fees")]
-pub struct FeesInfo {
-  pub id: i32,
-  pub name: String,
-  pub amount: i64,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
-pub struct AddFeeInfo {
-  pub name: String,
-  pub amount: i64,
-}

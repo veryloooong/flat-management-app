@@ -7,6 +7,24 @@ pub mod types {
   use serde::{Deserialize, Serialize};
   use utoipa::ToSchema;
 
+  #[derive(
+    Debug,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
+    ToSchema,
+    DerivePartialModel,
+    FromQueryResult,
+  )]
+  #[serde(rename_all = "snake_case")]
+  #[sea_orm(entity = "Fees")]
+  pub struct FeesInfo {
+    pub id: i32,
+    pub name: String,
+    pub amount: i64,
+    pub collected_at: Date,
+  }
+
   #[derive(Debug, Serialize, Deserialize, DerivePartialModel, FromQueryResult, ToSchema)]
   #[sea_orm(entity = "Fees")]
   pub struct DetailedFeeInfo {
@@ -17,7 +35,17 @@ pub mod types {
     pub created_at: Date,
     pub collected_at: Date,
   }
+
+  #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
+  pub struct AddFeeInfo {
+    pub name: String,
+    pub amount: i64,
+    pub is_required: bool,
+    pub collected_at: Date,
+  }
 }
+
+use types::*;
 
 #[utoipa::path(
   get,
@@ -77,12 +105,13 @@ pub async fn get_fees(
 )]
 pub async fn add_fee(
   State(state): State<AppState>,
-  // TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   Json(fee_info): Json<AddFeeInfo>,
 ) -> StatusCode {
   let new_fee = fees::ActiveModel {
     amount: Set(fee_info.amount),
     name: Set(fee_info.name),
+    collected_at: Set(fee_info.collected_at),
+    is_required: Set(fee_info.is_required),
     ..Default::default()
   };
 
