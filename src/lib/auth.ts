@@ -4,6 +4,8 @@ import { redirect } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
 import { BasicUserInfo } from "@/lib/types";
 
+type UserRole = 'Admin' | 'Manager' | 'Tenant';
+
 export const useAuth = () => {
   const isAuthenticated = async () => {
     try {
@@ -61,6 +63,15 @@ export const useAuth = () => {
     }
   }
 
+  const getRole = async () => {
+    try {
+      const res = await invoke('get_user_role');
+      return res as UserRole;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
   return {
     isAuthenticated,
     getUserInfo,
@@ -68,6 +79,7 @@ export const useAuth = () => {
     logout,
     isAdmin,
     isManager,
+    getRole,
   };
 }
 

@@ -3,7 +3,6 @@ import { toast } from '@/hooks/use-toast';
 import { DetailedFeeInfo } from '@/lib/types';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { invoke } from '@tauri-apps/api/core'
-import { AlignRight } from 'lucide-react';
 
 function ShowFeeInfoPage(): JSX.Element {
   const feeInfo: DetailedFeeInfo = Route.useLoaderData();
@@ -49,7 +48,7 @@ function ShowFeeInfoPage(): JSX.Element {
             </div>
             <div>
               <label className="font-semibold">Hạn nộp:</label>
-              <p className="text-gray-700">{feeInfo.collected_at}</p>
+              <p className="text-gray-700">{feeInfo.due_date}</p>
             </div>
             <div>
               <label className="font-semibold">Bắt buộc:</label>
@@ -63,9 +62,9 @@ function ShowFeeInfoPage(): JSX.Element {
           {/* Paid Households */}
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
             <h3 className="text-lg font-bold mb-4">Danh sách hộ đã nộp khoản thu
-                <Button style={{ float:"right", background:"white"}}>
-                  <i className="text-blue-500">🔍</i>
-                </Button>
+              <Button style={{ float: "right", background: "white" }}>
+                <i className="text-blue-500">🔍</i>
+              </Button>
             </h3>
             <div className="space-y-4 overflow-y-auto max-h-60">
               <div className="space-y-2">
@@ -87,29 +86,29 @@ function ShowFeeInfoPage(): JSX.Element {
 
           {/* Unpaid Households */}
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
-              <h3 className="text-lg font-bold mb-4">Danh sách hộ chưa nộp khoản thu
-                    <Button style={{float:"right", background:"white"}} >
-                      
-                      <i className="text-blue-500">🔍</i>
-                    </Button>
-              </h3>
-              <div className="space-y-4 overflow-y-auto max-h-60">
-              
-                <div className="space-y-2">
-                  {unpaidHouseholds.map((house, index) => (
-                    <div
-                      key={index}
-                      className="bg-white p-4 shadow rounded flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-semibold">Phòng: {house.room}</p>
-                        <p>Số tiền: {house.amount}</p>
-                        <p>Hạn nộp: {house.dueDate}</p>
-                      </div>
+            <h3 className="text-lg font-bold mb-4">Danh sách hộ chưa nộp khoản thu
+              <Button style={{ float: "right", background: "white" }} >
+
+                <i className="text-blue-500">🔍</i>
+              </Button>
+            </h3>
+            <div className="space-y-4 overflow-y-auto max-h-60">
+
+              <div className="space-y-2">
+                {unpaidHouseholds.map((house, index) => (
+                  <div
+                    key={index}
+                    className="bg-white p-4 shadow rounded flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-semibold">Phòng: {house.room}</p>
+                      <p>Số tiền: {house.amount}</p>
+                      <p>Hạn nộp: {house.dueDate}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
+            </div>
           </div>
         </div>
       </div>

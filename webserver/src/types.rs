@@ -1,5 +1,3 @@
-use sea_orm::FromQueryResult;
-
 use crate::prelude::*;
 
 /// Represents username / password for login

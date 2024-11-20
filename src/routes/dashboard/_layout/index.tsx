@@ -83,7 +83,7 @@ function DashboardPage(): JSX.Element {
           </div>
         </div>
         {/* News panel */}
-        <div className='col-span-1 border-2 rounded-md p-4 shadow-md'>
+        <div className='col-span-1 border-2 rounded-md p-4 shadow-md bg-white'>
           <h3 className='text-lg font-bold mb-4 border-b-2 border-gray-400'>Tin tức</h3>
           <ul className='space-y-3'>
             {newsItems.map((item, index) => (

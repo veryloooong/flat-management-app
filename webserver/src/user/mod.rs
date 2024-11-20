@@ -280,3 +280,52 @@ pub async fn update_password(
 
   Ok((StatusCode::OK, HeaderMap::new()))
 }
+
+/// Get the role of the user, given their token
+#[utoipa::path(
+  get,
+  path = "/role",
+  tag = USER,
+  responses(
+    (status = OK, description = "User role", body = String),
+    (status = UNAUTHORIZED, description = "Invalid token", body = String),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_user_role(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+) -> Result<&'static str, StatusCode> {
+  let jwt_access_secret = &state.jwt_access_secret;
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err(StatusCode::UNAUTHORIZED);
+    }
+  };
+
+  let user_id = claims.custom.id;
+
+  let user = match Users::find()
+    .filter(users::Column::Id.eq(user_id))
+    .one(&state.db)
+    .await
+  {
+    Ok(user) => user,
+    Err(_) => {
+      return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  let user = match user {
+    Some(user) => user,
+    None => {
+      return Err(StatusCode::NOT_FOUND);
+    }
+  };
+
+  Ok(user.role.into())
+}

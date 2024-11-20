@@ -17,18 +17,30 @@ const statusOptions = [
 ]
 
 // TODO: Add editable columns
-export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
+export const userInfoColumns: ColumnDef<BasicUserInfo & { size?: number }>[] = [
   {
     accessorKey: 'name',
     header: 'Họ và tên',
+    meta: {
+      headerClassName: 'max-w-[200px] min-w-[150px] w-[150px] overflow-hidden',
+      cellClassName: 'max-w-[200px] min-w-[150px] w-[150px] overflow-hidden',
+    }
   },
   {
     accessorKey: 'username',
     header: 'Username',
+    meta: {
+      headerClassName: 'w-[200px]',
+      cellClassName: 'w-[200px]'
+    }
   },
   {
     accessorKey: 'email',
     header: 'Email',
+    meta: {
+      headerClassName: 'w-[300px]',
+      cellClassName: 'w-[300px]'
+    }
   },
   {
     accessorKey: 'phone',
@@ -85,7 +97,7 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
     header: 'Số tiền',
   },
   {
-    accessorKey: 'collected_at',
+    accessorKey: 'due_date',
     header: 'Ngày thu',
   },
   {

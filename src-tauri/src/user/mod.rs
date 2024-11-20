@@ -150,3 +150,30 @@ pub(crate) async fn account_logout<R: Runtime>(app: tauri::AppHandle<R>) -> Resu
 
   Ok(())
 }
+
+#[tauri::command]
+async fn get_user_info<R: Runtime>(app: tauri::AppHandle<R>) -> Result<String, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let server_url = &state.server_url;
+  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let client = &state.client;
+
+  let response: String = client
+    .get(&format!("{}/user/info", server_url))
+    .bearer_auth(access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send get user info request: {}", e);
+      "Failed to send get user info request".to_string()
+    })?
+    .text()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse get user info response: {}", e);
+      "Failed to parse get user info response".to_string()
+    })?;
+
+  Ok(response)
+}

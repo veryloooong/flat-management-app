@@ -12,7 +12,7 @@ export type BasicFeeInfo = {
   id: number,
   name: string,
   amount: number,
-  collected_at: string,
+  due_date: string,
   // type: 'monthly' | 'quarterly' | 'yearly',
   // status: 'active' | 'inactive',
 }

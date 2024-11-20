@@ -7,9 +7,11 @@ import { Header } from '@/components/header';
 function DashboardLayoutPage(): JSX.Element {
 
   return (
-    <div>
+    <div className='bg-main-palette-0 min-h-screen pt-20'>
       <Header />
-      <Outlet />
+      <div>
+        <Outlet />
+      </div>
     </div>
   )
 }

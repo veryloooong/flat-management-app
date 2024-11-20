@@ -13,7 +13,7 @@ function AdminAccountsPage(): JSX.Element {
       <h1 className="text-center">Các tài khoản người dùng</h1>
 
       <div className="w-4/5 mx-auto mt-8 flex flex-col gap-4">
-        <DataTable columns={userInfoColumns} data={users} />
+        <DataTable columns={userInfoColumns} data={users} className="bg-white" />
         <Button
           className="w-fit self-end bg-main-palette-4 hover:bg-main-palette-5"
           onClick={() => console.log("TODO update account activation status")}

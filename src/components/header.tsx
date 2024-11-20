@@ -22,7 +22,7 @@ const NavLink = ({ to, children }: { to: string, children: React.ReactNode }) =>
   return (
     <NavigationMenuItem>
       <NavigationMenuLink>
-        <Link to={to} className={`flex flex-row items-center gap-2 ${isActive ? 'text-white underline' : 'text-gray-300'}`}>
+        <Link to={to} className={`flex flex-row items-center gap-2 ${isActive ? 'text-white underline font-medium' : 'text-main-palette-0'}`}>
           {children}
         </Link>
       </NavigationMenuLink>
@@ -40,7 +40,7 @@ export const Header = (): JSX.Element => {
   }, [isAdmin]);
 
   return (
-    <header className="w-full h-20 bg-main-palette-5 flex items-center justify-start gap-8 px-6">
+    <header className="w-full h-20 bg-main-palette-5 flex items-center justify-start gap-8 px-6 fixed top-0 z-50">
       {/* Các tab */}
       <NavigationMenu className="text-white flex-grow mr-auto">
         <NavigationMenuList className="flex flex-row gap-8">
