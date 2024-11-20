@@ -1,22 +1,24 @@
-import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
-import { DetailedFeeInfo } from '@/lib/types';
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { invoke } from '@tauri-apps/api/core'
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { DetailedFeeInfo } from "@/lib/types";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { invoke } from "@tauri-apps/api/core";
 
 function ShowFeeInfoPage(): JSX.Element {
   const feeInfo: DetailedFeeInfo = Route.useLoaderData();
 
-  const paidHouseholds = [ //  FIX ME
-    { room: '701', amount: '500.000 VND', paymentDate: '29/11/2024 18:51:20' },
-    { room: '803', amount: '500.000 VND', paymentDate: '29/11/2024 17:00:20' },
-    { room: '210', amount: '500.000 VND', paymentDate: '29/11/2024 08:11:59' },
+  const paidHouseholds = [
+    //  FIX ME
+    { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
+    { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
+    { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
   ];
 
-  const unpaidHouseholds = [ // FIX ME
-    { room: '203', amount: '500.000 VND', dueDate: '04/12/2024' },
-    { room: '204', amount: '500.000 VND', dueDate: '04/12/2024' },
-    { room: '205', amount: '500.000 VND', dueDate: '04/12/2024' },
+  const unpaidHouseholds = [
+    // FIX ME
+    { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
+    { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
+    { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
   ];
 
   return (
@@ -26,7 +28,9 @@ function ShowFeeInfoPage(): JSX.Element {
         <Button>Quay lại</Button>
       </Link>
 
-      <h1 className="text-center text-2xl font-bold mt-4">Thông tin khoản thu</h1>
+      <h1 className="text-center text-2xl font-bold mt-4">
+        Thông tin khoản thu
+      </h1>
 
       {/* Main Content */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -52,7 +56,9 @@ function ShowFeeInfoPage(): JSX.Element {
             </div>
             <div>
               <label className="font-semibold">Bắt buộc:</label>
-              <p className="text-gray-700">{feeInfo.is_required ? 'Có' : 'Không'}</p>
+              <p className="text-gray-700">
+                {feeInfo.is_required ? "Có" : "Không"}
+              </p>
             </div>
           </div>
         </div>
@@ -61,7 +67,8 @@ function ShowFeeInfoPage(): JSX.Element {
         <div className="space-y-8">
           {/* Paid Households */}
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
-            <h3 className="text-lg font-bold mb-4">Danh sách hộ đã nộp khoản thu
+            <h3 className="text-lg font-bold mb-4">
+              Danh sách hộ đã nộp khoản thu
               <Button style={{ float: "right", background: "white" }}>
                 <i className="text-blue-500">🔍</i>
               </Button>
@@ -86,14 +93,13 @@ function ShowFeeInfoPage(): JSX.Element {
 
           {/* Unpaid Households */}
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
-            <h3 className="text-lg font-bold mb-4">Danh sách hộ chưa nộp khoản thu
-              <Button style={{ float: "right", background: "white" }} >
-
+            <h3 className="text-lg font-bold mb-4">
+              Danh sách hộ chưa nộp khoản thu
+              <Button style={{ float: "right", background: "white" }}>
                 <i className="text-blue-500">🔍</i>
               </Button>
             </h3>
             <div className="space-y-4 overflow-y-auto max-h-60">
-
               <div className="space-y-2">
                 {unpaidHouseholds.map((house, index) => (
                   <div
@@ -116,23 +122,25 @@ function ShowFeeInfoPage(): JSX.Element {
   );
 }
 
-export const Route = createFileRoute('/dashboard/_layout/manager/info/$feeId')({
+export const Route = createFileRoute("/dashboard/_layout/manager/info/$feeId")({
   component: ShowFeeInfoPage,
   loader: async ({ params }) => {
     try {
-      const feeInfo = await invoke('get_fee_info', { feeId: Number(params.feeId) });
+      const feeInfo = await invoke("get_fee_info", {
+        feeId: Number(params.feeId),
+      });
       return feeInfo;
     } catch (err) {
-      console.error(err)
+      console.error(err);
       toast({
-        title: 'Lỗi',
-        description: 'Không thể tải thông tin khoản thu',
-        variant: 'destructive'
-      })
+        title: "Lỗi",
+        description: "Không thể tải thông tin khoản thu",
+        variant: "destructive",
+      });
 
       throw redirect({
-        to: '/dashboard/manager'
-      })
+        to: "/dashboard/manager",
+      });
     }
-  }
-})
+  },
+});

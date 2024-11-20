@@ -1,43 +1,44 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Fragment, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/hooks/use-toast'
-import { invoke } from '@tauri-apps/api/core';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Fragment, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { invoke } from "@tauri-apps/api/core";
 
 function ConfirmDeletePage(): JSX.Element {
   const { feeId } = Route.useParams();
 
-  const { toast } = useToast()
-  const navigate = useNavigate()
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   function handleConfirm() {
-    invoke('remove_fee', { id: Number(feeId) })
+    invoke("remove_fee", { id: Number(feeId) })
       .then((_) => {
         toast({
-          title: 'Đã xóa khoản thu',
-          description: 'Khoản thu đã được xóa. Đang chuyển hướng về trang quản lý.',
-          duration: 2000
-        })
+          title: "Đã xóa khoản thu",
+          description:
+            "Khoản thu đã được xóa. Đang chuyển hướng về trang quản lý.",
+          duration: 2000,
+        });
         setTimeout(() => {
           navigate({
-            to: '/dashboard/manager',
-          })
+            to: "/dashboard/manager",
+          });
         }, 2000);
       })
       .catch((err) => {
         console.error(err);
         toast({
-          title: 'Có lỗi xảy ra',
-          description: 'Không thể xóa khoản thu. Vui lòng thử lại sau.',
-          variant: 'destructive'
-        })
-      })
+          title: "Có lỗi xảy ra",
+          description: "Không thể xóa khoản thu. Vui lòng thử lại sau.",
+          variant: "destructive",
+        });
+      });
   }
 
   function handleCancel() {
     navigate({
-      to: '/dashboard/manager',
-    })
+      to: "/dashboard/manager",
+    });
   }
 
   return (
@@ -66,11 +67,11 @@ function ConfirmDeletePage(): JSX.Element {
         </div>
       </div>
     </Fragment>
-  )
+  );
 }
 
 export const Route = createFileRoute(
-  '/dashboard/_layout/manager/delete/$feeId',
+  "/dashboard/_layout/manager/delete/$feeId"
 )({
   component: ConfirmDeletePage,
-})
+});

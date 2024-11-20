@@ -1,8 +1,8 @@
-import { toast } from '@/hooks/use-toast';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { toast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import {
   Form,
@@ -11,23 +11,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import { invoke } from '@tauri-apps/api/core';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { invoke } from "@tauri-apps/api/core";
 
 const addFeeSchema = z.object({
   name: z.string(),
   amount: z.coerce.number().positive("Số tiền phải lớn hơn 0"),
   collected_at: z.date(),
   is_required: z.boolean(),
-})
+});
 
 function AddPage(): JSX.Element {
   const navigate = useNavigate();
@@ -35,50 +39,55 @@ function AddPage(): JSX.Element {
   const addFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
     defaultValues: {
-      name: '',
+      name: "",
       amount: 0,
       // deadline: new Date(),
       is_required: true,
     },
-  })
+  });
 
   function onSubmitAddFeeForm(data: z.infer<typeof addFeeSchema>) {
     // console.log(data)
     let info = {
       name: data.name,
       amount: data.amount,
-      collected_at: format(data.collected_at, 'yyyy-MM-dd'),
+      collected_at: format(data.collected_at, "yyyy-MM-dd"),
       is_required: data.is_required,
-    }
+    };
 
-    invoke('add_fee', { info }).then((_) => {
-      toast({
-        title: 'Tạo khoản thu thành công',
-        description: 'Khoản thu đã được tạo thành công',
+    invoke("add_fee", { info })
+      .then((_) => {
+        toast({
+          title: "Tạo khoản thu thành công",
+          description: "Khoản thu đã được tạo thành công",
+        });
+
+        setTimeout(() => {
+          navigate({
+            to: "/dashboard/manager",
+          });
+        }, 2000);
       })
-
-      setTimeout(() => {
-        navigate({
-          to: "/dashboard/manager"
-        })
-      }, 2000)
-
-    }).catch((err) => {
-      console.error(err)
-      toast({
-        title: 'Tạo khoản thu thất bại',
-        description: 'Có lỗi xảy ra khi tạo khoản thu',
-        variant: 'destructive'
-      })
-    })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: "Tạo khoản thu thất bại",
+          description: "Có lỗi xảy ra khi tạo khoản thu",
+          variant: "destructive",
+        });
+      });
   }
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <div className="p-6 rounded-lg shadow-lg border-2 w-full max-w-sm">
+    <div className="flex items-center justify-center">
+      <div className="p-6 rounded-lg shadow-lg border-2 w-full max-w-sm bg-white">
         <h2 className="text-xl font-bold mb-4">Tạo khoản thu</h2>
         <Form {...addFeeForm}>
-          <form onSubmit={addFeeForm.handleSubmit(onSubmitAddFeeForm)} className='flex flex-col gap-4' autoComplete="off">
+          <form
+            onSubmit={addFeeForm.handleSubmit(onSubmitAddFeeForm)}
+            className="flex flex-col gap-4"
+            autoComplete="off"
+          >
             <FormField
               name="name"
               control={addFeeForm.control}
@@ -88,7 +97,9 @@ function AddPage(): JSX.Element {
                   <FormControl>
                     <Input {...field} autoComplete="off" />
                   </FormControl>
-                  <FormMessage>{addFeeForm.formState.errors.name?.message}</FormMessage>
+                  <FormMessage>
+                    {addFeeForm.formState.errors.name?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -101,7 +112,9 @@ function AddPage(): JSX.Element {
                   <FormControl>
                     <Input {...field} type="number" autoComplete="off" />
                   </FormControl>
-                  <FormMessage>{addFeeForm.formState.errors.amount?.message}</FormMessage>
+                  <FormMessage>
+                    {addFeeForm.formState.errors.amount?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -131,19 +144,19 @@ function AddPage(): JSX.Element {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date()
-                        }
+                        disabled={(date) => date < new Date()}
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage>{addFeeForm.formState.errors.collected_at?.message}</FormMessage>
+                  <FormMessage>
+                    {addFeeForm.formState.errors.collected_at?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -151,7 +164,7 @@ function AddPage(): JSX.Element {
               name="is_required"
               control={addFeeForm.control}
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center space-x-3 space-y-0'>
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -159,26 +172,40 @@ function AddPage(): JSX.Element {
                     />
                   </FormControl>
                   <FormLabel>Có bắt buộc?</FormLabel>
-                  <FormMessage>{addFeeForm.formState.errors.is_required?.message}</FormMessage>
+                  <FormMessage>
+                    {addFeeForm.formState.errors.is_required?.message}
+                  </FormMessage>
                 </FormItem>
               )}
             />
 
             {/* TODO this shit */}
             <div className="flex justify-between">
-              <Button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Xác nhận</Button>
-              <Button type="reset" className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400" onClick={() => { navigate({ to: '..' }) }}>Hủy</Button>
+              <Button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Xác nhận
+              </Button>
+              <Button
+                type="reset"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                onClick={() => {
+                  navigate({ to: ".." });
+                }}
+              >
+                Hủy
+              </Button>
             </div>
-
           </form>
         </Form>
       </div>
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/dashboard/_layout/manager/add')({
+export const Route = createFileRoute("/dashboard/_layout/manager/add")({
   component: AddPage,
-})
+});
 
 export default Route;
