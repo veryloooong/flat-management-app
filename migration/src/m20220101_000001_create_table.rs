@@ -135,10 +135,10 @@ impl MigrationTrait for Migration {
 
     manager.exec_stmt(insert_stmt).await?;
 
-    // insert inactive tenant user
-    let tenant_username = "tenant";
-    let tenant_name = "Tenant";
-    let tenant_password = "tenant";
+    // insert tenant 1
+    let tenant_username = "tenant1";
+    let tenant_name = "Tenant 1";
+    let tenant_password = "tenant1";
     let tenant_email = "thebomberman9999@gmail.com";
     let tenant_hashed_pw = argon2::hash_raw(tenant_password.as_bytes(), &salt, &config).unwrap();
 
@@ -162,7 +162,40 @@ impl MigrationTrait for Migration {
         salt.clone().into(),
         tenant_hashed_pw.into(),
         SimpleExpr::Custom("'tenant'::user_role".to_string()),
-        SimpleExpr::Custom("'inactive'::user_status".to_string()),
+        SimpleExpr::Custom("'active'::user_status".to_string()),
+      ])
+      .to_owned();
+
+    manager.exec_stmt(insert_stmt).await?;
+
+    // insert tenant 2
+    let tenant_username = "tenant2";
+    let tenant_name = "Tenant 2";
+    let tenant_password = "tenant2";
+    let tenant_email = "anotherweebacc@gmail.com";
+    let tenant_hashed_pw = argon2::hash_raw(tenant_password.as_bytes(), &salt, &config).unwrap();
+
+    let insert_stmt = Query::insert()
+      .into_table(Users::Table)
+      .columns(vec![
+        Users::Username,
+        Users::Name,
+        Users::Email,
+        Users::Phone,
+        Users::Salt,
+        Users::Password,
+        Users::Role,
+        Users::Status,
+      ])
+      .values_panic([
+        tenant_username.into(),
+        tenant_name.into(),
+        tenant_email.into(),
+        "0927146787".into(),
+        salt.clone().into(),
+        tenant_hashed_pw.into(),
+        SimpleExpr::Custom("'tenant'::user_role".to_string()),
+        SimpleExpr::Custom("'active'::user_status".to_string()),
       ])
       .to_owned();
 

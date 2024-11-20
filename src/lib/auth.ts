@@ -23,6 +23,15 @@ export const useAuth = () => {
     }
   }
 
+  const isManager = async () => {
+    try {
+      await invoke('check_manager');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   const getUserInfo = async () => {
     try {
       const res = await invoke('get_user_info');
@@ -52,7 +61,14 @@ export const useAuth = () => {
     }
   }
 
-  return { isAuthenticated, getUserInfo, login, logout, isAdmin }
+  return {
+    isAuthenticated,
+    getUserInfo,
+    login,
+    logout,
+    isAdmin,
+    isManager,
+  };
 }
 
 export type AuthContext = ReturnType<typeof useAuth>;
