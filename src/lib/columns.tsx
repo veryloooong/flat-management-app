@@ -77,25 +77,25 @@ export const userInfoColumns: ColumnDef<BasicUserInfo>[] = [
 ]
 
 export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox checked={
-        table.getIsAllPageRowsSelected() ||
-        (table.getIsSomePageRowsSelected() && "indeterminate")
-      }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-  },
+  // {
+  //   id: 'select',
+  //   header: ({ table }) => (
+  //     <Checkbox checked={
+  //       table.getIsAllPageRowsSelected() ||
+  //       (table.getIsSomePageRowsSelected() && "indeterminate")
+  //     }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //     />
+  //   ),
+  // },
   {
     accessorKey: 'name',
     header: 'Tên',
