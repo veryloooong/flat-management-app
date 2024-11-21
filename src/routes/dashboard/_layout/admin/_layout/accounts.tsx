@@ -9,7 +9,7 @@ function AdminAccountsPage(): JSX.Element {
   const users = Route.useLoaderData();
 
   return (
-    <div className="w-screen pt-8">
+    <div className="w-screen">
       <h1 className="text-center">Các tài khoản người dùng</h1>
 
       <div className="w-4/5 mx-auto mt-8 flex flex-col gap-4">

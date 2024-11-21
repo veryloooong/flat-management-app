@@ -38,7 +38,6 @@ function LoginPage(): JSX.Element {
   });
 
   function onSubmit(data: z.infer<typeof loginFormSchema>) {
-    // invoke('account_login', data)
     login(data)
       .then((_) => {
         toast({

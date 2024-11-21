@@ -25,11 +25,9 @@ import { Route as DashboardLayoutNewsIndexImport } from './routes/dashboard/_lay
 import { Route as DashboardLayoutManagerIndexImport } from './routes/dashboard/_layout/manager/index'
 import { Route as DashboardLayoutHomesIndexImport } from './routes/dashboard/_layout/homes/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
-import { Route as DashboardLayoutManagerAddImport } from './routes/dashboard/_layout/manager/add'
 import { Route as DashboardLayoutAdminLayoutImport } from './routes/dashboard/_layout/admin/_layout'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
 import { Route as DashboardLayoutManagerInfoFeeIdImport } from './routes/dashboard/_layout/manager/info.$feeId'
-import { Route as DashboardLayoutManagerDeleteFeeIdImport } from './routes/dashboard/_layout/manager/delete.$feeId'
 import { Route as DashboardLayoutAdminLayoutAccountsImport } from './routes/dashboard/_layout/admin/_layout/accounts'
 
 // Create Virtual Routes
@@ -117,11 +115,6 @@ const DashboardLayoutAccountIndexRoute =
     getParentRoute: () => DashboardLayoutRoute,
   } as any)
 
-const DashboardLayoutManagerAddRoute = DashboardLayoutManagerAddImport.update({
-  path: '/manager/add',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
-
 const DashboardLayoutAdminLayoutRoute = DashboardLayoutAdminLayoutImport.update(
   {
     id: '/_layout',
@@ -139,12 +132,6 @@ const DashboardLayoutAccountEditRoute = DashboardLayoutAccountEditImport.update(
 const DashboardLayoutManagerInfoFeeIdRoute =
   DashboardLayoutManagerInfoFeeIdImport.update({
     path: '/manager/info/$feeId',
-    getParentRoute: () => DashboardLayoutRoute,
-  } as any)
-
-const DashboardLayoutManagerDeleteFeeIdRoute =
-  DashboardLayoutManagerDeleteFeeIdImport.update({
-    path: '/manager/delete/$feeId',
     getParentRoute: () => DashboardLayoutRoute,
   } as any)
 
@@ -249,13 +236,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutAdminLayoutImport
       parentRoute: typeof DashboardLayoutAdminRoute
     }
-    '/dashboard/_layout/manager/add': {
-      id: '/dashboard/_layout/manager/add'
-      path: '/manager/add'
-      fullPath: '/dashboard/manager/add'
-      preLoaderRoute: typeof DashboardLayoutManagerAddImport
-      parentRoute: typeof DashboardLayoutImport
-    }
     '/dashboard/_layout/account/': {
       id: '/dashboard/_layout/account/'
       path: '/account'
@@ -290,13 +270,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/accounts'
       preLoaderRoute: typeof DashboardLayoutAdminLayoutAccountsImport
       parentRoute: typeof DashboardLayoutAdminLayoutImport
-    }
-    '/dashboard/_layout/manager/delete/$feeId': {
-      id: '/dashboard/_layout/manager/delete/$feeId'
-      path: '/manager/delete/$feeId'
-      fullPath: '/dashboard/manager/delete/$feeId'
-      preLoaderRoute: typeof DashboardLayoutManagerDeleteFeeIdImport
-      parentRoute: typeof DashboardLayoutImport
     }
     '/dashboard/_layout/manager/info/$feeId': {
       id: '/dashboard/_layout/manager/info/$feeId'
@@ -367,12 +340,10 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutIndexRoute: typeof DashboardLayoutIndexRoute
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
-  DashboardLayoutManagerAddRoute: typeof DashboardLayoutManagerAddRoute
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
   DashboardLayoutHomesIndexRoute: typeof DashboardLayoutHomesIndexRoute
   DashboardLayoutManagerIndexRoute: typeof DashboardLayoutManagerIndexRoute
   DashboardLayoutNewsIndexRoute: typeof DashboardLayoutNewsIndexRoute
-  DashboardLayoutManagerDeleteFeeIdRoute: typeof DashboardLayoutManagerDeleteFeeIdRoute
   DashboardLayoutManagerInfoFeeIdRoute: typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
@@ -381,13 +352,10 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutIndexRoute: DashboardLayoutIndexRoute,
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
-  DashboardLayoutManagerAddRoute: DashboardLayoutManagerAddRoute,
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
   DashboardLayoutHomesIndexRoute: DashboardLayoutHomesIndexRoute,
   DashboardLayoutManagerIndexRoute: DashboardLayoutManagerIndexRoute,
   DashboardLayoutNewsIndexRoute: DashboardLayoutNewsIndexRoute,
-  DashboardLayoutManagerDeleteFeeIdRoute:
-    DashboardLayoutManagerDeleteFeeIdRoute,
   DashboardLayoutManagerInfoFeeIdRoute: DashboardLayoutManagerInfoFeeIdRoute,
 }
 
@@ -417,13 +385,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
-  '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
-  '/dashboard/manager/delete/$feeId': typeof DashboardLayoutManagerDeleteFeeIdRoute
   '/dashboard/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
@@ -436,13 +402,11 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardLayoutSettingsRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
-  '/dashboard/manager/add': typeof DashboardLayoutManagerAddRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/manager': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
-  '/dashboard/manager/delete/$feeId': typeof DashboardLayoutManagerDeleteFeeIdRoute
   '/dashboard/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
@@ -460,13 +424,11 @@ export interface FileRoutesById {
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
   '/dashboard/_layout/admin/_layout': typeof DashboardLayoutAdminLayoutRouteWithChildren
-  '/dashboard/_layout/manager/add': typeof DashboardLayoutManagerAddRoute
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/_layout/homes/': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/_layout/manager/': typeof DashboardLayoutManagerIndexRoute
   '/dashboard/_layout/news/': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/_layout/admin/_layout/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
-  '/dashboard/_layout/manager/delete/$feeId': typeof DashboardLayoutManagerDeleteFeeIdRoute
   '/dashboard/_layout/manager/info/$feeId': typeof DashboardLayoutManagerInfoFeeIdRoute
 }
 
@@ -482,13 +444,11 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
-    | '/dashboard/manager/add'
     | '/dashboard/account'
     | '/dashboard/homes'
     | '/dashboard/manager'
     | '/dashboard/news'
     | '/dashboard/admin/accounts'
-    | '/dashboard/manager/delete/$feeId'
     | '/dashboard/manager/info/$feeId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -500,13 +460,11 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
-    | '/dashboard/manager/add'
     | '/dashboard/account'
     | '/dashboard/homes'
     | '/dashboard/manager'
     | '/dashboard/news'
     | '/dashboard/admin/accounts'
-    | '/dashboard/manager/delete/$feeId'
     | '/dashboard/manager/info/$feeId'
   id:
     | '__root__'
@@ -522,13 +480,11 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/account/edit'
     | '/dashboard/_layout/admin'
     | '/dashboard/_layout/admin/_layout'
-    | '/dashboard/_layout/manager/add'
     | '/dashboard/_layout/account/'
     | '/dashboard/_layout/homes/'
     | '/dashboard/_layout/manager/'
     | '/dashboard/_layout/news/'
     | '/dashboard/_layout/admin/_layout/accounts'
-    | '/dashboard/_layout/manager/delete/$feeId'
     | '/dashboard/_layout/manager/info/$feeId'
   fileRoutesById: FileRoutesById
 }
@@ -591,12 +547,10 @@ export const routeTree = rootRoute
         "/dashboard/_layout/",
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
-        "/dashboard/_layout/manager/add",
         "/dashboard/_layout/account/",
         "/dashboard/_layout/homes/",
         "/dashboard/_layout/manager/",
         "/dashboard/_layout/news/",
-        "/dashboard/_layout/manager/delete/$feeId",
         "/dashboard/_layout/manager/info/$feeId"
       ]
     },
@@ -638,10 +592,6 @@ export const routeTree = rootRoute
         "/dashboard/_layout/admin/_layout/accounts"
       ]
     },
-    "/dashboard/_layout/manager/add": {
-      "filePath": "dashboard/_layout/manager/add.tsx",
-      "parent": "/dashboard/_layout"
-    },
     "/dashboard/_layout/account/": {
       "filePath": "dashboard/_layout/account/index.tsx",
       "parent": "/dashboard/_layout"
@@ -661,10 +611,6 @@ export const routeTree = rootRoute
     "/dashboard/_layout/admin/_layout/accounts": {
       "filePath": "dashboard/_layout/admin/_layout/accounts.tsx",
       "parent": "/dashboard/_layout/admin/_layout"
-    },
-    "/dashboard/_layout/manager/delete/$feeId": {
-      "filePath": "dashboard/_layout/manager/delete.$feeId.tsx",
-      "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/manager/info/$feeId": {
       "filePath": "dashboard/_layout/manager/info.$feeId.tsx",

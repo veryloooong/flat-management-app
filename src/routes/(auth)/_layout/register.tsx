@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { invoke } from "@tauri-apps/api/core";
+import { toast } from "@/hooks/use-toast";
 
 const registerFormSchema = z
   .object({
@@ -101,8 +102,23 @@ function RegisterPage(): JSX.Element {
         role: data.role,
       },
     })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err));
+      .then((_) => {
+        toast({
+          title: "Đăng ký tài khoản thành công",
+          description:
+            "Quản trị viên sẽ xét duyệt tài khoản của bạn, vui lòng đợi trong khoảng 1-2 ngày",
+          duration: 2000,
+        });
+      })
+      .catch((_) => {
+        toast({
+          title: "Đăng ký tài khoản thất bại",
+          description:
+            "Có lỗi xảy ra khi đăng ký tài khoản, vui lòng thử lại sau",
+          variant: "destructive",
+          duration: 2000,
+        });
+      });
   }
 
   return (

@@ -10,6 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { invoke } from "@tauri-apps/api/core";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const statusOptions = [
   { value: "active", label: "Đã kích hoạt" },
@@ -126,11 +138,67 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
     header: "Xoá",
     cell: ({ row }) => {
       const feeId = row.original.id.toString();
+      const [isOpen, setIsOpen] = useState(false);
 
       return (
-        <Link to="/dashboard/manager/delete/$feeId" params={{ feeId: feeId }}>
-          <Button className="bg-red-400 hover:bg-red-500">Xoá</Button>
-        </Link>
+        <Dialog open={isOpen}>
+          <DialogTrigger
+            onClick={() => {
+              setIsOpen(true);
+            }}
+          >
+            <Button className="bg-red-500 hover:bg-red-600 text-white">
+              Xoá
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="[&>button]:hidden">
+            <DialogTitle>Xóa khoản thu?</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa khoản thu này không? Thao tác này không
+              thể hoàn tác. Điều này sẽ xóa dữ liệu về khoản thu tới các hộ dân,
+              và các thông tin về lịch sử thu.
+            </DialogDescription>
+            <DialogFooter>
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white"
+                onClick={() => {
+                  invoke("remove_fee", { id: Number(feeId) })
+                    .then((_) => {
+                      toast({
+                        title: "Đã xóa khoản thu",
+                        description: "Khoản thu đã được xóa thành công.",
+                        duration: 2000,
+                      });
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      toast({
+                        title: "Có lỗi xảy ra",
+                        description:
+                          "Không thể xóa khoản thu. Vui lòng thử lại sau.",
+                        variant: "destructive",
+                      });
+                    })
+                    .finally(() => {
+                      setIsOpen(false);
+                    });
+                }}
+              >
+                Xóa khoản thu
+              </Button>
+              <DialogClose
+                asChild
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+              >
+                <Button className="bg-gray-300 hover:bg-gray-400 text-black">
+                  Hủy
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       );
     },
   },

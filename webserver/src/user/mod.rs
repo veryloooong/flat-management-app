@@ -298,7 +298,7 @@ pub async fn update_password(
 pub async fn get_user_role(
   State(state): State<AppState>,
   TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
-) -> Result<&'static str, StatusCode> {
+) -> Result<String, StatusCode> {
   let jwt_access_secret = &state.jwt_access_secret;
   let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
     Ok(claims) => claims,
@@ -327,5 +327,6 @@ pub async fn get_user_role(
     }
   };
 
-  Ok(user.role.into())
+  // hack to convert the enum to a &'static str then to a String wow this fucking sucks
+  Ok(serde_json::json!(user.role).as_str().unwrap().to_string())
 }

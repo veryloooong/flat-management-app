@@ -22,6 +22,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { useEffect, useState } from "react";
+import { roleToText } from "@/lib/utils";
 
 const NavLink = ({
   to,
@@ -47,7 +48,7 @@ const NavLink = ({
   );
 };
 
-export const Header = (): JSX.Element => {
+export const Header = ({ role }: { role?: string }): JSX.Element => {
   const { logout, isAdmin } = useAuth();
   const [admin, setAdmin] = useState(false);
 
@@ -94,16 +95,17 @@ export const Header = (): JSX.Element => {
       {/* Icons */}
       <div className="flex items-center gap-4 relative">
         {/* Icon Notification */}
-        <div className="relative">
+        {/* <div className="relative">
           <BellIcon className="w-6 h-6 text-white cursor-pointer" />
-        </div>
+        </div> */}
 
         {/* Icon User */}
         <div className="relative">
           {/* Dropdown Menu */}
           <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger className="flex flex-row gap-2">
               <UserIcon className="w-6 h-6 text-white cursor-pointer" />
+              <span className="text-white">{roleToText(role)}</span>
             </PopoverTrigger>
             <PopoverContent className="p-2 w-fit">
               <Link

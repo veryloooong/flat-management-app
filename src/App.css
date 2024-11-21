@@ -103,3 +103,14 @@ h4 {
 h5 {
   font-size: 1.125rem;
 }
+
+#root {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+#root::-webkit-scrollbar {
+  /* WebKit */
+  width: 0;
+  height: 0;
+}

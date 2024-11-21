@@ -12,7 +12,7 @@ function RootIndex(): JSX.Element {
     <main>
       <Outlet />
       <Toaster />
-      <TanStackRouterDevtools />
+      {import.meta.env.DEV && <TanStackRouterDevtools />}
     </main>
   );
 }

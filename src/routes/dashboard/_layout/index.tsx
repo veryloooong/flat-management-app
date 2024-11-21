@@ -37,7 +37,7 @@ function DashboardPage(): JSX.Element {
   ];
 
   return (
-    <div className="w-screen pt-6">
+    <div className="w-screen">
       <h1 className="text-center">Dashboard</h1>
       <div className="grid grid-cols-3 px-4 gap-x-2">
         {/* Fees and homes panel */}
@@ -104,9 +104,9 @@ function DashboardPage(): JSX.Element {
             ))}
           </ul>
           <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline text-sm">
-              Xem thêm
-            </a>
+            <Link to="/dashboard/news">
+              <Button variant="link">Xem thêm</Button>
+            </Link>
           </div>
         </div>
       </div>
