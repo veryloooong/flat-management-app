@@ -58,6 +58,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
   let user_router = OpenApiRouter::new()
     .routes(routes!(user::get_user_info, user::update_user_info))
     .routes(routes!(user::update_password))
+    .routes(routes!(user::get_user_role))
     .routes(routes!(check_token))
     .layer(middleware::from_fn_with_state(
       state.clone(),

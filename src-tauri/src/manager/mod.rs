@@ -9,7 +9,7 @@ pub struct BasicFeeInfo {
   pub id: i32,
   pub name: String,
   pub amount: i64,
-  pub collected_at: Date,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -45,7 +45,7 @@ pub struct AddFeeInfo {
   pub name: String,
   pub amount: i64,
   pub is_required: bool,
-  pub collected_at: Date,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -108,7 +108,7 @@ pub struct DetailedFeeInfo {
   pub amount: i64,
   pub is_required: bool,
   pub created_at: String,
-  pub collected_at: String,
+  pub due_date: String,
 }
 
 #[tauri::command]

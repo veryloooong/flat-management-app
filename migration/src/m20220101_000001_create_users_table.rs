@@ -1,4 +1,7 @@
 use extension::postgres::Type;
+use fake::faker::internet::en::*;
+use fake::faker::name::en::*;
+use fake::{Fake, Faker};
 use sea_orm::{ActiveEnum, DbBackend, DeriveActiveEnum, EnumIter, Schema};
 use sea_orm_migration::{prelude::*, schema::*};
 
@@ -135,38 +138,39 @@ impl MigrationTrait for Migration {
 
     manager.exec_stmt(insert_stmt).await?;
 
-    // insert inactive tenant user
-    let tenant_username = "tenant";
-    let tenant_name = "Tenant";
-    let tenant_password = "tenant";
-    let tenant_email = "thebomberman9999@gmail.com";
-    let tenant_hashed_pw = argon2::hash_raw(tenant_password.as_bytes(), &salt, &config).unwrap();
+    for i in 1..=20 {
+      let tenant_username = format!("tenant{}", i);
+      let tenant_name: String = Name().fake();
+      let tenant_password = format!("tenant{}", i);
+      let tenant_email: String = FreeEmail().fake();
+      let tenant_hashed_pw = argon2::hash_raw(tenant_password.as_bytes(), &salt, &config).unwrap();
 
-    let insert_stmt = Query::insert()
-      .into_table(Users::Table)
-      .columns(vec![
-        Users::Username,
-        Users::Name,
-        Users::Email,
-        Users::Phone,
-        Users::Salt,
-        Users::Password,
-        Users::Role,
-        Users::Status,
-      ])
-      .values_panic([
-        tenant_username.into(),
-        tenant_name.into(),
-        tenant_email.into(),
-        "0927146787".into(),
-        salt.clone().into(),
-        tenant_hashed_pw.into(),
-        SimpleExpr::Custom("'tenant'::user_role".to_string()),
-        SimpleExpr::Custom("'inactive'::user_status".to_string()),
-      ])
-      .to_owned();
+      let insert_stmt = Query::insert()
+        .into_table(Users::Table)
+        .columns(vec![
+          Users::Username,
+          Users::Name,
+          Users::Email,
+          Users::Phone,
+          Users::Salt,
+          Users::Password,
+          Users::Role,
+          Users::Status,
+        ])
+        .values_panic([
+          tenant_username.into(),
+          tenant_name.into(),
+          tenant_email.into(),
+          "0927146787".into(),
+          salt.clone().into(),
+          tenant_hashed_pw.into(),
+          SimpleExpr::Custom("'tenant'::user_role".to_string()),
+          SimpleExpr::Custom("'active'::user_status".to_string()),
+        ])
+        .to_owned();
 
-    manager.exec_stmt(insert_stmt).await?;
+      manager.exec_stmt(insert_stmt).await?;
+    }
 
     Ok(())
   }

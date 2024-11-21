@@ -32,13 +32,15 @@ impl MigrationTrait for Migration {
             ForeignKey::create()
               .name("fk_fees_room_room_number")
               .from(FeesRoom::Table, FeesRoom::RoomNumber)
-              .to(Rooms::Table, Rooms::RoomNumber),
+              .to(Rooms::Table, Rooms::RoomNumber)
+              .on_delete(ForeignKeyAction::SetDefault),
           )
           .foreign_key(
             ForeignKey::create()
               .name("fk_fees_room_fee_id")
               .from(FeesRoom::Table, FeesRoom::FeeId)
-              .to(Fees::Table, Fees::Id),
+              .to(Fees::Table, Fees::Id)
+              .on_delete(ForeignKeyAction::Cascade),
           )
           .to_owned(),
       )
@@ -49,14 +51,6 @@ impl MigrationTrait for Migration {
       .into_table(FeesRoom::Table)
       .columns(vec![FeesRoom::RoomNumber, FeesRoom::FeeId])
       .values_panic(vec![101.into(), 1.into()])
-      .to_owned();
-
-    manager.exec_stmt(insert_stmt).await?;
-
-    let insert_stmt = Query::insert()
-      .into_table(FeesRoom::Table)
-      .columns(vec![FeesRoom::RoomNumber, FeesRoom::FeeId])
-      .values_panic(vec![201.into(), 2.into()])
       .to_owned();
 
     manager.exec_stmt(insert_stmt).await?;

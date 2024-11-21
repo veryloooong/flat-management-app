@@ -19,7 +19,7 @@ pub enum Relation {
     from = "Column::FeeId",
     to = "super::fees::Column::Id",
     on_update = "NoAction",
-    on_delete = "NoAction"
+    on_delete = "Cascade"
   )]
   Fees,
   #[sea_orm(
@@ -27,7 +27,7 @@ pub enum Relation {
     from = "Column::RoomNumber",
     to = "super::rooms::Column::RoomNumber",
     on_update = "NoAction",
-    on_delete = "NoAction"
+    on_delete = "SetDefault"
   )]
   Rooms,
 }

@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
               .default(Expr::current_timestamp()),
           )
           .col(
-            ColumnDef::new(Fees::CollectedAt)
+            ColumnDef::new(Fees::DueDate)
               .date()
               .not_null()
               .default(Expr::custom_keyword(Alias::new(
@@ -77,5 +77,5 @@ pub enum Fees {
   Amount,
   IsRequired,
   CreatedAt,
-  CollectedAt,
+  DueDate,
 }

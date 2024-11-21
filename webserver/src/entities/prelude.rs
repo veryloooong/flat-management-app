@@ -3,6 +3,6 @@
 pub use super::fees::Entity as Fees;
 pub use super::fees_room::Entity as FeesRoom;
 pub use super::password_recovery_requests::Entity as PasswordRecoveryRequests;
-pub use super::room_tenant::Entity as RoomTenant;
 pub use super::rooms::Entity as Rooms;
+pub use super::transactions::Entity as Transactions;
 pub use super::users::Entity as Users;

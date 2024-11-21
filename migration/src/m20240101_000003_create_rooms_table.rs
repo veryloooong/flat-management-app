@@ -1,9 +1,12 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
+use crate::m20220101_000001_create_users_table::Users;
+
 #[derive(DeriveIden)]
 pub enum Rooms {
   Table,
   RoomNumber,
+  TenantId,
 }
 
 #[derive(DeriveMigrationName)]
@@ -18,26 +21,27 @@ impl MigrationTrait for Migration {
           .table(Rooms::Table)
           .if_not_exists()
           .col(integer(Rooms::RoomNumber).not_null().primary_key())
+          .col(integer(Rooms::TenantId).not_null().unique_key())
+          .foreign_key(
+            ForeignKey::create()
+              .from(Rooms::Table, Rooms::TenantId)
+              .to(Users::Table, Users::Id),
+          )
           .to_owned(),
       )
       .await?;
 
-    // Insert some data
-    let insert_stmt = Query::insert()
-      .into_table(Rooms::Table)
-      .columns(vec![Rooms::RoomNumber])
-      .values_panic(vec![101.into()])
-      .to_owned();
+    for i in 1..=10 {
+      let room_number = 100 + i;
+      let tenant_id = i + 2;
+      let insert_stmt = Query::insert()
+        .into_table(Rooms::Table)
+        .columns(vec![Rooms::RoomNumber, Rooms::TenantId])
+        .values_panic(vec![room_number.into(), tenant_id.into()])
+        .to_owned();
 
-    manager.exec_stmt(insert_stmt).await?;
-
-    let insert_stmt = Query::insert()
-      .into_table(Rooms::Table)
-      .columns(vec![Rooms::RoomNumber])
-      .values_panic(vec![201.into()])
-      .to_owned();
-
-    manager.exec_stmt(insert_stmt).await?;
+      manager.exec_stmt(insert_stmt).await?;
+    }
 
     Ok(())
   }

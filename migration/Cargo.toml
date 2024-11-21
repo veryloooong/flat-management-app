@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 async-std = { version = "1", features = ["attributes", "tokio1"] }
+fake = "3.0.1"
 fastrand = "2.1.1"
 rust-argon2 = "2.1.0"
 

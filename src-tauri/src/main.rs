@@ -59,6 +59,7 @@ async fn main() {
       user::info::update_user_info,
       user::info::update_password,
       user::tokens::check_token,
+      user::get_user_role,
       admin::check_admin,
       admin::get_all_users,
       crate::manager::get_fees,

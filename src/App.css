@@ -70,10 +70,17 @@
 }
 :root {
   font-family: Inter, sans-serif;
-  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1; /* fix for Chrome */
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
 }
 
@@ -95,4 +102,15 @@ h4 {
 
 h5 {
   font-size: 1.125rem;
+}
+
+#root {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+#root::-webkit-scrollbar {
+  /* WebKit */
+  width: 0;
+  height: 0;
 }

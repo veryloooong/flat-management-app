@@ -4,16 +4,26 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "room_tenant")]
+#[sea_orm(table_name = "transactions")]
 pub struct Model {
-  #[sea_orm(primary_key, auto_increment = false)]
+  #[sea_orm(primary_key)]
+  pub id: i32,
+  pub amount: i64,
+  pub created_at: DateTime,
   pub room_number: i32,
-  #[sea_orm(primary_key, auto_increment = false, unique)]
-  pub user_id: i32,
+  pub fee_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+  #[sea_orm(
+    belongs_to = "super::fees::Entity",
+    from = "Column::FeeId",
+    to = "super::fees::Column::Id",
+    on_update = "NoAction",
+    on_delete = "NoAction"
+  )]
+  Fees,
   #[sea_orm(
     belongs_to = "super::rooms::Entity",
     from = "Column::RoomNumber",
@@ -22,25 +32,17 @@ pub enum Relation {
     on_delete = "NoAction"
   )]
   Rooms,
-  #[sea_orm(
-    belongs_to = "super::users::Entity",
-    from = "Column::UserId",
-    to = "super::users::Column::Id",
-    on_update = "NoAction",
-    on_delete = "NoAction"
-  )]
-  Users,
+}
+
+impl Related<super::fees::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Fees.def()
+  }
 }
 
 impl Related<super::rooms::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::Rooms.def()
-  }
-}
-
-impl Related<super::users::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::Users.def()
   }
 }
 

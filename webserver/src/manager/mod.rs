@@ -22,7 +22,7 @@ pub mod types {
     pub id: i32,
     pub name: String,
     pub amount: i64,
-    pub collected_at: Date,
+    pub due_date: Date,
   }
 
   #[derive(Debug, Serialize, Deserialize, DerivePartialModel, FromQueryResult, ToSchema)]
@@ -33,7 +33,7 @@ pub mod types {
     pub amount: i64,
     pub is_required: bool,
     pub created_at: Date,
-    pub collected_at: Date,
+    pub due_date: Date,
   }
 
   #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
@@ -41,7 +41,7 @@ pub mod types {
     pub name: String,
     pub amount: i64,
     pub is_required: bool,
-    pub collected_at: Date,
+    pub due_date: Date,
   }
 }
 
@@ -110,7 +110,7 @@ pub async fn add_fee(
   let new_fee = fees::ActiveModel {
     amount: Set(fee_info.amount),
     name: Set(fee_info.name),
-    collected_at: Set(fee_info.collected_at),
+    due_date: Set(fee_info.due_date),
     is_required: Set(fee_info.is_required),
     ..Default::default()
   };

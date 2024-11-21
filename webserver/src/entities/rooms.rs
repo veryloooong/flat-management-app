@@ -8,14 +8,24 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
   pub room_number: i32,
+  #[sea_orm(unique)]
+  pub tenant_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
   #[sea_orm(has_many = "super::fees_room::Entity")]
   FeesRoom,
-  #[sea_orm(has_many = "super::room_tenant::Entity")]
-  RoomTenant,
+  #[sea_orm(has_many = "super::transactions::Entity")]
+  Transactions,
+  #[sea_orm(
+    belongs_to = "super::users::Entity",
+    from = "Column::TenantId",
+    to = "super::users::Column::Id",
+    on_update = "NoAction",
+    on_delete = "NoAction"
+  )]
+  Users,
 }
 
 impl Related<super::fees_room::Entity> for Entity {
@@ -24,9 +34,15 @@ impl Related<super::fees_room::Entity> for Entity {
   }
 }
 
-impl Related<super::room_tenant::Entity> for Entity {
+impl Related<super::transactions::Entity> for Entity {
   fn to() -> RelationDef {
-    Relation::RoomTenant.def()
+    Relation::Transactions.def()
+  }
+}
+
+impl Related<super::users::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Users.def()
   }
 }
 
@@ -36,15 +52,6 @@ impl Related<super::fees::Entity> for Entity {
   }
   fn via() -> Option<RelationDef> {
     Some(super::fees_room::Relation::Rooms.def().rev())
-  }
-}
-
-impl Related<super::users::Entity> for Entity {
-  fn to() -> RelationDef {
-    super::room_tenant::Relation::Users.def()
-  }
-  fn via() -> Option<RelationDef> {
-    Some(super::room_tenant::Relation::Rooms.def().rev())
   }
 }
 
