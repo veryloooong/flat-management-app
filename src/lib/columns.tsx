@@ -82,9 +82,38 @@ export const userInfoColumns: ColumnDef<BasicUserInfo & { size?: number }>[] = [
     header: "Trạng thái",
     cell: ({ cell }) => {
       const status = cell.getValue() as string;
+      const userId = cell.row.original.id.toString();
+      const router = useRouter();
 
       return (
-        <Select>
+        <Select
+          onValueChange={(value) => {
+            invoke("update_user_status", {
+              userId: Number(userId),
+              status: value,
+            })
+              .then((_) => {
+                toast({
+                  title: "Đã cập nhật trạng thái",
+                  description:
+                    "Trạng thái người dùng đã được cập nhật thành công.",
+                  duration: 2000,
+                });
+
+                router.invalidate();
+              })
+              .catch((err) => {
+                console.error(err);
+                toast({
+                  title: "Có lỗi xảy ra",
+                  description:
+                    "Không thể cập nhật trạng thái người dùng. Vui lòng thử lại sau.",
+                  variant: "destructive",
+                  duration: 2000,
+                });
+              });
+          }}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue
               placeholder={

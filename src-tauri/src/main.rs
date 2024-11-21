@@ -62,6 +62,7 @@ async fn main() {
       user::get_user_role,
       admin::check_admin,
       admin::get_all_users,
+      admin::update_user_status,
       crate::manager::get_fees,
       crate::manager::add_fee,
       crate::manager::remove_fee,

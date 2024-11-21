@@ -1,5 +1,7 @@
-use crate::prelude::*;
+use crate::{entities::users, prelude::*};
 
+use axum_extra::extract::Query;
+use sea_orm::{Order, QueryOrder};
 use tags::ADMIN;
 
 /// Get the list of all users.
@@ -38,6 +40,7 @@ pub async fn get_all_users(
   }
 
   let users = match Users::find()
+    .order_by(users::Column::Id, Order::Asc)
     .into_partial_model::<BasicUserInfo>()
     .all(&state.db)
     .await
@@ -91,6 +94,70 @@ pub async fn check_admin(
 
   if user_role != UserRole::Admin {
     return StatusCode::FORBIDDEN;
+  }
+
+  StatusCode::OK
+}
+
+#[derive(Debug, Deserialize, utoipa::IntoParams)]
+pub struct ActivateUserParams {
+  user_id: i32,
+  status: String,
+}
+
+#[utoipa::path(
+  post,
+  path = "/activate",
+  params(
+    ActivateUserParams
+  ),
+  tag = ADMIN,
+  responses(
+    (status = OK, description = "User activated"),
+    (status = BAD_REQUEST, description = "Invalid request"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn activate_user(
+  State(state): State<AppState>,
+  Query(ActivateUserParams { user_id, status }): Query<ActivateUserParams>,
+) -> StatusCode {
+  let user = match Users::find_by_id(user_id).one(&state.db).await {
+    Ok(user) => user,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  if user.is_none() {
+    return StatusCode::BAD_REQUEST;
+  }
+
+  let status = match status.as_str() {
+    "active" => UserStatus::Active,
+    "inactive" => UserStatus::Inactive,
+    _ => return StatusCode::BAD_REQUEST,
+  };
+
+  let user = user.unwrap();
+  if user.role == UserRole::Admin {
+    return StatusCode::BAD_REQUEST;
+  }
+
+  let mut user: users::ActiveModel = user.into();
+
+  user.status = Set(status);
+
+  match user.update(&state.db).await {
+    Ok(_) => (),
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
   }
 
   StatusCode::OK

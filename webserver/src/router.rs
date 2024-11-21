@@ -68,6 +68,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
   let admin_router = OpenApiRouter::new()
     .routes(routes!(admin::get_all_users))
     .routes(routes!(admin::check_admin))
+    .routes(routes!(admin::activate_user))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::admin_middleware,
