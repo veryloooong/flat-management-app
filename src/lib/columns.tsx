@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { BasicUserInfo, BasicFeeInfo } from "./types";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -139,6 +139,7 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
     cell: ({ row }) => {
       const feeId = row.original.id.toString();
       const [isOpen, setIsOpen] = useState(false);
+      const router = useRouter();
 
       return (
         <Dialog open={isOpen}>
@@ -181,6 +182,7 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
                     })
                     .finally(() => {
                       setIsOpen(false);
+                      router.invalidate();
                     });
                 }}
               >
