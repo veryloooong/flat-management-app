@@ -32,13 +32,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronLeftIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { add, format } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -59,14 +59,14 @@ function ShowFeeInfoPage(): JSX.Element {
   });
   function onSubmitEditFeeForm(data: z.infer<typeof addFeeSchema>) {
     const info = {
-      id: feeInfo.id,
+      // id: feeInfo.id,
       name: data.name,
       amount: data.amount,
       due_date: format(data.due_date, "yyyy-MM-dd"),
       is_required: data.is_required,
     };
 
-    invoke("edit_fee", { info })
+    invoke("edit_fee_info", { id: feeInfo.id, info })
       .then(() => {
         toast({ title: "Chỉnh sửa khoản thu thành công!", duration: 2000 });
         router.invalidate();
@@ -89,24 +89,6 @@ function ShowFeeInfoPage(): JSX.Element {
     //  FIX ME
     { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
     { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
-    {
-      room: "210",
-      amount: "500.000 VND",
-      paymentDate: "29/11/2024 0  8:11:59",
-    },
-  ];
-
-  const unpaidHouseholds = [
-    // FIX ME
-    { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
-    { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
-    { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
-  ];
-
-  const paidHouseholds = [
-    //  FIX ME
-    { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
-    { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
     { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
   ];
 
@@ -118,15 +100,16 @@ function ShowFeeInfoPage(): JSX.Element {
   ];
 
   return (
-    <div className="w-screen p-8 bg-gray-100">
+    <div className="w-screen pt-0 px-4 bg-gray-100">
       {/* Navigation Back */}
       <Link to="/dashboard/manager">
-        <Button>Quay lại</Button>
+        <Button className="flex flex-row gap-2">
+          <ChevronLeftIcon size={16} />
+          Quay lại
+        </Button>
       </Link>
 
-      <h1 className="text-center text-2xl font-bold mt-4">
-        Thông tin khoản thu
-      </h1>
+      <h1 className="text-center text-2xl font-bold">Thông tin khoản thu</h1>
 
       {/* Main Content */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">

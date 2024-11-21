@@ -45,6 +45,7 @@ pub mod types {
   }
 }
 
+use sea_orm::{Order, QueryOrder};
 use types::*;
 
 #[utoipa::path(
@@ -66,6 +67,7 @@ pub async fn get_fees(
   State(state): State<AppState>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
   let fees = match Fees::find()
+    .order_by(fees::Column::DueDate, Order::Asc)
     .into_partial_model::<FeesInfo>()
     .all(&state.db)
     .await
@@ -211,4 +213,60 @@ pub async fn get_one_fee(
     HeaderMap::new(),
     serde_json::to_string(&fee).unwrap(),
   ))
+}
+
+#[utoipa::path(
+  put,
+  path = "/fees/{id}",
+  summary = "Edit a fee",
+  tag = tags::MANAGER,
+  responses(
+    (status = NO_CONTENT, description = "Fee updated"),
+    (status = NOT_FOUND, description = "Fee not found"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+    (status = UNAUTHORIZED, description = "Unauthorized"),
+    (status = FORBIDDEN, description = "Forbidden"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn edit_fee_info(
+  State(state): State<AppState>,
+  Path(id): Path<i32>,
+  Json(fee_info): Json<AddFeeInfo>,
+) -> StatusCode {
+  let fee = match Fees::find_by_id(id).one(&state.db).await {
+    Ok(fee) => fee,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  let fee = match fee {
+    Some(fee) => fee,
+    None => {
+      return StatusCode::NOT_FOUND;
+    }
+  };
+
+  let fee = fees::ActiveModel {
+    amount: Set(fee_info.amount),
+    name: Set(fee_info.name),
+    due_date: Set(fee_info.due_date),
+    is_required: Set(fee_info.is_required),
+    ..fee.into()
+  };
+
+  match Fees::update(fee).exec(&state.db).await {
+    Ok(res) => {
+      log::info!("Fee updated: {:?}", res);
+      StatusCode::NO_CONTENT
+    }
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      StatusCode::INTERNAL_SERVER_ERROR
+    }
+  }
 }
