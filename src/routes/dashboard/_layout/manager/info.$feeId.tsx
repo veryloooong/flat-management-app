@@ -1,17 +1,98 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { DetailedFeeInfo } from "@/lib/types";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { add, format } from "date-fns";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { addFeeSchema } from "@/lib/add-fee";
 
 function ShowFeeInfoPage(): JSX.Element {
   const feeInfo: DetailedFeeInfo = Route.useLoaderData();
+  const router = useRouter();
+  const [isEditFeeDialogOpen, setIsEditFeeDialogOpen] = useState(false);
+  const editFeeForm = useForm<z.infer<typeof addFeeSchema>>({
+    resolver: zodResolver(addFeeSchema),
+    defaultValues: {
+      name: feeInfo.name,
+      amount: feeInfo.amount,
+      due_date: new Date(feeInfo.due_date),
+      is_required: feeInfo.is_required,
+    },
+  });
+  function onSubmitEditFeeForm(data: z.infer<typeof addFeeSchema>) {
+    const info = {
+      id: feeInfo.id,
+      name: data.name,
+      amount: data.amount,
+      due_date: format(data.due_date, "yyyy-MM-dd"),
+      is_required: data.is_required,
+    };
+
+    invoke("edit_fee", { info })
+      .then(() => {
+        toast({ title: "Chỉnh sửa khoản thu thành công!", duration: 2000 });
+        router.invalidate();
+      })
+      .catch((err) => {
+        toast({
+          title: "Chỉnh sửa khoản thu thất bại!",
+          description: err,
+          variant: "destructive",
+          duration: 2000,
+        });
+      })
+      .finally(() => {
+        editFeeForm.reset();
+        setIsEditFeeDialogOpen(false);
+      });
+  }
 
   const paidHouseholds = [
     //  FIX ME
     { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
     { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
-    { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
+    {
+      room: "210",
+      amount: "500.000 VND",
+      paymentDate: "29/11/2024 0  8:11:59",
+    },
   ];
 
   const unpaidHouseholds = [
@@ -61,6 +142,139 @@ function ShowFeeInfoPage(): JSX.Element {
               </p>
             </div>
           </div>
+          {/*Them nut chinh sua khoan thu */}
+          <Dialog open={isEditFeeDialogOpen}>
+            <DialogTrigger
+              onClick={() => {
+                setIsEditFeeDialogOpen(true);
+              }}
+            >
+              <Button>Chỉnh sửa khoản thu</Button>
+            </DialogTrigger>
+            <DialogContent className="[&>button]:hidden">
+              <DialogTitle>Chỉnh sửa khoản thu</DialogTitle>
+              <DialogDescription>
+                Điền thông tin cần chỉnh sửa và nhấn "Chỉnh sửa" để chỉnh sửa
+                thông tin.
+              </DialogDescription>
+              <Form {...editFeeForm}>
+                <form
+                  onSubmit={editFeeForm.handleSubmit(onSubmitEditFeeForm)}
+                  className="flex flex-col gap-4"
+                >
+                  <FormField
+                    name="name"
+                    control={editFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tên khoản thu</FormLabel>
+                        <FormControl>
+                          <Input {...field} autoComplete="off" />
+                        </FormControl>
+                        <FormMessage>
+                          {editFeeForm.formState.errors.name?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="amount"
+                    control={editFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Số tiền</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="number" min={0} />
+                        </FormControl>
+                        <FormMessage>
+                          {editFeeForm.formState.errors.amount?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="due_date"
+                    control={editFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel>Ngày thu</FormLabel>
+                        <FormControl>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "dd/MM/yyyy")
+                                  ) : (
+                                    <span>Chọn ngày</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) => date < new Date()}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage>
+                          {editFeeForm.formState.errors.due_date?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="is_required"
+                    control={editFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel>Có bắt buộc?</FormLabel>
+                        <FormMessage>
+                          {editFeeForm.formState.errors.is_required?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+              <DialogFooter>
+                <Button
+                  onClick={() => {
+                    editFeeForm.handleSubmit(onSubmitEditFeeForm)();
+                  }}
+                  className="bg-main-palette-5 hover:bg-main-palette-6"
+                >
+                  Chỉnh sửa
+                </Button>
+                <DialogClose>
+                  <Button onClick={() => setIsEditFeeDialogOpen(false)}>
+                    Đóng
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Households Lists */}
