@@ -6,10 +6,10 @@ use crate::AppState;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BasicFeeInfo {
-    pub id: i32,
-    pub name: String,
-    pub amount: i64,
-    pub due_date: Date,
+  pub id: i32,
+  pub name: String,
+  pub amount: i64,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -42,10 +42,10 @@ pub async fn get_fees<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<BasicF
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AddFeeInfo {
-    pub name: String,
-    pub amount: i64,
-    pub is_required: bool,
-    pub due_date: Date,
+  pub name: String,
+  pub amount: i64,
+  pub is_required: bool,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -103,12 +103,12 @@ pub async fn remove_fee<R: Runtime>(app: tauri::AppHandle<R>, id: i32) -> Result
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DetailedFeeInfo {
-    pub id: i32,
-    pub name: String,
-    pub amount: i64,
-    pub is_required: bool,
-    pub created_at: String,
-    pub due_date: String,
+  pub id: i32,
+  pub name: String,
+  pub amount: i64,
+  pub is_required: bool,
+  pub created_at: String,
+  pub due_date: String,
 }
 
 #[tauri::command]

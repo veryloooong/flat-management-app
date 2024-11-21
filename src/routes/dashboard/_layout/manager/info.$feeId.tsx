@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { DetailedFeeInfo } from "@/lib/types";
+
 import {
   createFileRoute,
   Link,
@@ -93,6 +94,20 @@ function ShowFeeInfoPage(): JSX.Element {
       amount: "500.000 VND",
       paymentDate: "29/11/2024 0  8:11:59",
     },
+  ];
+
+  const unpaidHouseholds = [
+    // FIX ME
+    { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
+    { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
+    { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
+  ];
+
+  const paidHouseholds = [
+    //  FIX ME
+    { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
+    { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
+    { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
   ];
 
   const unpaidHouseholds = [

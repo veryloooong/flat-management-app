@@ -66,3 +66,35 @@ pub async fn get_all_users<R: Runtime>(
 
   Ok(response)
 }
+
+#[tauri::command]
+pub async fn update_user_status<R: Runtime>(
+  app: tauri::AppHandle<R>,
+  user_id: i32,
+  status: String,
+) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let server_url = &state.server_url;
+  let client = &state.client;
+  let jwt_access_token = state.access_token.clone().ok_or("")?;
+
+  let response = client
+    .post(format!("{}/admin/activate", server_url))
+    .query(&[("user_id", user_id.to_string()), ("status", status)])
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send update user status request: {}", e);
+      "Failed to send update user status request".to_string()
+    })?;
+
+  if !response.status().is_success() {
+    log::error!("Failed to update user status: {:?}", response);
+    return Err("Failed to update user status".to_string());
+  }
+
+  Ok(())
+}
