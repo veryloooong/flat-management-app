@@ -1,7 +1,7 @@
 import { useAuth } from "@/lib/auth";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  BellIcon,
+  BuildingIcon,
   CircleDollarSignIcon,
   HomeIcon,
   NewspaperIcon,
@@ -21,7 +21,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { useEffect, useState } from "react";
 import { roleToText } from "@/lib/utils";
 
 const NavLink = ({
@@ -50,7 +49,6 @@ const NavLink = ({
 
 export const Header = ({ role }: { role?: string }): JSX.Element => {
   const { logout } = useAuth();
-  // check if user is admin by calling isAdmin function asynchrously
 
   return (
     <header className="w-full h-20 bg-main-palette-5 flex items-center justify-start gap-8 px-6 fixed top-0 z-50">
@@ -73,6 +71,12 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
                 <span>Hộ dân</span>
               </NavLink>
             </>
+          )}
+          {role === "tenant" && (
+            <NavLink to="/dashboard/household">
+              <BuildingIcon size={24} />
+              <span>Thông tin phòng</span>
+            </NavLink>
           )}
           <NavLink to="/dashboard/news">
             <NewspaperIcon size={24} />

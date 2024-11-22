@@ -22,6 +22,7 @@ import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/regis
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout/login'
 import { Route as DashboardLayoutNewsIndexImport } from './routes/dashboard/_layout/news/index'
+import { Route as DashboardLayoutHouseholdIndexImport } from './routes/dashboard/_layout/household/index'
 import { Route as DashboardLayoutHomesIndexImport } from './routes/dashboard/_layout/homes/index'
 import { Route as DashboardLayoutFeesIndexImport } from './routes/dashboard/_layout/fees/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
@@ -97,6 +98,12 @@ const DashboardLayoutNewsIndexRoute = DashboardLayoutNewsIndexImport.update({
   path: '/news/',
   getParentRoute: () => DashboardLayoutRoute,
 } as any)
+
+const DashboardLayoutHouseholdIndexRoute =
+  DashboardLayoutHouseholdIndexImport.update({
+    path: '/household/',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
 
 const DashboardLayoutHomesIndexRoute = DashboardLayoutHomesIndexImport.update({
   path: '/homes/',
@@ -256,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutHomesIndexImport
       parentRoute: typeof DashboardLayoutImport
     }
+    '/dashboard/_layout/household/': {
+      id: '/dashboard/_layout/household/'
+      path: '/household'
+      fullPath: '/dashboard/household'
+      preLoaderRoute: typeof DashboardLayoutHouseholdIndexImport
+      parentRoute: typeof DashboardLayoutImport
+    }
     '/dashboard/_layout/news/': {
       id: '/dashboard/_layout/news/'
       path: '/news'
@@ -342,6 +356,7 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
   DashboardLayoutFeesIndexRoute: typeof DashboardLayoutFeesIndexRoute
   DashboardLayoutHomesIndexRoute: typeof DashboardLayoutHomesIndexRoute
+  DashboardLayoutHouseholdIndexRoute: typeof DashboardLayoutHouseholdIndexRoute
   DashboardLayoutNewsIndexRoute: typeof DashboardLayoutNewsIndexRoute
   DashboardLayoutFeesInfoFeeIdRoute: typeof DashboardLayoutFeesInfoFeeIdRoute
 }
@@ -354,6 +369,7 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
   DashboardLayoutFeesIndexRoute: DashboardLayoutFeesIndexRoute,
   DashboardLayoutHomesIndexRoute: DashboardLayoutHomesIndexRoute,
+  DashboardLayoutHouseholdIndexRoute: DashboardLayoutHouseholdIndexRoute,
   DashboardLayoutNewsIndexRoute: DashboardLayoutNewsIndexRoute,
   DashboardLayoutFeesInfoFeeIdRoute: DashboardLayoutFeesInfoFeeIdRoute,
 }
@@ -387,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
+  '/dashboard/household': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
@@ -404,6 +421,7 @@ export interface FileRoutesByTo {
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
+  '/dashboard/household': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
@@ -426,6 +444,7 @@ export interface FileRoutesById {
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/_layout/fees/': typeof DashboardLayoutFeesIndexRoute
   '/dashboard/_layout/homes/': typeof DashboardLayoutHomesIndexRoute
+  '/dashboard/_layout/household/': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/_layout/news/': typeof DashboardLayoutNewsIndexRoute
   '/dashboard/_layout/admin/_layout/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/_layout/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
@@ -446,6 +465,7 @@ export interface FileRouteTypes {
     | '/dashboard/account'
     | '/dashboard/fees'
     | '/dashboard/homes'
+    | '/dashboard/household'
     | '/dashboard/news'
     | '/dashboard/admin/accounts'
     | '/dashboard/fees/info/$feeId'
@@ -462,6 +482,7 @@ export interface FileRouteTypes {
     | '/dashboard/account'
     | '/dashboard/fees'
     | '/dashboard/homes'
+    | '/dashboard/household'
     | '/dashboard/news'
     | '/dashboard/admin/accounts'
     | '/dashboard/fees/info/$feeId'
@@ -482,6 +503,7 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/account/'
     | '/dashboard/_layout/fees/'
     | '/dashboard/_layout/homes/'
+    | '/dashboard/_layout/household/'
     | '/dashboard/_layout/news/'
     | '/dashboard/_layout/admin/_layout/accounts'
     | '/dashboard/_layout/fees/info/$feeId'
@@ -549,6 +571,7 @@ export const routeTree = rootRoute
         "/dashboard/_layout/account/",
         "/dashboard/_layout/fees/",
         "/dashboard/_layout/homes/",
+        "/dashboard/_layout/household/",
         "/dashboard/_layout/news/",
         "/dashboard/_layout/fees/info/$feeId"
       ]
@@ -601,6 +624,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/_layout/homes/": {
       "filePath": "dashboard/_layout/homes/index.tsx",
+      "parent": "/dashboard/_layout"
+    },
+    "/dashboard/_layout/household/": {
+      "filePath": "dashboard/_layout/household/index.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/news/": {

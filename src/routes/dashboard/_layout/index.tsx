@@ -44,13 +44,11 @@ function DashboardPage(): JSX.Element {
         <div className="col-span-2">
           <div className="flex flex-row w-full items-center gap-2">
             <InfoTile title="Khoản thu">
-              {/* <p>100</p> */}
               <Link to="/dashboard/fees">
                 <Button>Xem chi tiết</Button>
               </Link>
             </InfoTile>
             <InfoTile title="Cư dân">
-              {/* <p>100</p> */}
               <Link to="/dashboard/homes">
                 <Button>Xem chi tiết</Button>
               </Link>
@@ -90,18 +88,20 @@ function DashboardPage(): JSX.Element {
             </div>
           </div>
         </div>
+
         {/* News panel */}
         <div className="col-span-1 border-2 rounded-md p-4 shadow-md bg-white">
           <h3 className="text-lg font-bold mb-4 border-b-2 border-gray-400">
             Tin tức
           </h3>
           <ul className="space-y-3">
-            {newsItems.map((item, index) => (
+            {/* {newsItems.map((item, index) => (
               <li key={index} className="flex justify-between border-b pb-2">
                 <span className="text-sm font-medium">{item.title}</span>
                 <span className="text-xs text-gray-500">{item.date}</span>
               </li>
-            ))}
+            ))} */}
+            <li>Tính năng đang được phát triển</li>
           </ul>
           <div className="mt-4">
             <Link to="/dashboard/news">
