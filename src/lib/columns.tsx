@@ -154,7 +154,7 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
       const feeId = row.original.id.toString();
 
       return (
-        <Link to="/dashboard/manager/info/$feeId" params={{ feeId: feeId }}>
+        <Link to="/dashboard/fees/info/$feeId" params={{ feeId: feeId }}>
           <Button className="bg-main-palette-5 hover:bg-main-palette-6">
             Thông tin
           </Button>

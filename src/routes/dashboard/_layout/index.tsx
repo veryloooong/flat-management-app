@@ -45,7 +45,7 @@ function DashboardPage(): JSX.Element {
           <div className="flex flex-row w-full items-center gap-2">
             <InfoTile title="Khoản thu">
               {/* <p>100</p> */}
-              <Link to="/dashboard/manager">
+              <Link to="/dashboard/fees">
                 <Button>Xem chi tiết</Button>
               </Link>
             </InfoTile>

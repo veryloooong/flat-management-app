@@ -59,7 +59,6 @@ function ShowFeeInfoPage(): JSX.Element {
   });
   function onSubmitEditFeeForm(data: z.infer<typeof addFeeSchema>) {
     const info = {
-      // id: feeInfo.id,
       name: data.name,
       amount: data.amount,
       due_date: format(data.due_date, "yyyy-MM-dd"),
@@ -102,7 +101,7 @@ function ShowFeeInfoPage(): JSX.Element {
   return (
     <div className="w-screen pt-0 px-4 bg-gray-100">
       {/* Navigation Back */}
-      <Link to="/dashboard/manager">
+      <Link to="/dashboard/fees">
         <Button className="flex flex-row gap-2">
           <ChevronLeftIcon size={16} />
           Quay lại
@@ -334,7 +333,7 @@ function ShowFeeInfoPage(): JSX.Element {
   );
 }
 
-export const Route = createFileRoute("/dashboard/_layout/manager/info/$feeId")({
+export const Route = createFileRoute("/dashboard/_layout/fees/info/$feeId")({
   component: ShowFeeInfoPage,
   loader: async ({ params }) => {
     try {
@@ -351,7 +350,7 @@ export const Route = createFileRoute("/dashboard/_layout/manager/info/$feeId")({
       });
 
       throw redirect({
-        to: "/dashboard/manager",
+        to: "/dashboard/fees",
       });
     }
   },

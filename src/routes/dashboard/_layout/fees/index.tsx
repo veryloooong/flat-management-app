@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { DataTable } from "@/components/ui/data-table";
-import { feeColumns } from "@/lib/columns";
-import { BasicFeeInfo } from "@/lib/types";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/ui/data-table'
+import { feeColumns } from '@/lib/columns'
+import { BasicFeeInfo } from '@/lib/types'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import {
   Dialog,
   DialogClose,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -19,70 +19,70 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
+import { CalendarIcon } from 'lucide-react'
+import { Calendar } from '@/components/ui/calendar'
 
-import { invoke } from "@tauri-apps/api/core";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { add, format } from "date-fns";
-import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { addFeeSchema } from "@/lib/add-fee";
+import { invoke } from '@tauri-apps/api/core'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { add, format } from 'date-fns'
+import { toast } from '@/hooks/use-toast'
+import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { addFeeSchema } from '@/lib/add-fee'
 
 function FeesPage(): JSX.Element {
-  const fees = Route.useLoaderData();
-  const router = useRouter();
-  const [isAddFeeDialogOpen, setIsAddFeeDialogOpen] = useState(false);
+  const fees = Route.useLoaderData()
+  const router = useRouter()
+  const [isAddFeeDialogOpen, setIsAddFeeDialogOpen] = useState(false)
 
   const addFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
     defaultValues: {
-      name: "",
+      name: '',
       amount: 0,
       due_date: add(new Date(), { months: 1 }),
       is_required: true,
     },
-  });
+  })
 
   function onSubmitAddFeeForm(data: z.infer<typeof addFeeSchema>) {
     let info = {
       name: data.name,
       amount: data.amount,
-      due_date: format(data.due_date, "yyyy-MM-dd"),
+      due_date: format(data.due_date, 'yyyy-MM-dd'),
       is_required: data.is_required,
-    };
+    }
 
-    invoke("add_fee", { info })
+    invoke('add_fee', { info })
       .then((_) => {
-        addFeeForm.reset();
+        addFeeForm.reset()
         toast({
-          title: "Thêm khoản thu thành công!",
+          title: 'Thêm khoản thu thành công!',
           duration: 2000,
-        });
+        })
       })
       .catch((err) => {
         toast({
-          title: "Thêm khoản thu thất bại!",
+          title: 'Thêm khoản thu thất bại!',
           description: err,
           duration: 2000,
-        });
+        })
       })
       .finally(() => {
-        addFeeForm.reset();
-        setIsAddFeeDialogOpen(false);
-        router.invalidate();
-      });
+        addFeeForm.reset()
+        setIsAddFeeDialogOpen(false)
+        router.invalidate()
+      })
   }
 
   return (
@@ -96,7 +96,7 @@ function FeesPage(): JSX.Element {
         <Dialog open={isAddFeeDialogOpen}>
           <DialogTrigger
             onClick={() => {
-              setIsAddFeeDialogOpen(true);
+              setIsAddFeeDialogOpen(true)
             }}
           >
             <Button>Thêm khoản thu</Button>
@@ -154,12 +154,12 @@ function FeesPage(): JSX.Element {
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  "pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
+                                  'pl-3 text-left font-normal',
+                                  !field.value && 'text-muted-foreground',
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "dd/MM/yyyy")
+                                  format(field.value, 'dd/MM/yyyy')
                                 ) : (
                                   <span>Chọn ngày</span>
                                 )}
@@ -207,7 +207,7 @@ function FeesPage(): JSX.Element {
             <DialogFooter>
               <Button
                 onClick={() => {
-                  addFeeForm.handleSubmit(onSubmitAddFeeForm)();
+                  addFeeForm.handleSubmit(onSubmitAddFeeForm)()
                 }}
                 className="bg-main-palette-5 hover:bg-main-palette-6"
               >
@@ -223,17 +223,17 @@ function FeesPage(): JSX.Element {
         </Dialog>
       </div>
     </div>
-  );
+  )
 }
 
-export const Route = createFileRoute("/dashboard/_layout/manager/")({
+export const Route = createFileRoute('/dashboard/_layout/fees/')({
   component: FeesPage,
   loader: async (_) => {
     try {
-      const fees = (await invoke("get_fees")) as BasicFeeInfo[];
-      return fees;
+      const fees = (await invoke('get_fees')) as BasicFeeInfo[]
+      return fees
     } catch {
-      return [];
+      return []
     }
   },
-});
+})
