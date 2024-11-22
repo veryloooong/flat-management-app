@@ -71,6 +71,7 @@ const registerFormSchema = z
     email: z.string().email("Email không hợp lệ"),
     phone: z.string(),
     role: z.enum(["manager", "tenant"]),
+    roomId: z.coerce.number().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu xác nhận không khớp",
@@ -88,6 +89,7 @@ function RegisterPage(): JSX.Element {
       email: "",
       phone: "",
       role: "manager",
+      roomId: 0,
     },
   });
 
@@ -100,6 +102,7 @@ function RegisterPage(): JSX.Element {
         email: data.email,
         phone: data.phone,
         role: data.role,
+        room_id: data.roomId,
       },
     })
       .then((_) => {
@@ -253,6 +256,23 @@ function RegisterPage(): JSX.Element {
               </FormItem>
             )}
           />
+          {form.watch("role") === "tenant" && (
+            <FormField
+              name="roomId"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phòng số</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage>
+                    {form.formState.errors.roomId?.message}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+          )}
 
           <Button
             type="submit"
