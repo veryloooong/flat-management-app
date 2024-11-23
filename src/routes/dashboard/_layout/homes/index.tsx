@@ -1,9 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { TodoPage } from "@/lib/todo";
+import { createFileRoute } from "@tanstack/react-router";
 
 function HomeManagementPage(): JSX.Element {
-  return <div>Hello /dashboard/_layout/homes/!</div>
+  return <TodoPage />;
 }
 
-export const Route = createFileRoute('/dashboard/_layout/homes/')({
+export const Route = createFileRoute("/dashboard/_layout/homes/")({
   component: HomeManagementPage,
-})
+});

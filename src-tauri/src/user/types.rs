@@ -17,6 +17,7 @@ pub(crate) struct RegisterInfo {
   phone: String,
   password: String,
   role: UserRole,
+  room_id: Option<i32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

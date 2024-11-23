@@ -1,5 +1,3 @@
-use sea_orm::FromQueryResult;
-
 use crate::prelude::*;
 
 /// Represents username / password for login
@@ -43,6 +41,7 @@ pub struct RegisterInfo {
   pub password: String,
   #[schema(value_type = String, examples("manager", "tenant"))]
   pub role: UserRole,
+  pub room_id: Option<i32>,
 }
 
 /// Represents an access token refresh request

@@ -58,6 +58,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
   let user_router = OpenApiRouter::new()
     .routes(routes!(user::get_user_info, user::update_user_info))
     .routes(routes!(user::update_password))
+    .routes(routes!(user::get_user_role))
     .routes(routes!(check_token))
     .layer(middleware::from_fn_with_state(
       state.clone(),
@@ -67,6 +68,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
   let admin_router = OpenApiRouter::new()
     .routes(routes!(admin::get_all_users))
     .routes(routes!(admin::check_admin))
+    .routes(routes!(admin::activate_user))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::admin_middleware,
@@ -80,8 +82,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(crate::manager::get_fees, crate::manager::add_fee))
     .routes(routes!(
       crate::manager::remove_fee,
-      crate::manager::get_one_fee
+      crate::manager::get_one_fee,
+      crate::manager::edit_fee_info
     ))
+    .routes(routes!(crate::manager::get_rooms))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::manager_middleware,

@@ -6,11 +6,13 @@ use serde::{Deserialize, Serialize};
 #[derive(
   Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, utoipa :: ToSchema,
 )]
-#[sea_orm(table_name = "fees_room")]
+#[sea_orm(table_name = "transactions")]
 pub struct Model {
-  #[sea_orm(primary_key, auto_increment = false)]
+  #[sea_orm(primary_key)]
+  pub id: i32,
+  pub amount: i64,
+  pub created_at: DateTime,
   pub room_number: i32,
-  #[sea_orm(primary_key, auto_increment = false)]
   pub fee_id: i32,
 }
 
@@ -21,7 +23,7 @@ pub enum Relation {
     from = "Column::FeeId",
     to = "super::fees::Column::Id",
     on_update = "NoAction",
-    on_delete = "Cascade"
+    on_delete = "NoAction"
   )]
   Fees,
   #[sea_orm(
@@ -29,7 +31,7 @@ pub enum Relation {
     from = "Column::RoomNumber",
     to = "super::rooms::Column::RoomNumber",
     on_update = "NoAction",
-    on_delete = "SetDefault"
+    on_delete = "NoAction"
   )]
   Rooms,
 }

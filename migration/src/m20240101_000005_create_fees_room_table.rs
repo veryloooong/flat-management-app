@@ -55,14 +55,6 @@ impl MigrationTrait for Migration {
 
     manager.exec_stmt(insert_stmt).await?;
 
-    let insert_stmt = Query::insert()
-      .into_table(FeesRoom::Table)
-      .columns(vec![FeesRoom::RoomNumber, FeesRoom::FeeId])
-      .values_panic(vec![201.into(), 2.into()])
-      .to_owned();
-
-    manager.exec_stmt(insert_stmt).await?;
-
     Ok(())
   }
 

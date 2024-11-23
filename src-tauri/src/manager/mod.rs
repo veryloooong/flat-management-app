@@ -9,7 +9,7 @@ pub struct BasicFeeInfo {
   pub id: i32,
   pub name: String,
   pub amount: i64,
-  pub collected_at: Date,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -45,7 +45,7 @@ pub struct AddFeeInfo {
   pub name: String,
   pub amount: i64,
   pub is_required: bool,
-  pub collected_at: Date,
+  pub due_date: Date,
 }
 
 #[tauri::command]
@@ -108,7 +108,7 @@ pub struct DetailedFeeInfo {
   pub amount: i64,
   pub is_required: bool,
   pub created_at: String,
-  pub collected_at: String,
+  pub due_date: String,
 }
 
 #[tauri::command]
@@ -142,6 +142,73 @@ pub async fn get_fee_info<R: Runtime>(
     })?;
 
   log::debug!("Got fee info: {:?}", response);
+
+  Ok(response)
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct EditFeeInfo {
+  pub name: String,
+  pub amount: i64,
+  pub is_required: bool,
+  pub due_date: Date,
+}
+
+#[tauri::command]
+pub async fn edit_fee_info<R: Runtime>(
+  app: tauri::AppHandle<R>,
+  id: i32,
+  info: EditFeeInfo,
+) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response = client
+    .put(&format!("{}/manager/fees/{}", server_url, id))
+    .bearer_auth(jwt_access_token)
+    .json(&info)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send edit fee info request: {}", e);
+      "Failed to send edit fee info request".to_string()
+    })?;
+
+  if response.status().is_success() {
+    Ok(())
+  } else {
+    Err("Failed to edit fee info".to_string())
+  }
+}
+
+#[tauri::command]
+pub async fn get_rooms<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<i32>, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response: Vec<i32> = client
+    .get(&format!("{}/manager/rooms", server_url))
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send rooms request: {}", e);
+      "Failed to send rooms request".to_string()
+    })?
+    .json()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse rooms response: {}", e);
+      "Failed to parse rooms response".to_string()
+    })?;
 
   Ok(response)
 }

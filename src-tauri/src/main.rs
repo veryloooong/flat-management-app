@@ -59,12 +59,16 @@ async fn main() {
       user::info::update_user_info,
       user::info::update_password,
       user::tokens::check_token,
+      user::get_user_role,
       admin::check_admin,
       admin::get_all_users,
+      admin::update_user_status,
       crate::manager::get_fees,
       crate::manager::add_fee,
       crate::manager::remove_fee,
-      crate::manager::get_fee_info
+      crate::manager::get_fee_info,
+      crate::manager::edit_fee_info,
+      crate::manager::get_rooms
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

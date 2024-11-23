@@ -70,17 +70,15 @@ pub(crate) async fn account_register<R: Runtime>(
     .map_err(|e| {
       log::error!("Failed to send registration request: {}", e);
       register_err.clone()
-    })?
-    .text()
-    .await
-    .map_err(|e| {
-      log::error!("Failed to parse registration response: {}", e);
-      register_err.clone()
     })?;
 
-  log::debug!("Registration successful: {}", response);
-
-  Ok("registration success".to_string())
+  if response.status().is_success() {
+    log::debug!("Registration successful");
+    Ok("registration success".to_string())
+  } else {
+    log::error!("Registration failed: {:?}", response);
+    Err(register_err)
+  }
 }
 
 #[tauri::command]
@@ -149,4 +147,33 @@ pub(crate) async fn account_logout<R: Runtime>(app: tauri::AppHandle<R>) -> Resu
   state.refresh_token = None;
 
   Ok(())
+}
+
+#[tauri::command]
+pub async fn get_user_role<R: Runtime>(app: tauri::AppHandle<R>) -> Result<String, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let server_url = &state.server_url;
+  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let client = &state.client;
+
+  let response: String = client
+    .get(&format!("{}/user/role", server_url))
+    .bearer_auth(access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send get user info request: {}", e);
+      "Failed to send get user info request".to_string()
+    })?
+    .text()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse get user info response: {}", e);
+      "Failed to parse get user info response".to_string()
+    })?;
+
+  log::debug!("User role: {}", &response);
+
+  Ok(response)
 }

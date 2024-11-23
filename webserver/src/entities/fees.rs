@@ -3,7 +3,9 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
+#[derive(
+  Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, utoipa :: ToSchema,
+)]
 #[sea_orm(table_name = "fees")]
 pub struct Model {
   #[sea_orm(primary_key)]
@@ -12,18 +14,26 @@ pub struct Model {
   pub amount: i64,
   pub is_required: bool,
   pub created_at: Date,
-  pub collected_at: Date,
+  pub due_date: Date,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
   #[sea_orm(has_many = "super::fees_room::Entity")]
   FeesRoom,
+  #[sea_orm(has_many = "super::transactions::Entity")]
+  Transactions,
 }
 
 impl Related<super::fees_room::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::FeesRoom.def()
+  }
+}
+
+impl Related<super::transactions::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Transactions.def()
   }
 }
 
