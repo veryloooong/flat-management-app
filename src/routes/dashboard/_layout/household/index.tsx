@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 // TODO: hoàn thành trang xem thông tin hộ gia đình và các khoản thu được gán (frontend thôi)
 function HouseholdInfoPage(): JSX.Element {
   return (
-    <TodoPage />
+    <div>hello</div>
   );
 }
 

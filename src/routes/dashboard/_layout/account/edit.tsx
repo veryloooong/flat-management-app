@@ -144,7 +144,7 @@ function AccountEditPage(): JSX.Element {
         Thay đổi thông tin tài khoản
       </h1>
       <div className="flex justify-center items-center">
-        <div className="max-w-4xl w-full m-5 p-1">
+        <div className="max-w-4xl w-full m-5 p-1 flex ">
           <Form {...updateUserInfoForm}>
             <form
               onSubmit={updateUserInfoForm.handleSubmit(
@@ -152,12 +152,12 @@ function AccountEditPage(): JSX.Element {
               )}
               className="flex flex-col m-12"
             >
-              <h3 className="flex justify-center text-3xl">
+              <h3 className="flex justify-center text-3xl pb-4">
                 Tài khoản cá nhân
               </h3>
               {/* Account Information Section */}
-              <div className="border-b pb-4 mb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="border-b pb-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     name="name"
                     control={updateUserInfoForm.control}
@@ -228,7 +228,7 @@ function AccountEditPage(): JSX.Element {
               </div>
             </form>
           </Form>
-
+          <div className="w-px bg-gray-300"></div>
           {/* Password Update Section */}
 
           <Form {...updatePasswordForm}>
@@ -238,11 +238,11 @@ function AccountEditPage(): JSX.Element {
               )}
               className="flex flex-col m-12"
             >
-              <h3 className="flex justify-center text-3xl">
+              <h3 className="flex justify-center text-3xl pb-4">
                 Thay đổi mật khẩu
               </h3>
-              <div className="border-b pb-4 mb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div >
+                <div className=" border-b pb-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     name="oldPassword"
                     control={updatePasswordForm.control}
