@@ -22,6 +22,8 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { format } from "date-fns";
+import { moneyFormatter } from "./utils";
 
 const statusOptions = [
   { value: "active", label: "Đã kích hoạt" },
@@ -142,10 +144,20 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
   {
     accessorKey: "amount",
     header: "Số tiền",
+    cell: ({ cell }) => {
+      const amount = cell.getValue() as number;
+
+      return <span>{moneyFormatter.format(amount)}</span>;
+    },
   },
   {
     accessorKey: "due_date",
     header: "Ngày thu",
+    cell: ({ cell }) => {
+      const date = cell.getValue() as string;
+
+      return <span>{format(date, "dd/MM/yyyy")}</span>;
+    },
   },
   {
     accessorKey: "getFeeInfo",

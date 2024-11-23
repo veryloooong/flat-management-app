@@ -13,36 +13,19 @@ pub struct Model {
   pub name: String,
   pub amount: i64,
   pub is_required: bool,
-  pub created_at: Date,
-  pub due_date: Date,
+  pub created_at: DateTime,
+  pub due_date: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-  #[sea_orm(has_many = "super::fees_room::Entity")]
-  FeesRoom,
-  #[sea_orm(has_many = "super::transactions::Entity")]
-  Transactions,
+  #[sea_orm(has_many = "super::fees_room_assignment::Entity")]
+  FeesRoomAssignment,
 }
 
-impl Related<super::fees_room::Entity> for Entity {
+impl Related<super::fees_room_assignment::Entity> for Entity {
   fn to() -> RelationDef {
-    Relation::FeesRoom.def()
-  }
-}
-
-impl Related<super::transactions::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::Transactions.def()
-  }
-}
-
-impl Related<super::rooms::Entity> for Entity {
-  fn to() -> RelationDef {
-    super::fees_room::Relation::Rooms.def()
-  }
-  fn via() -> Option<RelationDef> {
-    Some(super::fees_room::Relation::Fees.def().rev())
+    Relation::FeesRoomAssignment.def()
   }
 }
 

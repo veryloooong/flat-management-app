@@ -31,7 +31,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, moneyFormatter } from "@/lib/utils";
 import { CalendarIcon, ChevronLeftIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -83,7 +83,7 @@ function ShowFeeInfoPage(): JSX.Element {
     const info = {
       name: data.name,
       amount: data.amount,
-      due_date: format(data.due_date, "yyyy-MM-dd"),
+      due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
     };
 
@@ -118,11 +118,26 @@ function ShowFeeInfoPage(): JSX.Element {
       rooms: data.rooms.map((room) => Number(room.value)),
     };
     console.log(info);
-    toast({
-      title: "Thu phí thành công!",
-      description: JSON.stringify(info.rooms),
-      duration: 2000,
-    });
+
+    invoke("assign_fee", { feeId: feeInfo.id, roomNumbers: info.rooms })
+      .then(() => {
+        toast({
+          title: "Đã gửi thông báo thu phí!",
+          description: "Thông báo thu phí đã được gửi thành công tới các hộ",
+          duration: 2000,
+        });
+        collectFeeForm.reset();
+        setIsCollectFeeDialogOpen(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: "Có lỗi xảy ra!",
+          description: "Đã xảy ra lỗi khi gửi thông báo thu phí",
+          variant: "destructive",
+          duration: 2000,
+        });
+      });
     collectFeeForm.reset();
     setIsCollectFeeDialogOpen(false);
   }
@@ -162,15 +177,21 @@ function ShowFeeInfoPage(): JSX.Element {
             </div>
             <div>
               <label className="font-semibold">Số tiền:</label>
-              <p className="text-gray-700">{feeInfo.amount}</p>
+              <p className="text-gray-700">
+                {moneyFormatter.format(feeInfo.amount)}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Ngày bắt đầu thu:</label>
-              <p className="text-gray-700">{feeInfo.created_at}</p>
+              <p className="text-gray-700">
+                {format(feeInfo.created_at, "dd/MM/yyyy")}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Hạn nộp:</label>
-              <p className="text-gray-700">{feeInfo.due_date}</p>
+              <p className="text-gray-700">
+                {format(feeInfo.due_date, "dd/MM/yyyy")}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Bắt buộc:</label>

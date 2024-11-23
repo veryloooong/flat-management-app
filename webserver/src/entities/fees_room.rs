@@ -8,10 +8,12 @@ use serde::{Deserialize, Serialize};
 )]
 #[sea_orm(table_name = "fees_room")]
 pub struct Model {
-  #[sea_orm(primary_key, auto_increment = false)]
+  #[sea_orm(primary_key)]
+  pub assignment_id: i32,
   pub room_number: i32,
-  #[sea_orm(primary_key, auto_increment = false)]
   pub fee_id: i32,
+  pub due_date: DateTime,
+  pub is_paid: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -32,6 +34,8 @@ pub enum Relation {
     on_delete = "SetDefault"
   )]
   Rooms,
+  #[sea_orm(has_many = "super::transactions::Entity")]
+  Transactions,
 }
 
 impl Related<super::fees::Entity> for Entity {
@@ -43,6 +47,12 @@ impl Related<super::fees::Entity> for Entity {
 impl Related<super::rooms::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::Rooms.def()
+  }
+}
+
+impl Related<super::transactions::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Transactions.def()
   }
 }
 

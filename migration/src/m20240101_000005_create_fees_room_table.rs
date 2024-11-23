@@ -4,10 +4,14 @@ use crate::m20240101_000001_create_fees_table::Fees;
 use crate::m20240101_000003_create_rooms_table::Rooms;
 
 #[derive(DeriveIden)]
-pub enum FeesRoom {
+pub enum FeesRoomAssignment {
   Table,
+  AssignmentId,
   RoomNumber,
   FeeId,
+  DueDate,
+  PaymentDate,
+  IsPaid,
 }
 
 #[derive(DeriveMigrationName)]
@@ -19,26 +23,30 @@ impl MigrationTrait for Migration {
     manager
       .create_table(
         Table::create()
-          .table(FeesRoom::Table)
+          .table(FeesRoomAssignment::Table)
           .if_not_exists()
-          .col(integer(FeesRoom::RoomNumber).not_null())
-          .col(integer(FeesRoom::FeeId).not_null())
-          .primary_key(
-            Index::create()
-              .col(FeesRoom::RoomNumber)
-              .col(FeesRoom::FeeId),
+          .col(
+            integer(FeesRoomAssignment::AssignmentId)
+              .not_null()
+              .auto_increment()
+              .primary_key(),
           )
+          .col(integer(FeesRoomAssignment::RoomNumber).not_null())
+          .col(integer(FeesRoomAssignment::FeeId).not_null())
+          .col(timestamp(FeesRoomAssignment::DueDate).default(Expr::current_timestamp()))
+          .col(timestamp_null(FeesRoomAssignment::PaymentDate))
+          .col(boolean(FeesRoomAssignment::IsPaid).default(false))
           .foreign_key(
             ForeignKey::create()
               .name("fk_fees_room_room_number")
-              .from(FeesRoom::Table, FeesRoom::RoomNumber)
+              .from(FeesRoomAssignment::Table, FeesRoomAssignment::RoomNumber)
               .to(Rooms::Table, Rooms::RoomNumber)
               .on_delete(ForeignKeyAction::SetDefault),
           )
           .foreign_key(
             ForeignKey::create()
               .name("fk_fees_room_fee_id")
-              .from(FeesRoom::Table, FeesRoom::FeeId)
+              .from(FeesRoomAssignment::Table, FeesRoomAssignment::FeeId)
               .to(Fees::Table, Fees::Id)
               .on_delete(ForeignKeyAction::Cascade),
           )
@@ -46,10 +54,25 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
+    manager
+      .create_index(
+        Index::create()
+          .table(FeesRoomAssignment::Table)
+          .name("unique_fee_room_assignment")
+          .unique()
+          .col(FeesRoomAssignment::RoomNumber)
+          .col(FeesRoomAssignment::FeeId)
+          .to_owned(),
+      )
+      .await?;
+
     // Insert some data
     let insert_stmt = Query::insert()
-      .into_table(FeesRoom::Table)
-      .columns(vec![FeesRoom::RoomNumber, FeesRoom::FeeId])
+      .into_table(FeesRoomAssignment::Table)
+      .columns(vec![
+        FeesRoomAssignment::RoomNumber,
+        FeesRoomAssignment::FeeId,
+      ])
       .values_panic(vec![101.into(), 1.into()])
       .to_owned();
 
@@ -60,7 +83,12 @@ impl MigrationTrait for Migration {
 
   async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
     manager
-      .drop_table(Table::drop().if_exists().table(FeesRoom::Table).to_owned())
+      .drop_table(
+        Table::drop()
+          .if_exists()
+          .table(FeesRoomAssignment::Table)
+          .to_owned(),
+      )
       .await?;
 
     Ok(())
