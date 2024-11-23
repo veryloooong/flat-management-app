@@ -184,3 +184,31 @@ pub async fn edit_fee_info<R: Runtime>(
     Err("Failed to edit fee info".to_string())
   }
 }
+
+#[tauri::command]
+pub async fn get_rooms<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<i32>, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response: Vec<i32> = client
+    .get(&format!("{}/manager/rooms", server_url))
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send rooms request: {}", e);
+      "Failed to send rooms request".to_string()
+    })?
+    .json()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse rooms response: {}", e);
+      "Failed to parse rooms response".to_string()
+    })?;
+
+  Ok(response)
+}

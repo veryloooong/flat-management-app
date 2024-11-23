@@ -67,7 +67,8 @@ async fn main() {
       crate::manager::add_fee,
       crate::manager::remove_fee,
       crate::manager::get_fee_info,
-      crate::manager::edit_fee_info
+      crate::manager::edit_fee_info,
+      crate::manager::get_rooms
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -78,6 +78,4 @@ pub async fn recover_password(
 
   // Send email with password recovery link
   // TODO
-
-  Ok(StatusCode::OK)
 }

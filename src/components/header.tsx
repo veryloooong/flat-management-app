@@ -35,14 +35,12 @@ const NavLink = ({
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuLink>
-        <Link
-          to={to}
-          className={`flex flex-row items-center gap-2 ${isActive ? "text-white underline font-medium" : "text-main-palette-0"}`}
-        >
-          {children}
-        </Link>
-      </NavigationMenuLink>
+      <Link
+        to={to}
+        className={`flex flex-row items-center gap-2 ${isActive ? "text-white underline font-medium" : "text-main-palette-0"}`}
+      >
+        {children}
+      </Link>
     </NavigationMenuItem>
   );
 };

@@ -1,4 +1,7 @@
-use crate::{entities::fees, prelude::*};
+use crate::{
+  entities::{fees, rooms, users},
+  prelude::*,
+};
 
 pub mod types {
   use crate::Fees;
@@ -45,7 +48,7 @@ pub mod types {
   }
 }
 
-use sea_orm::{Order, QueryOrder};
+use sea_orm::{FromQueryResult, JoinType, Order, QueryOrder, QuerySelect};
 use types::*;
 
 #[utoipa::path(
@@ -269,4 +272,47 @@ pub async fn edit_fee_info(
       StatusCode::INTERNAL_SERVER_ERROR
     }
   }
+}
+
+#[utoipa::path(
+  get,
+  path = "/rooms",
+  summary = "Get all rooms",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Rooms retrieved", body = Vec<i32>),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+    (status = UNAUTHORIZED, description = "Unauthorized", body = String),
+    (status = FORBIDDEN, description = "Forbidden", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_rooms(
+  State(state): State<AppState>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+  let rooms = match Rooms::find().all(&state.db).await {
+    Ok(rooms) => rooms,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  // make an array of room numbers
+  let rooms = rooms
+    .into_iter()
+    .map(|room| room.room_number)
+    .collect::<Vec<_>>();
+
+  Ok((
+    StatusCode::OK,
+    HeaderMap::new(),
+    serde_json::to_string(&rooms).unwrap(),
+  ))
+}
+
+pub async fn assign_fee() {
+  todo!()
 }

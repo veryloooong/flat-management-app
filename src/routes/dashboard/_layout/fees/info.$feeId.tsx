@@ -35,6 +35,8 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon, ChevronLeftIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 
+import { MultipleSelector, Option } from "@/components/ui/multi-select";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -44,10 +46,30 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addFeeSchema } from "@/lib/add-fee";
 
+const optionSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+const collectFeeSchema = z.object({
+  rooms: z.array(optionSchema).refine((value) => value.some((item) => item), {
+    message: "Hãy chọn ít nhất một phòng",
+  }),
+});
+
 function ShowFeeInfoPage(): JSX.Element {
-  const feeInfo: DetailedFeeInfo = Route.useLoaderData();
+  const { feeInfo, rooms } = Route.useLoaderData();
+  const options: Option[] = rooms.map((room) => {
+    return {
+      value: room.toString(),
+      label: `Phòng ${room}`,
+    };
+  });
+
   const router = useRouter();
   const [isEditFeeDialogOpen, setIsEditFeeDialogOpen] = useState(false);
+  const [isCollectFeeDialogOpen, setIsCollectFeeDialogOpen] = useState(false);
+
   const editFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
     defaultValues: {
@@ -84,15 +106,36 @@ function ShowFeeInfoPage(): JSX.Element {
       });
   }
 
+  const collectFeeForm = useForm<z.infer<typeof collectFeeSchema>>({
+    resolver: zodResolver(collectFeeSchema),
+    defaultValues: {
+      rooms: [],
+    },
+  });
+
+  function onSubmitCollectFeeForm(data: z.infer<typeof collectFeeSchema>) {
+    const info = {
+      rooms: data.rooms.map((room) => Number(room.value)),
+    };
+    console.log(info);
+    toast({
+      title: "Thu phí thành công!",
+      description: JSON.stringify(info.rooms),
+      duration: 2000,
+    });
+    collectFeeForm.reset();
+    setIsCollectFeeDialogOpen(false);
+  }
+
   const paidHouseholds = [
-    //  FIX ME
+    // TODO
     { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
     { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
     { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
   ];
 
   const unpaidHouseholds = [
-    // FIX ME
+    // TODO
     { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
     { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
     { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
@@ -100,7 +143,6 @@ function ShowFeeInfoPage(): JSX.Element {
 
   return (
     <div className="w-screen pt-0 px-4 bg-gray-100">
-      {/* Navigation Back */}
       <Link to="/dashboard/fees">
         <Button className="flex flex-row gap-2">
           <ChevronLeftIcon size={16} />
@@ -110,9 +152,7 @@ function ShowFeeInfoPage(): JSX.Element {
 
       <h1 className="text-center text-2xl font-bold">Thông tin khoản thu</h1>
 
-      {/* Main Content */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Fee Information Section */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-xl font-bold mb-4">Thông tin khoản thu</h2>
           <div className="space-y-4">
@@ -139,139 +179,206 @@ function ShowFeeInfoPage(): JSX.Element {
               </p>
             </div>
           </div>
-          {/*Them nut chinh sua khoan thu */}
-          <Dialog open={isEditFeeDialogOpen}>
-            <DialogTrigger
-              onClick={() => {
-                setIsEditFeeDialogOpen(true);
-              }}
-            >
-              <Button>Chỉnh sửa khoản thu</Button>
-            </DialogTrigger>
-            <DialogContent className="[&>button]:hidden">
-              <DialogTitle>Chỉnh sửa khoản thu</DialogTitle>
-              <DialogDescription>
-                Điền thông tin cần chỉnh sửa và nhấn "Chỉnh sửa" để chỉnh sửa
-                thông tin.
-              </DialogDescription>
-              <Form {...editFeeForm}>
-                <form
-                  onSubmit={editFeeForm.handleSubmit(onSubmitEditFeeForm)}
-                  className="flex flex-col gap-4"
-                >
-                  <FormField
-                    name="name"
-                    control={editFeeForm.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tên khoản thu</FormLabel>
-                        <FormControl>
-                          <Input {...field} autoComplete="off" />
-                        </FormControl>
-                        <FormMessage>
-                          {editFeeForm.formState.errors.name?.message}
-                        </FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name="amount"
-                    control={editFeeForm.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Số tiền</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="number" min={0} />
-                        </FormControl>
-                        <FormMessage>
-                          {editFeeForm.formState.errors.amount?.message}
-                        </FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name="due_date"
-                    control={editFeeForm.control}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col gap-2">
-                        <FormLabel>Ngày thu</FormLabel>
-                        <FormControl>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "dd/MM/yyyy")
-                                  ) : (
-                                    <span>Chọn ngày</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => date < new Date()}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </FormControl>
-                        <FormMessage>
-                          {editFeeForm.formState.errors.due_date?.message}
-                        </FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name="is_required"
-                    control={editFeeForm.control}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel>Có bắt buộc?</FormLabel>
-                        <FormMessage>
-                          {editFeeForm.formState.errors.is_required?.message}
-                        </FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-              <DialogFooter>
-                <Button
-                  onClick={() => {
-                    editFeeForm.handleSubmit(onSubmitEditFeeForm)();
-                  }}
-                  className="bg-main-palette-5 hover:bg-main-palette-6"
-                >
-                  Chỉnh sửa
+          <div className="flex items-center gap-4 mt-4">
+            <Dialog open={isEditFeeDialogOpen}>
+              <DialogTrigger
+                onClick={() => {
+                  setIsEditFeeDialogOpen(true);
+                }}
+              >
+                <Button className="bg-black text-white hover:bg-gray-800">
+                  Chỉnh sửa khoản thu
                 </Button>
-                <DialogClose>
-                  <Button onClick={() => setIsEditFeeDialogOpen(false)}>
-                    Đóng
+              </DialogTrigger>
+              <DialogContent className="[&>button]:hidden">
+                <DialogTitle>Chỉnh sửa khoản thu</DialogTitle>
+                <DialogDescription>
+                  Điền thông tin cần chỉnh sửa và nhấn "Chỉnh sửa" để chỉnh sửa
+                  thông tin.
+                </DialogDescription>
+                <Form {...editFeeForm}>
+                  <form
+                    onSubmit={editFeeForm.handleSubmit(onSubmitEditFeeForm)}
+                    className="flex flex-col gap-4"
+                  >
+                    <FormField
+                      name="name"
+                      control={editFeeForm.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tên khoản thu</FormLabel>
+                          <FormControl>
+                            <Input {...field} autoComplete="off" />
+                          </FormControl>
+                          <FormMessage>
+                            {editFeeForm.formState.errors.name?.message}
+                          </FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="amount"
+                      control={editFeeForm.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Số tiền</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="number" min={0} />
+                          </FormControl>
+                          <FormMessage>
+                            {editFeeForm.formState.errors.amount?.message}
+                          </FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="due_date"
+                      control={editFeeForm.control}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col gap-2">
+                          <FormLabel>Ngày thu</FormLabel>
+                          <FormControl>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "dd/MM/yyyy")
+                                    ) : (
+                                      <span>Chọn ngày</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) => date < new Date()}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </FormControl>
+                          <FormMessage>
+                            {editFeeForm.formState.errors.due_date?.message}
+                          </FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="is_required"
+                      control={editFeeForm.control}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>Có bắt buộc?</FormLabel>
+                          <FormMessage>
+                            {editFeeForm.formState.errors.is_required?.message}
+                          </FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+                <DialogFooter>
+                  <Button
+                    onClick={() => {
+                      editFeeForm.handleSubmit(onSubmitEditFeeForm)();
+                    }}
+                    className="bg-main-palette-5 hover:bg-main-palette-6"
+                  >
+                    Chỉnh sửa
                   </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                  <DialogClose>
+                    <Button onClick={() => setIsEditFeeDialogOpen(false)}>
+                      Đóng
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button
+              onClick={() => setIsCollectFeeDialogOpen(true)}
+              className="bg-black text-white hover:bg-gray-800"
+            >
+              Thu phí
+            </Button>
+            <Dialog
+              open={isCollectFeeDialogOpen}
+              onOpenChange={setIsCollectFeeDialogOpen}
+            >
+              <DialogContent className="[&>button]:hidden">
+                <DialogTitle>Thu phí</DialogTitle>
+                <DialogDescription>
+                  Chọn các phòng cần thu phí và điền thông tin để xác nhận thông
+                  báo thu phí.
+                </DialogDescription>
+                <Form {...collectFeeForm}>
+                  <form
+                    onSubmit={collectFeeForm.handleSubmit(
+                      onSubmitCollectFeeForm
+                    )}
+                    className="flex flex-col gap-4"
+                  >
+                    {/* Room Field */}
+                    <FormField
+                      control={collectFeeForm.control}
+                      name="rooms"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Chọn phòng</FormLabel>
+                          <FormControl>
+                            <MultipleSelector
+                              {...field}
+                              defaultOptions={options}
+                              placeholder="Chọn các phòng cần thu phí"
+                              emptyIndicator="Không có phòng nào"
+                            />
+                          </FormControl>
+                          <FormMessage>
+                            {collectFeeForm.formState.errors.rooms?.message}
+                          </FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+                <DialogFooter>
+                  <Button
+                    onClick={() =>
+                      collectFeeForm.handleSubmit(onSubmitCollectFeeForm)()
+                    }
+                    className="bg-main-palette-5 hover:bg-main-palette-6"
+                  >
+                    Thu
+                  </Button>
+                  <DialogClose>
+                    <Button onClick={() => setIsCollectFeeDialogOpen(false)}>
+                      Đóng
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Households Lists */}
@@ -337,10 +444,15 @@ export const Route = createFileRoute("/dashboard/_layout/fees/info/$feeId")({
   component: ShowFeeInfoPage,
   loader: async ({ params }) => {
     try {
-      const feeInfo = await invoke("get_fee_info", {
+      const feeInfo = (await invoke("get_fee_info", {
         feeId: Number(params.feeId),
-      });
-      return feeInfo;
+      })) as DetailedFeeInfo;
+      const rooms = (await invoke("get_rooms")) as number[];
+
+      return {
+        feeInfo,
+        rooms,
+      };
     } catch (err) {
       console.error(err);
       toast({
