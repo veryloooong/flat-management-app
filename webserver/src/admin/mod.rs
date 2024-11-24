@@ -68,6 +68,7 @@ pub async fn get_all_users(
 #[utoipa::path(
   get,
   path = "/check",
+  description = "Kiểm tra người dùng có role là Admin hay không. Trả về status OK nếu thành công.",
   tag = ADMIN,
   responses(
     (status = OK, description = "Admin check successful"),
