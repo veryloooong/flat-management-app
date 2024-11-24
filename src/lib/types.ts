@@ -25,3 +25,10 @@ export type DetailedFeeInfo = BasicFeeInfo & {
 export type HouseholdInfo = BasicUserInfo & {
   room_number: number;
 };
+
+export type Notification = {
+  id: number;
+  from: string;
+  to: string;
+  content: string;
+};

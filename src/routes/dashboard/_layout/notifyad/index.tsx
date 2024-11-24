@@ -2,13 +2,7 @@ import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-
-interface Notification {
-  id: number;
-  from: string;
-  to: string;
-  content: string;
-}
+import { Notification } from "@/lib/types";
 
 function NotifyPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<"new" | "view" | null>(null);

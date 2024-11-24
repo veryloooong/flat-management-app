@@ -1,12 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-
-interface Notification {
-  id: number;
-  from: string;
-  to: string;
-  content: string;
-}
+import { Notification } from "@/lib/types";
 
 function NotifyPage(): JSX.Element {
   const [selectedNotification, setSelectedNotification] =
