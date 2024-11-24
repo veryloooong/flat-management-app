@@ -1,9 +1,10 @@
 use crate::{entities::users, prelude::*};
 
-/// Recover password, either by email or phone
+/// Recover password
 #[utoipa::path(
   post,
   path = "/recover",
+  description = "Khôi phục mật khẩu, có thể sử dụng email hoặc số điện thoại. Trả về mã xác nhận để thay đổi mật khẩu. Chức năng chưa hoàn thiện",
   tag = tags::AUTH,
   responses(
     (status = OK, description = "Password recovery successful"),

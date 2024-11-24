@@ -11,10 +11,11 @@ use serde_json::json;
 use crate::router::tags::AUTH;
 
 /// Login command.
-/// Takes a username and password and checks if they match a user in the database. Also checks if the user account is active.
 #[utoipa::path(
   post,
   path = "/login",
+  description = "Đăng nhập vào hệ thống với tên đăng nhập và mật khẩu. Đăng nhập thành công nếu tài khoản có trong cơ sở dữ liệu và đã được kích hoạt.
+  Trả về access token và refresh token.",
   tag = AUTH,
   responses(
     (status = OK, description = "Login successful", body = TokenResponse),
@@ -154,10 +155,11 @@ pub(crate) async fn account_login(
 }
 
 /// Register command.
-/// Takes registration info as JSON and creates a new user in the database.
 #[utoipa::path(
   post,
   path = "/register",
+  description = "Đăng ký tài khoản mới với thông tin cần thiết (đưa vào dưới dạng JSON). Trả về trạng thái CREATED và thêm người dùng mới vào database
+  nếu đăng ký thành công.",
   tag = AUTH,
   responses(
     (status = CREATED, description = "Registration successful"),
@@ -264,11 +266,12 @@ pub(crate) async fn account_register(
 }
 
 /// Logout command.
-/// Takes a JWT token and increases the refresh token version of the user in the database.
-/// This will invalidate all refresh tokens for the user.
 #[utoipa::path(
   post,
   path = "/logout",
+  description = "Đăng xuất khỏi hệ thống. Nhận JWT token, sau đó tìm thông tin và kiểm tra trạng thái kích hoạt của người dùng trong database. 
+  Tăng phiên bản refresh token của người dùng trong cơ sở dữ liệu.  Điều này sẽ vô hiệu hóa tất cả các refresh token của người dùng. 
+  Trả về mã trạng thái OK nếu đăng xuất thành công.",
   tag = AUTH,
   responses(
     (status = OK, description = "Logout successful"),

@@ -8,7 +8,7 @@ use tags::AUTH;
 #[utoipa::path(
   get,
   path = "/check",
-  summary = "Check if the token is valid",
+  description = "Kiểm tra tính hợp lệ của token dựa trên Authorization header. Trả về status OK nếu token hợp lệ.",
   tag = tags::MISC,
   responses(
     (status = OK, description = "Token is valid"),
@@ -30,7 +30,7 @@ pub async fn check_token(
 #[utoipa::path(
   post,
   path = "/refresh",
-  summary = "Grant a new access token by providing a refresh token",
+  description = "Cấp lại access token mới bằng cách cung cấp refresh token. Nếu refresh token hợp lệ thì cấp lại access token mới.",
   tag = AUTH,
   responses(
     (status = OK, description = "New access token granted", body = TokenResponse),

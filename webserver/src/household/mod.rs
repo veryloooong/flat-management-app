@@ -19,6 +19,7 @@ pub mod types {
 #[utoipa::path(
   get,
   path = "/household",
+  description = "Lấy thông tin về hộ gia đình của người dùng. Nếu người dùng hợp lệ, trả về thông tin người dùng và phòng mà người dùng đang thuê dưới dạng JSON.",
   tag = tags::HOUSEHOLD,
   responses(
     (status = OK, description = "Household info"),

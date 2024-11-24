@@ -8,6 +8,7 @@ use tags::ADMIN;
 #[utoipa::path(
   get,
   path = "/users",
+  description = "Lấy danh sách tất cả người dùng, yêu cầu request có role là Admin. Trả về danh sách người dùng.",
   tag = ADMIN,
   responses(
     (status = OK, description = "List of users", body = Vec<BasicUserInfo>),
@@ -108,6 +109,7 @@ pub struct ActivateUserParams {
 #[utoipa::path(
   post,
   path = "/activate",
+  description = "Kích hoạt người dùng. Yêu cầu request có role là Admin.",
   params(
     ActivateUserParams
   ),

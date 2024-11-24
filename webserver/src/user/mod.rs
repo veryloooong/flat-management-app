@@ -81,6 +81,7 @@ pub(crate) async fn get_user_info(
 #[utoipa::path(
   put,
   path = "/info",
+  description = "Cập nhật thông tin người dùng, yêu cầu request có token ở header. Trả về thông báo cập nhật thành công hoặc thất bại.",
   tag = USER,
   responses(
     (status = OK, description = "User info updated"),
@@ -165,6 +166,8 @@ pub async fn update_user_info(
 #[utoipa::path(
   put,
   path = "/password",
+  description = "Cập nhật mật khẩu người dùng, yêu cầu request có token ở header. Kiểm tra người dùng hợp lệ và mật khẩu cũ.
+  Trả về thông báo cập nhật thành công hoặc thất bại.",
   tag = USER,
   responses(
     (status = OK, description = "Password updated"),
@@ -285,6 +288,7 @@ pub async fn update_password(
 #[utoipa::path(
   get,
   path = "/role",
+  description = "Lấy quyền của người dùng, yêu cầu request có token ở header. Trả về quyền của người dùng dưới dạng JSON.",
   tag = USER,
   responses(
     (status = OK, description = "User role", body = String),

@@ -50,10 +50,11 @@ pub mod types {
 use sea_orm::{sea_query::OnConflict, Order, QueryOrder};
 use types::*;
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/fees",
-  summary = "Get all fees",
+  description = "Lấy danh sách tất cả các khoản phí, yêu cầu request có role là Manager. Trả về danh sách các khoản phí.",
   tag = tags::MANAGER,
   responses(
     (status = OK, description = "Fees retrieved", body = Vec<FeesInfo>),
@@ -94,10 +95,11 @@ pub async fn get_fees(
   ))
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   post,
   path = "/fees",
-  summary = "Add a new fee",
+  description = "Thêm một khoản phí mới, yêu cầu request có role là Manager. Trả về status CREATED nếu thành công",
   tag = tags::MANAGER,
   responses(
     (status = CREATED, description = "Fee added"),
@@ -133,10 +135,11 @@ pub async fn add_fee(
   }
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   delete,
   path = "/fees/{id}",
-  summary = "Remove a fee",
+  description = "Xóa một khoản phí, yêu cầu request có role là Manager. Kiểm tra khoản thu có tồn tại không, và trả về status NO_CONTENT nếu thành công",
   tag = tags::MANAGER,
   responses(
     (status = NO_CONTENT, description = "Fee removed"),
@@ -169,10 +172,12 @@ pub async fn remove_fee(State(state): State<AppState>, Path(id): Path<i32>) -> S
   }
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/fees/{id}",
-  summary = "Get a fee",
+  description = "Lấy thông tin một khoản phí theo ID, yêu cầu request có role là Manager. Kiểm tra khoản thu có tồn tại không, 
+  trả về thông tin chi tiết của khoản phí",
   tag = tags::MANAGER,
   responses(
     (status = OK, description = "Fee retrieved", body = types::DetailedFeeInfo),
@@ -219,10 +224,13 @@ pub async fn get_one_fee(
   ))
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
+
 #[utoipa::path(
   put,
   path = "/fees/{id}",
-  summary = "Edit a fee",
+  description = "Chỉnh sửa thông tin một khoản phí, yêu cầu request có role là Manager. Kiểm tra khoản thu có tồn tại không, 
+  trả về status NO_CONTENT nếu thành công",
   tag = tags::MANAGER,
   responses(
     (status = NO_CONTENT, description = "Fee updated"),
@@ -275,10 +283,11 @@ pub async fn edit_fee_info(
   }
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/rooms",
-  summary = "Get all rooms",
+  description = "Lấy danh sách tất cả các phòng, yêu cầu request có role là Manager. Trả về danh sách các phòng",
   tag = tags::MANAGER,
   responses(
     (status = OK, description = "Rooms retrieved", body = Vec<i32>),
@@ -314,10 +323,12 @@ pub async fn get_rooms(
   ))
 }
 
+// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   post,
   path = "/fees/{fee_id}/assign",
-  summary = "Assign fee to rooms",
+  description = "Gán một khoản phí cho một hoặc nhiều phòng, yêu cầu request có role là Manager. Kiểm tra khoản phí và phòng có tồn tại không
+  trả về status OK nếu thành công",
   tag = tags::MANAGER,
   responses(
     (status = OK, description = "Fee assigned"),
