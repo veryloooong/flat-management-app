@@ -1,8 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { BasicUserInfo, BasicFeeInfo } from "./types";
+import { BasicUserInfo, BasicFeeInfo, HouseholdInfo } from "./types";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+
 import {
   Select,
   SelectContent,
@@ -242,6 +243,33 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      );
+    },
+  },
+];
+export const householdColumns: ColumnDef<HouseholdInfo>[] = [
+  {
+    accessorKey: "room_number",
+    header: "Số phòng",
+    cell: (info) => info.getValue(),
+  },
+  {
+    accessorKey: "owner",
+    header: "Chủ hộ",
+    cell: (info) => info.getValue(),
+  },
+  {
+    accessorKey: "getHouseholdInfo",
+    header: "Thông tin",
+    cell: ({ row }) => {
+      const household = row.original.id.toString();
+
+      return (
+        <Link to={`/dashboard/household`} params={{ household: household }}>
+          <Button className="bg-main-palette-5 hover:bg-main-palette-6">
+            Thông tin
+          </Button>
+        </Link>
       );
     },
   },
