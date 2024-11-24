@@ -1,7 +1,7 @@
 import { useAuth } from "@/lib/auth";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  BellIcon,
+  BuildingIcon,
   CircleDollarSignIcon,
   HomeIcon,
   NewspaperIcon,
@@ -21,7 +21,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { useEffect, useState } from "react";
 import { roleToText } from "@/lib/utils";
 
 const NavLink = ({
@@ -36,26 +35,18 @@ const NavLink = ({
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuLink>
-        <Link
-          to={to}
-          className={`flex flex-row items-center gap-2 ${isActive ? "text-white underline font-medium" : "text-main-palette-0"}`}
-        >
-          {children}
-        </Link>
-      </NavigationMenuLink>
+      <Link
+        to={to}
+        className={`flex flex-row items-center gap-2 ${isActive ? "text-white underline font-medium" : "text-main-palette-0"}`}
+      >
+        {children}
+      </Link>
     </NavigationMenuItem>
   );
 };
 
 export const Header = ({ role }: { role?: string }): JSX.Element => {
-  const { logout, isAdmin } = useAuth();
-  const [admin, setAdmin] = useState(false);
-
-  // check if user is admin by calling isAdmin function asynchrously
-  useEffect(() => {
-    isAdmin().then(setAdmin);
-  }, [isAdmin]);
+  const { logout } = useAuth();
 
   return (
     <header className="w-full h-20 bg-main-palette-5 flex items-center justify-start gap-8 px-6 fixed top-0 z-50">
@@ -67,14 +58,24 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
             <HomeIcon size={24} />
             <span>Trang chủ</span>
           </NavLink>
-          <NavLink to="/dashboard/manager">
-            <CircleDollarSignIcon size={24} />
-            <span>Khoản thu</span>
-          </NavLink>
-          <NavLink to="/dashboard/homes">
-            <UsersIcon size={24} />
-            <span>Hộ dân</span>
-          </NavLink>
+          {role !== "tenant" && (
+            <>
+              <NavLink to="/dashboard/fees">
+                <CircleDollarSignIcon size={24} />
+                <span>Khoản thu</span>
+              </NavLink>
+              <NavLink to="/dashboard/homes">
+                <UsersIcon size={24} />
+                <span>Hộ dân</span>
+              </NavLink>
+            </>
+          )}
+          {role === "tenant" && (
+            <NavLink to="/dashboard/household">
+              <BuildingIcon size={24} />
+              <span>Thông tin phòng</span>
+            </NavLink>
+          )}
           <NavLink to="/dashboard/news">
             <NewspaperIcon size={24} />
             <span>Tin tức</span>
@@ -83,7 +84,7 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
             <SettingsIcon size={24} />
             <span>Cài đặt</span>
           </NavLink>
-          {admin && (
+          {role === "admin" && (
             <NavLink to="/dashboard/admin/accounts">
               <UsersIcon size={24} />
               <span>Quản trị viên</span>

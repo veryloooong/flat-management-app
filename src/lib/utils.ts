@@ -18,3 +18,8 @@ export function roleToText(role: UserRole | string | undefined) {
       return "Khách";
   }
 }
+
+export const moneyFormatter = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+});

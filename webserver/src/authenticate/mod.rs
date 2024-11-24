@@ -3,7 +3,7 @@ pub mod validate_token;
 
 use crate::prelude::*;
 
-use crate::entities::users;
+use crate::entities::{rooms, users};
 
 use axum::Json;
 use serde_json::json;
@@ -179,6 +179,7 @@ pub(crate) async fn account_register(
     phone,
     password,
     role,
+    room_id,
   } = register_info;
 
   let user_exists = Users::find()
@@ -220,10 +221,44 @@ pub(crate) async fn account_register(
     ..Default::default()
   };
 
-  new_user.insert(db).await.map_err(|e| {
-    log::error!("Error creating user: {:?}", e);
+  let res = Users::insert(new_user).exec(db).await.map_err(|e| {
+    log::error!("Error: {:?}", e);
     register_err.clone().err().unwrap()
   })?;
+
+  let user_id = res.last_insert_id;
+
+  // add new room to db and assign to user
+  if room_id.is_some() && role == UserRole::Tenant {
+    let room_id = room_id.unwrap();
+
+    // check if room exists
+    let room = Rooms::find()
+      .filter(rooms::Column::RoomNumber.eq(room_id))
+      .one(db)
+      .await
+      .map_err(|e| {
+        log::error!("Error: {:?}", e);
+        register_err.clone().err().unwrap()
+      })?;
+
+    if room.is_some() {
+      // the room already exists, throw error
+      return register_err.clone();
+    }
+
+    // create new room
+    let new_room = rooms::ActiveModel {
+      room_number: Set(room_id.clone()),
+      tenant_id: Set(user_id),
+      ..Default::default()
+    };
+
+    new_room.insert(db).await.map_err(|e| {
+      log::error!("Error: {:?}", e);
+      register_err.clone().err().unwrap()
+    })?;
+  }
 
   Ok(StatusCode::CREATED)
 }

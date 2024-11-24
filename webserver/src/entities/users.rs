@@ -5,7 +5,9 @@ use super::sea_orm_active_enums::UserStatus;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
+#[derive(
+  Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, utoipa :: ToSchema,
+)]
 #[sea_orm(table_name = "users")]
 pub struct Model {
   #[sea_orm(primary_key)]
@@ -27,16 +29,8 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-  #[sea_orm(has_many = "super::password_recovery_requests::Entity")]
-  PasswordRecoveryRequests,
   #[sea_orm(has_one = "super::rooms::Entity")]
   Rooms,
-}
-
-impl Related<super::password_recovery_requests::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::PasswordRecoveryRequests.def()
-  }
 }
 
 impl Related<super::rooms::Entity> for Entity {

@@ -1,7 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use crate::m20240101_000001_create_fees_table::Fees;
-use crate::m20240101_000003_create_rooms_table::Rooms;
+use crate::m20240101_000005_create_fees_room_table::FeesRoomAssignment;
 
 #[derive(DeriveIden)]
 pub enum Transactions {
@@ -9,8 +8,7 @@ pub enum Transactions {
   Id,
   Amount,
   CreatedAt,
-  RoomNumber,
-  FeeId,
+  AssignmentId,
 }
 
 #[derive(DeriveMigrationName)]
@@ -36,19 +34,13 @@ impl MigrationTrait for Migration {
               .not_null()
               .default(Expr::current_timestamp()),
           )
-          .col(integer(Transactions::RoomNumber).not_null())
-          .col(integer(Transactions::FeeId).not_null())
+          .col(integer(Transactions::AssignmentId).not_null())
           .foreign_key(
             ForeignKey::create()
-              .name("fk_transactions_room_id")
-              .from(Transactions::Table, Transactions::RoomNumber)
-              .to(Rooms::Table, Rooms::RoomNumber),
-          )
-          .foreign_key(
-            ForeignKey::create()
-              .name("fk_transactions_fee_id")
-              .from(Transactions::Table, Transactions::FeeId)
-              .to(Fees::Table, Fees::Id),
+              .name("fk_transactions_assignment_id")
+              .from(Transactions::Table, Transactions::AssignmentId)
+              .to(FeesRoomAssignment::Table, FeesRoomAssignment::AssignmentId)
+              .on_delete(ForeignKeyAction::Cascade),
           )
           .to_owned(),
       )

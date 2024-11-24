@@ -1,4 +1,3 @@
-use sea_orm::prelude::Date;
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
@@ -9,7 +8,7 @@ pub struct BasicFeeInfo {
   pub id: i32,
   pub name: String,
   pub amount: i64,
-  pub due_date: Date,
+  pub due_date: chrono::NaiveDateTime,
 }
 
 #[tauri::command]
@@ -45,7 +44,7 @@ pub struct AddFeeInfo {
   pub name: String,
   pub amount: i64,
   pub is_required: bool,
-  pub due_date: Date,
+  pub due_date: chrono::NaiveDateTime,
 }
 
 #[tauri::command]
@@ -151,7 +150,7 @@ pub struct EditFeeInfo {
   pub name: String,
   pub amount: i64,
   pub is_required: bool,
-  pub due_date: Date,
+  pub due_date: chrono::NaiveDateTime,
 }
 
 #[tauri::command]
@@ -182,5 +181,64 @@ pub async fn edit_fee_info<R: Runtime>(
     Ok(())
   } else {
     Err("Failed to edit fee info".to_string())
+  }
+}
+
+#[tauri::command]
+pub async fn get_rooms<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Vec<i32>, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response: Vec<i32> = client
+    .get(&format!("{}/manager/rooms", server_url))
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send rooms request: {}", e);
+      "Failed to send rooms request".to_string()
+    })?
+    .json()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse rooms response: {}", e);
+      "Failed to parse rooms response".to_string()
+    })?;
+
+  Ok(response)
+}
+
+#[tauri::command]
+pub async fn assign_fee<R: Runtime>(
+  app: tauri::AppHandle<R>,
+  fee_id: i32,
+  room_numbers: Vec<i32>,
+) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response = client
+    .post(&format!("{}/manager/fees/{}/assign", server_url, fee_id))
+    .bearer_auth(jwt_access_token)
+    .json(&room_numbers)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send assign fee request: {}", e);
+      "Failed to send assign fee request".to_string()
+    })?;
+
+  if response.status().is_success() {
+    Ok(())
+  } else {
+    Err("Failed to assign fee".to_string())
   }
 }

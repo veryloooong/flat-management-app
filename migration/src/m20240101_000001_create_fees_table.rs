@@ -16,13 +16,13 @@ impl MigrationTrait for Migration {
           .col(big_integer(Fees::Amount).not_null())
           .col(boolean(Fees::IsRequired).not_null().default(false))
           .col(
-            date(Fees::CreatedAt)
+            timestamp(Fees::CreatedAt)
               .not_null()
               .default(Expr::current_timestamp()),
           )
           .col(
             ColumnDef::new(Fees::DueDate)
-              .date()
+              .timestamp()
               .not_null()
               .default(Expr::custom_keyword(Alias::new(
                 "current_date + interval '1 month'",

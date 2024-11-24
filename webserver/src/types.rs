@@ -41,6 +41,7 @@ pub struct RegisterInfo {
   pub password: String,
   #[schema(value_type = String, examples("manager", "tenant"))]
   pub role: UserRole,
+  pub room_id: Option<i32>,
 }
 
 /// Represents an access token refresh request

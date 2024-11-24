@@ -1,8 +1,10 @@
-use crate::{entities::fees, prelude::*};
+use crate::{
+  entities::{fees, fees_room_assignment, rooms},
+  prelude::*,
+};
 
 pub mod types {
   use crate::Fees;
-  use chrono::NaiveDate as Date;
   use sea_orm::{DerivePartialModel, FromQueryResult};
   use serde::{Deserialize, Serialize};
   use utoipa::ToSchema;
@@ -22,7 +24,7 @@ pub mod types {
     pub id: i32,
     pub name: String,
     pub amount: i64,
-    pub due_date: Date,
+    pub due_date: chrono::NaiveDateTime,
   }
 
   #[derive(Debug, Serialize, Deserialize, DerivePartialModel, FromQueryResult, ToSchema)]
@@ -32,8 +34,8 @@ pub mod types {
     pub name: String,
     pub amount: i64,
     pub is_required: bool,
-    pub created_at: Date,
-    pub due_date: Date,
+    pub created_at: chrono::NaiveDateTime,
+    pub due_date: chrono::NaiveDateTime,
   }
 
   #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, ToSchema)]
@@ -41,11 +43,11 @@ pub mod types {
     pub name: String,
     pub amount: i64,
     pub is_required: bool,
-    pub due_date: Date,
+    pub due_date: chrono::NaiveDateTime,
   }
 }
 
-use sea_orm::{Order, QueryOrder};
+use sea_orm::{sea_query::OnConflict, Order, QueryOrder};
 use types::*;
 
 #[utoipa::path(
@@ -82,6 +84,8 @@ pub async fn get_fees(
       ));
     }
   };
+
+  log::info!("Fees: {:?}", fees);
 
   Ok((
     StatusCode::OK,
@@ -269,4 +273,127 @@ pub async fn edit_fee_info(
       StatusCode::INTERNAL_SERVER_ERROR
     }
   }
+}
+
+#[utoipa::path(
+  get,
+  path = "/rooms",
+  summary = "Get all rooms",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Rooms retrieved", body = Vec<i32>),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+    (status = UNAUTHORIZED, description = "Unauthorized", body = String),
+    (status = FORBIDDEN, description = "Forbidden", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_rooms(
+  State(state): State<AppState>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+  let rooms = match Rooms::find().all(&state.db).await {
+    Ok(rooms) => rooms,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  // make an array of room numbers
+  let rooms = rooms
+    .into_iter()
+    .map(|room| room.room_number)
+    .collect::<Vec<_>>();
+
+  Ok((
+    StatusCode::OK,
+    HeaderMap::new(),
+    serde_json::to_string(&rooms).unwrap(),
+  ))
+}
+
+#[utoipa::path(
+  post,
+  path = "/fees/{fee_id}/assign",
+  summary = "Assign fee to rooms",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Fee assigned"),
+    (status = NOT_FOUND, description = "Fee not found or room not found"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+    (status = UNAUTHORIZED, description = "Unauthorized"),
+    (status = FORBIDDEN, description = "Forbidden"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn assign_fee(
+  State(state): State<AppState>,
+  Path(fee_id): Path<i32>,
+  Json(room_numbers): Json<Vec<i32>>,
+) -> StatusCode {
+  let fee = match Fees::find_by_id(fee_id).one(&state.db).await {
+    Ok(fee) => fee,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  if fee.is_none() {
+    return StatusCode::NOT_FOUND;
+  }
+
+  // check if all rooms exist
+  let rooms = match Rooms::find()
+    .filter(rooms::Column::RoomNumber.is_in(room_numbers.clone()))
+    .all(&state.db)
+    .await
+  {
+    Ok(rooms) => rooms,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  if rooms.len() != room_numbers.len() {
+    return StatusCode::NOT_FOUND;
+  }
+
+  // assign fee to rooms
+  for room_number in room_numbers {
+    let fee_room = fees_room_assignment::ActiveModel {
+      fee_id: Set(fee_id),
+      room_number: Set(room_number),
+      due_date: Set(fee.as_ref().unwrap().due_date),
+      ..Default::default()
+    };
+
+    match FeesRoomAssignment::insert(fee_room)
+      .on_conflict(
+        OnConflict::columns([
+          fees_room_assignment::Column::RoomNumber,
+          fees_room_assignment::Column::FeeId,
+        ])
+        .update_columns([fees_room_assignment::Column::FeeId])
+        .to_owned(),
+      )
+      .exec(&state.db)
+      .await
+    {
+      Ok(res) => {
+        log::info!("Fee assigned: {:?}", res);
+      }
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+  }
+
+  StatusCode::OK
 }

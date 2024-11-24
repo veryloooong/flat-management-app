@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
   DeriveActiveEnum,
   Serialize,
   Deserialize,
-  strum :: IntoStaticStr,
+  utoipa :: ToSchema,
 )]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "user_role")]
 #[serde(rename_all = "snake_case")]
@@ -33,7 +33,7 @@ pub enum UserRole {
   DeriveActiveEnum,
   Serialize,
   Deserialize,
-  strum :: IntoStaticStr,
+  utoipa :: ToSchema,
 )]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "user_status")]
 #[serde(rename_all = "snake_case")]

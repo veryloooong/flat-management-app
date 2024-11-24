@@ -1,7 +1,7 @@
 use extension::postgres::Type;
 use fake::faker::internet::en::*;
 use fake::faker::name::en::*;
-use fake::{Fake, Faker};
+use fake::Fake;
 use sea_orm::{ActiveEnum, DbBackend, DeriveActiveEnum, EnumIter, Schema};
 use sea_orm_migration::{prelude::*, schema::*};
 

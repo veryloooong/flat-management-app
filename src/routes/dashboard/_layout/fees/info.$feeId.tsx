@@ -31,9 +31,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, moneyFormatter } from "@/lib/utils";
 import { CalendarIcon, ChevronLeftIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+
+import { MultipleSelector, Option } from "@/components/ui/multi-select";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,10 +46,30 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addFeeSchema } from "@/lib/add-fee";
 
+const optionSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+const collectFeeSchema = z.object({
+  rooms: z.array(optionSchema).refine((value) => value.some((item) => item), {
+    message: "Hãy chọn ít nhất một phòng",
+  }),
+});
+
 function ShowFeeInfoPage(): JSX.Element {
-  const feeInfo: DetailedFeeInfo = Route.useLoaderData();
+  const { feeInfo, rooms } = Route.useLoaderData();
+  const options: Option[] = rooms.map((room) => {
+    return {
+      value: room.toString(),
+      label: `Phòng ${room}`,
+    };
+  });
+
   const router = useRouter();
   const [isEditFeeDialogOpen, setIsEditFeeDialogOpen] = useState(false);
+  const [isCollectFeeDialogOpen, setIsCollectFeeDialogOpen] = useState(false);
+
   const editFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
     defaultValues: {
@@ -59,10 +81,9 @@ function ShowFeeInfoPage(): JSX.Element {
   });
   function onSubmitEditFeeForm(data: z.infer<typeof addFeeSchema>) {
     const info = {
-      // id: feeInfo.id,
       name: data.name,
       amount: data.amount,
-      due_date: format(data.due_date, "yyyy-MM-dd"),
+      due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
     };
 
@@ -84,46 +105,52 @@ function ShowFeeInfoPage(): JSX.Element {
         setIsEditFeeDialogOpen(false);
       });
   }
-  const [isCollectFeeDialogOpen, setIsCollectFeeDialogOpen] = useState(false);
-  const collectFeeSchema = z.object({
-    room: z.string().min(1, "Phòng không được để trống"),
-    amount: z.number().min(1, "Số tiền phải lớn hơn 0"),
-    transaction_date: z.date().optional(),
-  });
+
   const collectFeeForm = useForm<z.infer<typeof collectFeeSchema>>({
     resolver: zodResolver(collectFeeSchema),
     defaultValues: {
-      room: "",
-      amount: 0,
-      transaction_date: new Date(),
+      rooms: [],
     },
   });
+
   function onSubmitCollectFeeForm(data: z.infer<typeof collectFeeSchema>) {
     const info = {
-      room: data.room,
-      amount: data.amount,
-      transaction_date: data.transaction_date
-        ? format(data.transaction_date, "yyyy-MM-dd")
-        : format(new Date(), "yyyy-MM-dd"),
+      rooms: data.rooms.map((room) => Number(room.value)),
     };
     console.log(info);
-    toast({
-      title: "Thu phí thành công!",
-      duration: 2000,
-    });
+
+    invoke("assign_fee", { feeId: feeInfo.id, roomNumbers: info.rooms })
+      .then(() => {
+        toast({
+          title: "Đã gửi thông báo thu phí!",
+          description: "Thông báo thu phí đã được gửi thành công tới các hộ",
+          duration: 2000,
+        });
+        collectFeeForm.reset();
+        setIsCollectFeeDialogOpen(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: "Có lỗi xảy ra!",
+          description: "Đã xảy ra lỗi khi gửi thông báo thu phí",
+          variant: "destructive",
+          duration: 2000,
+        });
+      });
     collectFeeForm.reset();
     setIsCollectFeeDialogOpen(false);
   }
 
   const paidHouseholds = [
-    //  FIX ME
+    // TODO
     { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
     { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
     { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
   ];
 
   const unpaidHouseholds = [
-    // FIX ME
+    // TODO
     { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
     { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
     { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
@@ -131,7 +158,7 @@ function ShowFeeInfoPage(): JSX.Element {
 
   return (
     <div className="w-screen pt-0 px-4 bg-gray-100">
-      <Link to="/dashboard/manager">
+      <Link to="/dashboard/fees">
         <Button className="flex flex-row gap-2">
           <ChevronLeftIcon size={16} />
           Quay lại
@@ -150,15 +177,21 @@ function ShowFeeInfoPage(): JSX.Element {
             </div>
             <div>
               <label className="font-semibold">Số tiền:</label>
-              <p className="text-gray-700">{feeInfo.amount}</p>
+              <p className="text-gray-700">
+                {moneyFormatter.format(feeInfo.amount)}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Ngày bắt đầu thu:</label>
-              <p className="text-gray-700">{feeInfo.created_at}</p>
+              <p className="text-gray-700">
+                {format(feeInfo.created_at, "dd/MM/yyyy")}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Hạn nộp:</label>
-              <p className="text-gray-700">{feeInfo.due_date}</p>
+              <p className="text-gray-700">
+                {format(feeInfo.due_date, "dd/MM/yyyy")}
+              </p>
             </div>
             <div>
               <label className="font-semibold">Bắt buộc:</label>
@@ -302,6 +335,7 @@ function ShowFeeInfoPage(): JSX.Element {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
             <Button
               onClick={() => setIsCollectFeeDialogOpen(true)}
               className="bg-black text-white hover:bg-gray-800"
@@ -315,7 +349,8 @@ function ShowFeeInfoPage(): JSX.Element {
               <DialogContent className="[&>button]:hidden">
                 <DialogTitle>Thu phí</DialogTitle>
                 <DialogDescription>
-                  Điền thông tin giao dịch và nhấn "Thu" để xác nhận.
+                  Chọn các phòng cần thu phí và điền thông tin để xác nhận thông
+                  báo thu phí.
                 </DialogDescription>
                 <Form {...collectFeeForm}>
                   <form
@@ -326,149 +361,21 @@ function ShowFeeInfoPage(): JSX.Element {
                   >
                     {/* Room Field */}
                     <FormField
-                      name="room"
                       control={collectFeeForm.control}
+                      name="rooms"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phòng</FormLabel>
+                          <FormLabel>Chọn phòng</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Số phòng" />
-                          </FormControl>
-                          <FormMessage>
-                            {collectFeeForm.formState.errors.room?.message}
-                          </FormMessage>
-                        </FormItem>
-                      )}
-                    />
-                    {/* Amount Field */}
-                    <FormField
-                      name="amount"
-                      control={collectFeeForm.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Số tiền</FormLabel>
-                          <FormControl>
-                            <Input
+                            <MultipleSelector
                               {...field}
-                              type="number"
-                              min={0}
-                              placeholder="Số tiền"
+                              defaultOptions={options}
+                              placeholder="Chọn các phòng cần thu phí"
+                              emptyIndicator="Không có phòng nào"
                             />
                           </FormControl>
                           <FormMessage>
-                            {collectFeeForm.formState.errors.amount?.message}
-                          </FormMessage>
-                        </FormItem>
-                      )}
-                    />
-                    {/* Transaction Date Field */}
-                    <FormField
-                      name="transaction_date"
-                      control={collectFeeForm.control}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col gap-2">
-                          <FormLabel>Ngày giao dịch</FormLabel>
-                          <FormControl>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  className={`pl-3 text-left font-normal ${
-                                    !field.value ? "text-muted-foreground" : ""
-                                  }`}
-                                >
-                                  {field.value
-                                    ? format(field.value, "dd/MM/yyyy HH:mm:ss")
-                                    : "Chọn ngày và giờ"}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-0"
-                                align="start"
-                              >
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={(date) => {
-                                    field.onChange(date);
-                                  }}
-                                  initialFocus
-                                />
-                                <div className="flex gap-2 mt-2">
-                                  {/* Hour Input */}
-                                  <Input
-                                    type="number"
-                                    min={0}
-                                    max={23}
-                                    placeholder="Giờ"
-                                    value={
-                                      field.value
-                                        ? format(field.value, "HH")
-                                        : ""
-                                    }
-                                    onChange={(e) => {
-                                      const newTime = new Date(
-                                        field.value || new Date()
-                                      );
-                                      newTime.setHours(Number(e.target.value));
-                                      field.onChange(newTime);
-                                    }}
-                                    className="w-16"
-                                  />
-                                  {/* Minute Input */}
-                                  <Input
-                                    type="number"
-                                    min={0}
-                                    max={59}
-                                    placeholder="Phút"
-                                    value={
-                                      field.value
-                                        ? format(field.value, "mm")
-                                        : ""
-                                    }
-                                    onChange={(e) => {
-                                      const newTime = new Date(
-                                        field.value || new Date()
-                                      );
-                                      newTime.setMinutes(
-                                        Number(e.target.value)
-                                      );
-                                      field.onChange(newTime);
-                                    }}
-                                    className="w-16"
-                                  />
-                                  {/* Second Input */}
-                                  <Input
-                                    type="number"
-                                    min={0}
-                                    max={59}
-                                    placeholder="Giây"
-                                    value={
-                                      field.value
-                                        ? format(field.value, "ss")
-                                        : ""
-                                    }
-                                    onChange={(e) => {
-                                      const newTime = new Date(
-                                        field.value || new Date()
-                                      );
-                                      newTime.setSeconds(
-                                        Number(e.target.value)
-                                      );
-                                      field.onChange(newTime);
-                                    }}
-                                    className="w-16"
-                                  />
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </FormControl>
-                          <FormMessage>
-                            {
-                              collectFeeForm.formState.errors.transaction_date
-                                ?.message
-                            }
+                            {collectFeeForm.formState.errors.rooms?.message}
                           </FormMessage>
                         </FormItem>
                       )}
@@ -554,14 +461,19 @@ function ShowFeeInfoPage(): JSX.Element {
   );
 }
 
-export const Route = createFileRoute("/dashboard/_layout/manager/info/$feeId")({
+export const Route = createFileRoute("/dashboard/_layout/fees/info/$feeId")({
   component: ShowFeeInfoPage,
   loader: async ({ params }) => {
     try {
-      const feeInfo = await invoke("get_fee_info", {
+      const feeInfo = (await invoke("get_fee_info", {
         feeId: Number(params.feeId),
-      });
-      return feeInfo;
+      })) as DetailedFeeInfo;
+      const rooms = (await invoke("get_rooms")) as number[];
+
+      return {
+        feeInfo,
+        rooms,
+      };
     } catch (err) {
       console.error(err);
       toast({
@@ -571,7 +483,7 @@ export const Route = createFileRoute("/dashboard/_layout/manager/info/$feeId")({
       });
 
       throw redirect({
-        to: "/dashboard/manager",
+        to: "/dashboard/fees",
       });
     }
   },

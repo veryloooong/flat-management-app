@@ -59,7 +59,7 @@ function FeesPage(): JSX.Element {
     let info = {
       name: data.name,
       amount: data.amount,
-      due_date: format(data.due_date, "yyyy-MM-dd"),
+      due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
     };
 
@@ -76,6 +76,7 @@ function FeesPage(): JSX.Element {
           title: "Thêm khoản thu thất bại!",
           description: err,
           duration: 2000,
+          variant: "destructive",
         });
       })
       .finally(() => {
@@ -226,7 +227,7 @@ function FeesPage(): JSX.Element {
   );
 }
 
-export const Route = createFileRoute("/dashboard/_layout/manager/")({
+export const Route = createFileRoute("/dashboard/_layout/fees/")({
   component: FeesPage,
   loader: async (_) => {
     try {

@@ -1,7 +1,4 @@
-use crate::{
-  entities::{password_recovery_requests, users},
-  prelude::*,
-};
+use crate::{entities::users, prelude::*};
 
 /// Recover password, either by email or phone
 #[utoipa::path(
@@ -16,68 +13,72 @@ use crate::{
     (status = NOT_IMPLEMENTED, description = "Method not implemented"),
   )
 )]
+#[allow(unused)]
 pub async fn recover_password(
   State(state): State<AppState>,
   Json(recovery_info): Json<RecoverPasswordInfo>,
-) -> Result<impl IntoResponse, impl IntoResponse> {
-  if recovery_info.method == RecoverPasswordMethod::Phone {
-    return Err((StatusCode::NOT_IMPLEMENTED, "currently not implemented"));
-  }
+) -> (StatusCode, String) {
+  (
+    StatusCode::NOT_IMPLEMENTED,
+    "currently not implemented".to_string(),
+  )
 
-  let user_email = match &recovery_info.email {
-    Some(email) => email,
-    None => {
-      return Err((StatusCode::NOT_FOUND, ""));
-    }
-  };
+  // if recovery_info.method == RecoverPasswordMethod::Phone {
+  //   return Err((StatusCode::NOT_IMPLEMENTED, "currently not implemented"));
+  // }
 
-  let user_search_result = match Users::find()
-    .filter(users::Column::Email.eq(user_email))
-    .one(&state.db)
-    .await
-  {
-    Ok(user) => user,
-    Err(e) => {
-      log::error!("Error: {:?}", e);
-      return Err((StatusCode::INTERNAL_SERVER_ERROR, ""));
-    }
-  };
+  // let user_email = match &recovery_info.email {
+  //   Some(email) => email,
+  //   None => {
+  //     return Err((StatusCode::NOT_FOUND, ""));
+  //   }
+  // };
 
-  let user_info = match user_search_result {
-    Some(user) => user,
-    None => {
-      return Err((StatusCode::NOT_FOUND, ""));
-    }
-  };
+  // let user_search_result = match Users::find()
+  //   .filter(users::Column::Email.eq(user_email))
+  //   .one(&state.db)
+  //   .await
+  // {
+  //   Ok(user) => user,
+  //   Err(e) => {
+  //     log::error!("Error: {:?}", e);
+  //     return Err((StatusCode::INTERNAL_SERVER_ERROR, ""));
+  //   }
+  // };
 
-  // Make a password recovery token and store it in the database
-  let token = Uuid::new_v4();
-  let token_expiry = chrono::Utc::now() + chrono::Duration::hours(1);
+  // let user_info = match user_search_result {
+  //   Some(user) => user,
+  //   None => {
+  //     return Err((StatusCode::NOT_FOUND, ""));
+  //   }
+  // };
 
-  let recovery_request = password_recovery_requests::ActiveModel {
-    id: Set(token),
-    user_id: Set(user_info.id),
-    recovery_time: Set(token_expiry.naive_utc()),
-    ..Default::default()
-  };
+  // // Make a password recovery token and store it in the database
+  // let token = Uuid::new_v4();
+  // let token_expiry = chrono::Utc::now() + chrono::Duration::hours(1);
 
-  match recovery_request.insert(&state.db).await {
-    Ok(res) => {
-      let _token = res.id;
+  // let recovery_request = password_recovery_requests::ActiveModel {
+  //   id: Set(token),
+  //   user_id: Set(user_info.id),
+  //   recovery_time: Set(token_expiry.naive_utc()),
+  //   ..Default::default()
+  // };
 
-      // TODO: Send email with password recovery link
-      // let email = user_info.email;
+  // match recovery_request.insert(&state.db).await {
+  //   Ok(res) => {
+  //     let _token = res.id;
 
-      return Ok(StatusCode::OK);
-    }
-    Err(e) => {
-      log::error!("Error: {:?}", e);
-      return Err((StatusCode::INTERNAL_SERVER_ERROR, ""));
-    }
-  }
+  //     // TODO: Send email with password recovery link
+  //     // let email = user_info.email;
+
+  //     return Ok(StatusCode::OK);
+  //   }
+  //   Err(e) => {
+  //     log::error!("Error: {:?}", e);
+  //     return Err((StatusCode::INTERNAL_SERVER_ERROR, ""));
+  //   }
+  // }
 
   // Send email with password recovery link
   // TODO
-
-  Ok(StatusCode::OK)
 }
