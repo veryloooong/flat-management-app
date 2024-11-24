@@ -19,6 +19,7 @@ pub mod tags {
   pub const MISC: &str = "Miscellaneous";
   pub const ADMIN: &str = "Admin";
   pub const MANAGER: &str = "Manager";
+  pub const HOUSEHOLD: &str = "Household";
 }
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
@@ -60,6 +61,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(user::update_password))
     .routes(routes!(user::get_user_role))
     .routes(routes!(check_token))
+    .routes(routes!(crate::household::get_household_info))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::validate_request,

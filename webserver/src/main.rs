@@ -1,6 +1,7 @@
 mod admin;
 mod authenticate;
 mod entities;
+mod household;
 mod manager;
 mod middleware;
 pub mod prelude;

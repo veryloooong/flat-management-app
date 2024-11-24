@@ -21,3 +21,7 @@ export type DetailedFeeInfo = BasicFeeInfo & {
   is_required: boolean;
   created_at: string;
 };
+
+export type HouseholdInfo = BasicUserInfo & {
+  room_number: number;
+};

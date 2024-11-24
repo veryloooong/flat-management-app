@@ -7,6 +7,7 @@ use tokio::sync::Mutex;
 
 mod admin;
 mod entities;
+mod household;
 mod manager;
 mod user;
 
@@ -50,26 +51,31 @@ async fn main() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
-      greet,
+      // User commands
       user::account_login,
       user::account_register,
       user::account_recovery,
       user::account_logout,
+      // User info commands
       user::info::get_user_info,
       user::info::update_user_info,
       user::info::update_password,
       user::tokens::check_token,
       user::get_user_role,
+      // Admin commands
       admin::check_admin,
       admin::get_all_users,
       admin::update_user_status,
+      // Manager commands
       crate::manager::get_fees,
       crate::manager::add_fee,
       crate::manager::remove_fee,
       crate::manager::get_fee_info,
       crate::manager::edit_fee_info,
       crate::manager::get_rooms,
-      crate::manager::assign_fee
+      crate::manager::assign_fee,
+      // Household commands
+      crate::household::get_household_info,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
