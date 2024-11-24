@@ -43,6 +43,8 @@ async fn main() -> anyhow::Result<()> {
 
   let tcp = TcpListener::bind("127.0.0.1:8080").await?;
 
+  println!("Listening on: {}", tcp.local_addr()?);
+
   axum::serve(tcp, router).await?;
 
   Ok(())

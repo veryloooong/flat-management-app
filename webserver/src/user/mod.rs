@@ -6,10 +6,10 @@ use crate::entities::users;
 
 use tags::USER;
 
-/// Gets the user info from the database. Takes a bearer token and returns the user info.
 #[utoipa::path(
   get,
   path = "/info",
+  description = "Lấy thông tin người dùng, yêu cầu request có token ở header. Trả về thông tin cơ bản của người dùng.",
   tag = USER,
   responses(
     (status = OK, description = "User info", body = BasicUserInfo),
