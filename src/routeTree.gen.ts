@@ -21,6 +21,8 @@ import { Route as DashboardLayoutSettingsImport } from './routes/dashboard/_layo
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout/login'
+import { Route as DashboardLayoutNotifytenantIndexImport } from './routes/dashboard/_layout/notifytenant/index'
+import { Route as DashboardLayoutNotifyadIndexImport } from './routes/dashboard/_layout/notifyad/index'
 import { Route as DashboardLayoutNewsIndexImport } from './routes/dashboard/_layout/news/index'
 import { Route as DashboardLayoutHouseholdIndexImport } from './routes/dashboard/_layout/household/index'
 import { Route as DashboardLayoutHomesIndexImport } from './routes/dashboard/_layout/homes/index'
@@ -93,6 +95,18 @@ const authLayoutLoginRoute = authLayoutLoginImport.update({
   path: '/login',
   getParentRoute: () => authLayoutRoute,
 } as any)
+
+const DashboardLayoutNotifytenantIndexRoute =
+  DashboardLayoutNotifytenantIndexImport.update({
+    path: '/notifytenant/',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
+
+const DashboardLayoutNotifyadIndexRoute =
+  DashboardLayoutNotifyadIndexImport.update({
+    path: '/notifyad/',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
 
 const DashboardLayoutNewsIndexRoute = DashboardLayoutNewsIndexImport.update({
   path: '/news/',
@@ -277,6 +291,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutNewsIndexImport
       parentRoute: typeof DashboardLayoutImport
     }
+    '/dashboard/_layout/notifyad/': {
+      id: '/dashboard/_layout/notifyad/'
+      path: '/notifyad'
+      fullPath: '/dashboard/notifyad'
+      preLoaderRoute: typeof DashboardLayoutNotifyadIndexImport
+      parentRoute: typeof DashboardLayoutImport
+    }
+    '/dashboard/_layout/notifytenant/': {
+      id: '/dashboard/_layout/notifytenant/'
+      path: '/notifytenant'
+      fullPath: '/dashboard/notifytenant'
+      preLoaderRoute: typeof DashboardLayoutNotifytenantIndexImport
+      parentRoute: typeof DashboardLayoutImport
+    }
     '/dashboard/_layout/admin/_layout/accounts': {
       id: '/dashboard/_layout/admin/_layout/accounts'
       path: '/accounts'
@@ -358,6 +386,8 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutHomesIndexRoute: typeof DashboardLayoutHomesIndexRoute
   DashboardLayoutHouseholdIndexRoute: typeof DashboardLayoutHouseholdIndexRoute
   DashboardLayoutNewsIndexRoute: typeof DashboardLayoutNewsIndexRoute
+  DashboardLayoutNotifyadIndexRoute: typeof DashboardLayoutNotifyadIndexRoute
+  DashboardLayoutNotifytenantIndexRoute: typeof DashboardLayoutNotifytenantIndexRoute
   DashboardLayoutFeesInfoFeeIdRoute: typeof DashboardLayoutFeesInfoFeeIdRoute
 }
 
@@ -371,6 +401,8 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutHomesIndexRoute: DashboardLayoutHomesIndexRoute,
   DashboardLayoutHouseholdIndexRoute: DashboardLayoutHouseholdIndexRoute,
   DashboardLayoutNewsIndexRoute: DashboardLayoutNewsIndexRoute,
+  DashboardLayoutNotifyadIndexRoute: DashboardLayoutNotifyadIndexRoute,
+  DashboardLayoutNotifytenantIndexRoute: DashboardLayoutNotifytenantIndexRoute,
   DashboardLayoutFeesInfoFeeIdRoute: DashboardLayoutFeesInfoFeeIdRoute,
 }
 
@@ -405,6 +437,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/household': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
+  '/dashboard/notifyad': typeof DashboardLayoutNotifyadIndexRoute
+  '/dashboard/notifytenant': typeof DashboardLayoutNotifytenantIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
 }
@@ -423,6 +457,8 @@ export interface FileRoutesByTo {
   '/dashboard/homes': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/household': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/news': typeof DashboardLayoutNewsIndexRoute
+  '/dashboard/notifyad': typeof DashboardLayoutNotifyadIndexRoute
+  '/dashboard/notifytenant': typeof DashboardLayoutNotifytenantIndexRoute
   '/dashboard/admin/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
 }
@@ -446,6 +482,8 @@ export interface FileRoutesById {
   '/dashboard/_layout/homes/': typeof DashboardLayoutHomesIndexRoute
   '/dashboard/_layout/household/': typeof DashboardLayoutHouseholdIndexRoute
   '/dashboard/_layout/news/': typeof DashboardLayoutNewsIndexRoute
+  '/dashboard/_layout/notifyad/': typeof DashboardLayoutNotifyadIndexRoute
+  '/dashboard/_layout/notifytenant/': typeof DashboardLayoutNotifytenantIndexRoute
   '/dashboard/_layout/admin/_layout/accounts': typeof DashboardLayoutAdminLayoutAccountsRoute
   '/dashboard/_layout/fees/info/$feeId': typeof DashboardLayoutFeesInfoFeeIdRoute
 }
@@ -467,6 +505,8 @@ export interface FileRouteTypes {
     | '/dashboard/homes'
     | '/dashboard/household'
     | '/dashboard/news'
+    | '/dashboard/notifyad'
+    | '/dashboard/notifytenant'
     | '/dashboard/admin/accounts'
     | '/dashboard/fees/info/$feeId'
   fileRoutesByTo: FileRoutesByTo
@@ -484,6 +524,8 @@ export interface FileRouteTypes {
     | '/dashboard/homes'
     | '/dashboard/household'
     | '/dashboard/news'
+    | '/dashboard/notifyad'
+    | '/dashboard/notifytenant'
     | '/dashboard/admin/accounts'
     | '/dashboard/fees/info/$feeId'
   id:
@@ -505,6 +547,8 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/homes/'
     | '/dashboard/_layout/household/'
     | '/dashboard/_layout/news/'
+    | '/dashboard/_layout/notifyad/'
+    | '/dashboard/_layout/notifytenant/'
     | '/dashboard/_layout/admin/_layout/accounts'
     | '/dashboard/_layout/fees/info/$feeId'
   fileRoutesById: FileRoutesById
@@ -573,6 +617,8 @@ export const routeTree = rootRoute
         "/dashboard/_layout/homes/",
         "/dashboard/_layout/household/",
         "/dashboard/_layout/news/",
+        "/dashboard/_layout/notifyad/",
+        "/dashboard/_layout/notifytenant/",
         "/dashboard/_layout/fees/info/$feeId"
       ]
     },
@@ -632,6 +678,14 @@ export const routeTree = rootRoute
     },
     "/dashboard/_layout/news/": {
       "filePath": "dashboard/_layout/news/index.tsx",
+      "parent": "/dashboard/_layout"
+    },
+    "/dashboard/_layout/notifyad/": {
+      "filePath": "dashboard/_layout/notifyad/index.tsx",
+      "parent": "/dashboard/_layout"
+    },
+    "/dashboard/_layout/notifytenant/": {
+      "filePath": "dashboard/_layout/notifytenant/index.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/admin/_layout/accounts": {
