@@ -20,6 +20,7 @@ export type BasicFeeInfo = {
 export type DetailedFeeInfo = BasicFeeInfo & {
   is_required: boolean;
   created_at: string;
+  fee_assignments: FeesRoomInfo[];
 };
 
 export type HouseholdInfo = {

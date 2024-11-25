@@ -62,6 +62,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(user::get_user_role))
     .routes(routes!(check_token))
     .routes(routes!(crate::household::get_household_info))
+    .routes(routes!(crate::household::pay_fee))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::validate_request,

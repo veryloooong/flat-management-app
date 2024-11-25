@@ -1,14 +1,16 @@
+use axum_extra::extract::Query;
+
 use crate::{entities::fees_room_assignment, prelude::*};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct FeesRoomInfo {
-  room_number: i32,
-  fee_id: i32,
-  fee_name: String,
-  fee_amount: i64,
-  due_date: DateTime,
-  payment_date: Option<DateTime>,
-  is_paid: bool,
+  pub room_number: i32,
+  pub fee_id: i32,
+  pub fee_name: String,
+  pub fee_amount: i64,
+  pub due_date: DateTime,
+  pub payment_date: Option<DateTime>,
+  pub is_paid: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
@@ -101,4 +103,97 @@ pub async fn get_household_info(
 
   // return user and room info as one json object
   Ok(Json(household_info))
+}
+
+#[derive(Debug, Deserialize, utoipa::IntoParams)]
+pub struct PayFeeParams {
+  fee_id: i32,
+}
+
+#[utoipa::path(
+  post,
+  path = "/household/pay",
+  description = "Thanh toán phí cho phòng mà người dùng đang thuê.",
+  tag = tags::HOUSEHOLD,
+  params(
+    PayFeeParams
+  ),
+  responses(
+    (status = OK, description = "Fee paid"),
+    (status = UNAUTHORIZED, description = "Unauthorized"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+    (status = NOT_FOUND, description = "User or room not found"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn pay_fee(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+  Query(PayFeeParams { fee_id }): Query<PayFeeParams>,
+) -> Result<StatusCode, StatusCode> {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err(StatusCode::UNAUTHORIZED);
+    }
+  };
+
+  let user_id = claims.custom.id;
+
+  // find user by id and the room that the user is renting
+  let user = Users::find_by_id(user_id)
+    .find_also_related(Rooms)
+    .one(&state.db)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+  let user = match user {
+    Some(user) => user,
+    None => {
+      return Err(StatusCode::NOT_FOUND);
+    }
+  };
+
+  if user.1.is_none() {
+    return Err(StatusCode::NOT_FOUND);
+  }
+
+  // find fee by id
+  let fee = FeesRoomAssignment::find()
+    .filter(
+      Condition::all()
+        .add(fees_room_assignment::Column::FeeId.eq(fee_id))
+        .add(fees_room_assignment::Column::RoomNumber.eq(user.1.as_ref().unwrap().room_number)),
+    )
+    .one(&state.db)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+  let fee = match fee {
+    Some(fee) => fee,
+    None => {
+      return Err(StatusCode::NOT_FOUND);
+    }
+  };
+
+  // check if the fee is already paid
+  if fee.is_paid {
+    return Ok(StatusCode::OK);
+  }
+
+  // update payment date and is_paid status
+  let mut fee: fees_room_assignment::ActiveModel = fee.into();
+  fee.is_paid = Set(true);
+  fee.payment_date = Set(Some(chrono::Utc::now().naive_utc()));
+
+  fee
+    .save(&state.db)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+  Ok(StatusCode::OK)
 }

@@ -45,7 +45,7 @@ async fn main() -> anyhow::Result<()> {
 
   println!("Listening on: {}\n", tcp.local_addr()?);
   println!(
-    "Go to {}/api/ to see the API documentation\n",
+    "Go to http://{}/api/ to see the API documentation\n",
     tcp.local_addr()?
   );
 

@@ -1,7 +1,7 @@
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
-use crate::AppState;
+use crate::{household::FeesRoomInfo, AppState};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BasicFeeInfo {
@@ -108,6 +108,7 @@ pub struct DetailedFeeInfo {
   pub is_required: bool,
   pub created_at: String,
   pub due_date: String,
+  pub fee_assignments: Vec<FeesRoomInfo>,
 }
 
 #[tauri::command]
@@ -121,8 +122,6 @@ pub async fn get_fee_info<R: Runtime>(
   let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
   let server_url = &state.server_url;
   let client = &state.client;
-
-  log::debug!("Getting fee info for fee_id: {}", fee_id);
 
   let response: DetailedFeeInfo = client
     .get(&format!("{}/manager/fees/{}", server_url, fee_id))

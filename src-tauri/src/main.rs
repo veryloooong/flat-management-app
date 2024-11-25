@@ -72,6 +72,7 @@ async fn main() {
       crate::manager::get_rooms_detailed,
       // Household commands
       crate::household::get_household_info,
+      crate::household::pay_fee,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

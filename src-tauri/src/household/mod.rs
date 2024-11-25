@@ -53,3 +53,29 @@ pub async fn get_household_info<R: Runtime>(
 
   Ok(response)
 }
+
+#[tauri::command]
+pub async fn pay_fee<R: Runtime>(app: tauri::AppHandle<R>, fee_id: i32) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let client = &state.client;
+  let server_url = &state.server_url;
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+
+  let response = client
+    .post(&format!("{}/user/household/pay", server_url))
+    .query(&[("fee_id", fee_id.to_string())])
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send pay fee request: {}", e);
+      "Failed to send pay fee request".to_string()
+    })?;
+
+  if response.status().is_success() {
+    Ok(())
+  } else {
+    Err("Failed to pay fee".to_string())
+  }
+}
