@@ -9,6 +9,9 @@ export function TodoPage(): JSX.Element {
         Trang này đang được phát triển và sẽ sớm được hoàn thiện. Xin hãy quay
         lại sau.
       </p>
+      <Link to="/dashboard">
+        <Button>Quay lại trang chính</Button>
+      </Link>
     </div>
   );
 }

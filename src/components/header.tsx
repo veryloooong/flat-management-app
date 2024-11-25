@@ -3,7 +3,6 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   BuildingIcon,
   CircleDollarSignIcon,
-  HomeIcon,
   NewspaperIcon,
   SettingsIcon,
   UserIcon,
@@ -19,7 +18,6 @@ import {
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { roleToText } from "@/lib/utils";
@@ -55,17 +53,10 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
       {/* TODO: make this responsive by turning into a sidebar */}
       <NavigationMenu className="text-white flex-grow mr-auto">
         <NavigationMenuList className="flex flex-row gap-8">
-          {role === "tenant" ? (
-            <NavLink to="/dashboard/tenant">
-              <HomeIcon size={24} />
-              <span>Trang chủ</span>
-            </NavLink>
-          ) : (
-            <NavLink to="/dashboard">
-              <BellIcon size={24} />
-              <span>Trang chủ</span>
-            </NavLink>
-          )}
+          <NavLink to="/dashboard">
+            <BellIcon size={24} />
+            <span>Trang chủ</span>
+          </NavLink>
           {role !== "tenant" && (
             <>
               <NavLink to="/dashboard/fees">

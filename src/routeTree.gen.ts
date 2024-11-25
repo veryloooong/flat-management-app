@@ -17,7 +17,6 @@ import { Route as IndexImport } from './routes/index'
 import { Route as DashboardLayoutImport } from './routes/dashboard/_layout'
 import { Route as authLayoutImport } from './routes/(auth)/_layout'
 import { Route as DashboardLayoutIndexImport } from './routes/dashboard/_layout/index'
-import { Route as DashboardLayoutTenantImport } from './routes/dashboard/_layout/tenant'
 import { Route as DashboardLayoutSettingsImport } from './routes/dashboard/_layout/settings'
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
@@ -74,11 +73,6 @@ const DashboardLayoutAdminRoute = DashboardLayoutAdminImport.update({
 
 const DashboardLayoutIndexRoute = DashboardLayoutIndexImport.update({
   path: '/',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
-
-const DashboardLayoutTenantRoute = DashboardLayoutTenantImport.update({
-  path: '/tenant',
   getParentRoute: () => DashboardLayoutRoute,
 } as any)
 
@@ -234,13 +228,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLayoutSettingsImport
       parentRoute: typeof DashboardLayoutImport
     }
-    '/dashboard/_layout/tenant': {
-      id: '/dashboard/_layout/tenant'
-      path: '/tenant'
-      fullPath: '/dashboard/tenant'
-      preLoaderRoute: typeof DashboardLayoutTenantImport
-      parentRoute: typeof DashboardLayoutImport
-    }
     '/dashboard/_layout/': {
       id: '/dashboard/_layout/'
       path: '/'
@@ -391,7 +378,6 @@ const DashboardLayoutAdminRouteWithChildren =
 
 interface DashboardLayoutRouteChildren {
   DashboardLayoutSettingsRoute: typeof DashboardLayoutSettingsRoute
-  DashboardLayoutTenantRoute: typeof DashboardLayoutTenantRoute
   DashboardLayoutIndexRoute: typeof DashboardLayoutIndexRoute
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
@@ -407,7 +393,6 @@ interface DashboardLayoutRouteChildren {
 
 const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutSettingsRoute: DashboardLayoutSettingsRoute,
-  DashboardLayoutTenantRoute: DashboardLayoutTenantRoute,
   DashboardLayoutIndexRoute: DashboardLayoutIndexRoute,
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
@@ -446,7 +431,6 @@ export interface FileRoutesByFullPath {
   '/password-reset': typeof authLayoutPasswordResetRoute
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/tenant': typeof DashboardLayoutTenantRoute
   '/dashboard/': typeof DashboardLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
@@ -468,7 +452,6 @@ export interface FileRoutesByTo {
   '/password-reset': typeof authLayoutPasswordResetRoute
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/tenant': typeof DashboardLayoutTenantRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/notifications/manager': typeof DashboardLayoutNotificationsManagerRoute
@@ -492,7 +475,6 @@ export interface FileRoutesById {
   '/_layout/password-reset': typeof authLayoutPasswordResetRoute
   '/_layout/register': typeof authLayoutRegisterRoute
   '/dashboard/_layout/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/_layout/tenant': typeof DashboardLayoutTenantRoute
   '/dashboard/_layout/': typeof DashboardLayoutIndexRoute
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
@@ -517,7 +499,6 @@ export interface FileRouteTypes {
     | '/password-reset'
     | '/register'
     | '/dashboard/settings'
-    | '/dashboard/tenant'
     | '/dashboard/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
@@ -538,7 +519,6 @@ export interface FileRouteTypes {
     | '/password-reset'
     | '/register'
     | '/dashboard/settings'
-    | '/dashboard/tenant'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/notifications/manager'
@@ -560,7 +540,6 @@ export interface FileRouteTypes {
     | '/_layout/password-reset'
     | '/_layout/register'
     | '/dashboard/_layout/settings'
-    | '/dashboard/_layout/tenant'
     | '/dashboard/_layout/'
     | '/dashboard/_layout/account/edit'
     | '/dashboard/_layout/admin'
@@ -632,7 +611,6 @@ export const routeTree = rootRoute
       "parent": "/dashboard",
       "children": [
         "/dashboard/_layout/settings",
-        "/dashboard/_layout/tenant",
         "/dashboard/_layout/",
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
@@ -660,10 +638,6 @@ export const routeTree = rootRoute
     },
     "/dashboard/_layout/settings": {
       "filePath": "dashboard/_layout/settings.tsx",
-      "parent": "/dashboard/_layout"
-    },
-    "/dashboard/_layout/tenant": {
-      "filePath": "dashboard/_layout/tenant.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/": {
