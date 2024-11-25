@@ -91,14 +91,13 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
               <span>Quản trị viên</span>
             </NavLink>
           )}
-          {role === "admin" && (
-            <NavLink to="/dashboard/notifyad">
+          {role === "tenant" ? (
+            <NavLink to="/dashboard/notifications">
               <BellIcon size={24} />
               <span>Thông báo</span>
             </NavLink>
-          )}
-          {role === "tenant" && (
-            <NavLink to="/dashboard/notifytenant">
+          ) : (
+            <NavLink to="/dashboard/notifications/manager">
               <BellIcon size={24} />
               <span>Thông báo</span>
             </NavLink>

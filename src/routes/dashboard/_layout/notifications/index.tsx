@@ -1,49 +1,37 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Notification } from "@/lib/types";
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Notification } from '@/lib/types'
 
 function NotifyPage(): JSX.Element {
   const [selectedNotification, setSelectedNotification] =
-    useState<Notification | null>(null);
+    useState<Notification | null>(null)
 
   const [notifications] = useState<Notification[]>([
     {
       id: 1,
-      from: "hailong2004ptcnn@gmail.com",
-      to: "long.lh224873@sis.hust.edu.vn",
-      content: "Đây là nội dung thông báo đầu tiên.",
+      from: 'hailong2004ptcnn@gmail.com',
+      to: 'long.lh224873@sis.hust.edu.vn',
+      content: 'Đây là nội dung thông báo đầu tiên.',
     },
     {
       id: 2,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ hai.",
+      from: 'admin@example.com',
+      to: 'user@example.com',
+      content: 'Nội dung thông báo thứ hai.',
     },
     {
       id: 3,
-      from: "hailong2004ptcnn@gmail.com",
-      to: "long.lh224873@sis.hust.edu.vn",
-      content: "Đây là nội dung thông báo thứ ba.",
+      from: 'hailong2004ptcnn@gmail.com',
+      to: 'long.lh224873@sis.hust.edu.vn',
+      content: 'Đây là nội dung thông báo thứ ba.',
     },
     {
       id: 4,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ tư.",
+      from: 'admin@example.com',
+      to: 'user@example.com',
+      content: 'Nội dung thông báo thứ tư.',
     },
-    {
-      id: 4,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ tư.",
-    },
-    {
-      id: 4,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ tư.",
-    },
-  ]);
+  ])
 
   return (
     <div className=" bg-gray-100 p-4">
@@ -54,7 +42,7 @@ function NotifyPage(): JSX.Element {
               key={notification.id}
               className="border-b pb-4 mb-4 cursor-pointer hover:bg-gray-100"
               onClick={() => {
-                setSelectedNotification(notification);
+                setSelectedNotification(notification)
               }}
             >
               <h2 className="font-bold text-lg">{notification.to}</h2>
@@ -67,11 +55,11 @@ function NotifyPage(): JSX.Element {
           <div className="flex-1 p-4 bg-white rounded-lg shadow-md ">
             <h2 className="font-bold text-xl mb-4">Chi tiết thông báo</h2>
             <p className="mb-2">
-              <span className="font-medium">Từ:</span>{" "}
+              <span className="font-medium">Từ:</span>{' '}
               {selectedNotification.from}
             </p>
             <p className="mb-2">
-              <span className="font-medium">Đến:</span>{" "}
+              <span className="font-medium">Đến:</span>{' '}
               {selectedNotification.to}
             </p>
             <p>
@@ -84,9 +72,9 @@ function NotifyPage(): JSX.Element {
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export const Route = createFileRoute("/dashboard/_layout/notifytenant/")({
+export const Route = createFileRoute('/dashboard/_layout/notifications/')({
   component: NotifyPage,
-});
+})

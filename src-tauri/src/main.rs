@@ -74,6 +74,7 @@ async fn main() {
       crate::manager::edit_fee_info,
       crate::manager::get_rooms,
       crate::manager::assign_fee,
+      crate::manager::get_rooms_detailed,
       // Household commands
       crate::household::get_household_info,
     ])

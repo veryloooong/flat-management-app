@@ -1,4 +1,4 @@
-import { HouseholdInfo } from "@/lib/types";
+import { PersonalHouseholdInfo } from "@/lib/types";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -126,9 +126,8 @@ export const Route = createFileRoute("/dashboard/_layout/household/")({
   component: HouseholdInfoPage,
   loader: async ({}) => {
     try {
-      const householdInfo = (await invoke(
-        "get_household_info"
-      )) as HouseholdInfo;
+      const householdInfo =
+        await invoke<PersonalHouseholdInfo>("get_household_info");
       return { householdInfo };
     } catch (error) {
       console.error(error);

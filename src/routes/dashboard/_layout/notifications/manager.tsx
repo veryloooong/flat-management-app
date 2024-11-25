@@ -25,48 +25,6 @@ function NotifyPage(): JSX.Element {
       to: "user@example.com",
       content: "Nội dung thông báo thứ hai.",
     },
-    {
-      id: 1,
-      from: "hailong2004ptcnn@gmail.com",
-      to: "long.lh224873@sis.hust.edu.vn",
-      content: "Đây là nội dung thông báo đầu tiên.",
-    },
-    {
-      id: 2,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ hai.",
-    },
-    {
-      id: 1,
-      from: "hailong2004ptcnn@gmail.com",
-      to: "long.lh224873@sis.hust.edu.vn",
-      content: "Đây là nội dung thông báo đầu tiên.",
-    },
-    {
-      id: 2,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ hai.",
-    },
-    {
-      id: 2,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ hai.",
-    },
-    {
-      id: 1,
-      from: "hailong2004ptcnn@gmail.com",
-      to: "long.lh224873@sis.hust.edu.vn",
-      content: "Đây là nội dung thông báo đầu tiên.",
-    },
-    {
-      id: 2,
-      from: "admin@example.com",
-      to: "user@example.com",
-      content: "Nội dung thông báo thứ hai.",
-    },
   ]);
 
   const handleSend = () => {
@@ -209,6 +167,8 @@ function NotifyPage(): JSX.Element {
   );
 }
 
-export const Route = createFileRoute("/dashboard/_layout/notifyad/")({
+export const Route = createFileRoute(
+  "/dashboard/_layout/notifications/manager"
+)({
   component: NotifyPage,
 });

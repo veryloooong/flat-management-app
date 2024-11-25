@@ -22,7 +22,15 @@ export type DetailedFeeInfo = BasicFeeInfo & {
   created_at: string;
 };
 
-export type HouseholdInfo = BasicUserInfo & {
+export type HouseholdInfo = {
+  room_number: number;
+  tenant_id: number;
+  tenant_name: string;
+  tenant_email: string;
+  tenant_phone: string;
+};
+
+export type PersonalHouseholdInfo = BasicUserInfo & {
   room_number: number;
 };
 

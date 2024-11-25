@@ -242,3 +242,42 @@ pub async fn assign_fee<R: Runtime>(
     Err("Failed to assign fee".to_string())
   }
 }
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DetailedRoomInfo {
+  room_number: i32,
+  tenant_id: i32,
+  tenant_name: String,
+  tenant_email: String,
+  tenant_phone: String,
+}
+
+#[tauri::command]
+pub async fn get_rooms_detailed<R: Runtime>(
+  app: tauri::AppHandle<R>,
+) -> Result<Vec<DetailedRoomInfo>, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response: Vec<DetailedRoomInfo> = client
+    .get(&format!("{}/manager/rooms/detailed", server_url))
+    .bearer_auth(jwt_access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send rooms detailed request: {}", e);
+      "Failed to send rooms detailed request".to_string()
+    })?
+    .json()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse rooms detailed response: {}", e);
+      "Failed to parse rooms detailed response".to_string()
+    })?;
+
+  Ok(response)
+}
