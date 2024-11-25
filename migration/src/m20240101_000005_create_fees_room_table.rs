@@ -33,7 +33,14 @@ impl MigrationTrait for Migration {
           )
           .col(integer(FeesRoomAssignment::RoomNumber).not_null())
           .col(integer(FeesRoomAssignment::FeeId).not_null())
-          .col(timestamp(FeesRoomAssignment::DueDate).default(Expr::current_timestamp()))
+          .col(
+            ColumnDef::new(FeesRoomAssignment::DueDate)
+              .timestamp()
+              .not_null()
+              .default(Expr::custom_keyword(Alias::new(
+                "current_date + interval '1 month'",
+              ))),
+          )
           .col(timestamp_null(FeesRoomAssignment::PaymentDate))
           .col(boolean(FeesRoomAssignment::IsPaid).default(false))
           .foreign_key(
