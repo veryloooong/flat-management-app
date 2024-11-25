@@ -1,7 +1,4 @@
-use crate::{
-  entities::{fees_room_assignment, rooms, users},
-  prelude::*,
-};
+use crate::{entities::fees_room_assignment, prelude::*};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct FeesRoomInfo {
