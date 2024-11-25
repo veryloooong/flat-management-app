@@ -28,7 +28,7 @@ export const FeeInfoTile = ({
           </p>
         ) : (
           <p>
-            Hạn nộp: {format(new Date(fee.due_date), "dd/MM/yyyy HH:mm:ss")}
+            Hạn nộp: {format(new Date(fee.due_date), "dd/MM/yyyy")}
           </p>
         )}
       </div>

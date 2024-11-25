@@ -11,7 +11,7 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 - `migration`: Handles database migrations.
 - `src`: Contains front-end source.
 - `src-tauri`: Contains back-end source.
-- `webserver`: Contains source for server.
+- `webserver`: Contains source for webserver.
 
 ## Development instructions
 
