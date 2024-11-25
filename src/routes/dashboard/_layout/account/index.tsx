@@ -23,8 +23,8 @@ function AccountPage(): JSX.Element {
                   userInfo.role === "admin"
                     ? "Quản trị viên"
                     : userInfo.role === "manager"
-                    ? "Quản lý"
-                    : "Người thuê",
+                      ? "Quản lý"
+                      : "Người thuê",
                 icon: "🔑",
               },
             ].map((item, idx) => (
