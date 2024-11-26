@@ -52,7 +52,9 @@ export type PersonalHouseholdInfo = {
 
 export type Notification = {
   id: number;
+  title: string;
+  message: string;
+  created_at: string;
   from: string;
   to: string;
-  content: string;
 };

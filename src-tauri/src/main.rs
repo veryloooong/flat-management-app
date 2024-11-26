@@ -57,6 +57,7 @@ async fn main() {
       user::info::update_password,
       user::tokens::check_token,
       user::get_user_role,
+      user::get_notifications,
       // Admin commands
       admin::check_admin,
       admin::get_all_users,

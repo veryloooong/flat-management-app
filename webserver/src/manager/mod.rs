@@ -1,5 +1,5 @@
 use crate::{
-  entities::{fees, fees_room_assignment, rooms},
+  entities::{fees, fees_room_assignment, notifications, rooms},
   household::FeesRoomInfo,
   prelude::*,
 };
@@ -371,9 +371,32 @@ pub async fn get_rooms(
 )]
 pub async fn assign_fee(
   State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
   Path(fee_id): Path<i32>,
   Json(room_numbers): Json<Vec<i32>>,
 ) -> StatusCode {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  // get manager info
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return StatusCode::UNAUTHORIZED;
+    }
+  };
+  let manager_id = claims.custom.id;
+  let manager_info = match Users::find_by_id(manager_id).one(&state.db).await {
+    Ok(manager) => manager,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+  if manager_info.is_none() {
+    return StatusCode::NOT_FOUND;
+  }
+
+  // check if fee exists
   let fee = match Fees::find_by_id(fee_id).one(&state.db).await {
     Ok(fee) => fee,
     Err(e) => {
@@ -389,6 +412,7 @@ pub async fn assign_fee(
   // check if all rooms exist
   let rooms = match Rooms::find()
     .filter(rooms::Column::RoomNumber.is_in(room_numbers.clone()))
+    .find_also_related(Users)
     .all(&state.db)
     .await
   {
@@ -398,16 +422,15 @@ pub async fn assign_fee(
       return StatusCode::INTERNAL_SERVER_ERROR;
     }
   };
-
   if rooms.len() != room_numbers.len() {
     return StatusCode::NOT_FOUND;
   }
 
   // assign fee to rooms
-  for room_number in room_numbers {
+  for room_info in rooms {
     // check if fee is already assigned to room
     let fee_room = FeesRoomAssignment::find()
-      .filter(fees_room_assignment::Column::RoomNumber.eq(room_number))
+      .filter(fees_room_assignment::Column::RoomNumber.eq(room_info.0.room_number))
       .filter(fees_room_assignment::Column::FeeId.eq(fee_id))
       .one(&state.db)
       .await;
@@ -418,7 +441,7 @@ pub async fn assign_fee(
 
     let fee_room = fees_room_assignment::ActiveModel {
       fee_id: Set(fee_id),
-      room_number: Set(room_number),
+      room_number: Set(room_info.0.room_number),
       due_date: Set(fee.as_ref().unwrap().due_date),
       ..Default::default()
     };
@@ -438,6 +461,27 @@ pub async fn assign_fee(
     {
       Ok(res) => {
         log::info!("Fee assigned: {:?}", res);
+
+        // send notification
+        let user = room_info.1.unwrap();
+
+        let notification = notifications::ActiveModel {
+          title: Set(format!("Thông báo về phí {}", fee.as_ref().unwrap().name)),
+          message: Set(
+            format!("Phòng {} có khoản phí {} với số tiền cần thanh toán là {} VND. Vui lòng thanh toán trước ngày {}", room_info.0.room_number, fee.as_ref().unwrap().name, fee.as_ref().unwrap().amount, fee.as_ref().unwrap().due_date.format("%d/%m/%Y")),
+          ),
+          from_user: Set(manager_id),
+          to_user: Set(user.id),
+          ..Default::default()
+        };
+
+        match Notifications::insert(notification).exec(&state.db).await {
+          Ok(_) => {}
+          Err(e) => {
+            log::error!("Error: {:?}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+          }
+        }
       }
       Err(e) => {
         log::error!("Error: {:?}", e);
@@ -503,3 +547,6 @@ pub async fn get_rooms_detailed(
 
   Ok((StatusCode::OK, serde_json::to_string(&response).unwrap()))
 }
+
+#[allow(unused)]
+pub async fn send_notification() {}

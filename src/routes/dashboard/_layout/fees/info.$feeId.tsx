@@ -170,21 +170,8 @@ function ShowFeeInfoPage(): JSX.Element {
       });
     collectFeeForm.reset();
     setIsCollectFeeDialogOpen(false);
+    router.invalidate();
   }
-
-  // const paidHouseholds = [
-  //   // TODO
-  //   { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
-  //   { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
-  //   { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
-  // ];
-
-  // const unpaidHouseholds = [
-  //   // TODO
-  //   { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
-  //   { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
-  //   { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
-  // ];
 
   return (
     <div className="w-screen pt-0 px-4 bg-gray-100">
