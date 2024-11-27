@@ -1,7 +1,7 @@
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
-use crate::AppState;
+use crate::{household::FeesRoomInfo, AppState};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BasicFeeInfo {
@@ -108,6 +108,7 @@ pub struct DetailedFeeInfo {
   pub is_required: bool,
   pub created_at: String,
   pub due_date: String,
+  pub fee_assignments: Vec<FeesRoomInfo>,
 }
 
 #[tauri::command]
@@ -121,8 +122,6 @@ pub async fn get_fee_info<R: Runtime>(
   let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
   let server_url = &state.server_url;
   let client = &state.client;
-
-  log::debug!("Getting fee info for fee_id: {}", fee_id);
 
   let response: DetailedFeeInfo = client
     .get(&format!("{}/manager/fees/{}", server_url, fee_id))
@@ -280,4 +279,42 @@ pub async fn get_rooms_detailed<R: Runtime>(
     })?;
 
   Ok(response)
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SendNotificationInfo {
+  pub title: String,
+  pub message: String,
+  pub to_user: Option<String>,
+  pub send_all: bool,
+}
+
+#[tauri::command]
+pub async fn send_notification<R: Runtime>(
+  app: tauri::AppHandle<R>,
+  info: SendNotificationInfo,
+) -> Result<(), String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+
+  let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let server_url = &state.server_url;
+  let client = &state.client;
+
+  let response = client
+    .post(&format!("{}/manager/notifications", server_url))
+    .bearer_auth(jwt_access_token)
+    .json(&info)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send send notification request: {}", e);
+      "Failed to send send notification request".to_string()
+    })?;
+
+  if response.status().is_success() {
+    Ok(())
+  } else {
+    Err("Failed to send notification".to_string())
+  }
 }

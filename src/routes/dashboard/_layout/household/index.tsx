@@ -1,44 +1,11 @@
-import { FeesRoomInfo, PersonalHouseholdInfo } from "@/lib/types";
+import { PersonalHouseholdInfo } from "@/lib/types";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { format } from "date-fns";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { moneyFormatter } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
-export const FeeInfoTile = ({
-  fee,
-  isPaid,
-}: {
-  fee: FeesRoomInfo;
-  isPaid: boolean;
-}) => {
-  return (
-    <div className="bg-white p-4 rounded-lg mb-4 shadow flex flex-row justify-between items-end">
-      <div>
-        <div className="flex items-center mb-2 border-b">
-          <h3 className="text-lg font-semibold">{fee.fee_name}</h3>
-        </div>
-        <p>Số tiền: {moneyFormatter.format(fee.fee_amount)}</p>
-        {isPaid ? (
-          <p>
-            Đã nộp:{" "}
-            {format(new Date(fee.payment_date || ""), "dd/MM/yyyy HH:mm:ss")}
-          </p>
-        ) : (
-          <p>
-            Hạn nộp: {format(new Date(fee.due_date), "dd/MM/yyyy")}
-          </p>
-        )}
-      </div>
-      {/* TODO: add thanh toan function */}
-      {!isPaid && <Button>Thanh toán</Button>}
-    </div>
-  );
-};
+import { HouseholdFeeInfoTile } from "@/components/tiles";
 
-// TODO: hoàn thành trang xem thông tin hộ gia đình và các khoản thu được gán (frontend thôi)
 function HouseholdInfoPage(): JSX.Element {
   const { householdInfo } = Route.useLoaderData();
   const [paidFees, setPaidFees] = useState<PersonalHouseholdInfo["fees"]>([]);
@@ -103,7 +70,7 @@ function HouseholdInfoPage(): JSX.Element {
           </h2>
           <div className="bg-main-palette-3 rounded-lg p-6 shadow-md overflow-y-auto max-h-96">
             {unpaidFees.map((fee) => (
-              <FeeInfoTile fee={fee} isPaid={false} />
+              <HouseholdFeeInfoTile fee={fee} isPaid={false} />
             ))}
           </div>
         </div>
@@ -114,7 +81,7 @@ function HouseholdInfoPage(): JSX.Element {
           </h2>
           <div className="bg-main-palette-3 rounded-lg p-6 shadow-md overflow-y-auto max-h-96">
             {paidFees.map((fee) => (
-              <FeeInfoTile fee={fee} isPaid={true} />
+              <HouseholdFeeInfoTile fee={fee} isPaid={true} />
             ))}
           </div>
         </div>

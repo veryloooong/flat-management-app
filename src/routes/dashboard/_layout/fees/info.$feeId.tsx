@@ -41,10 +41,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addFeeSchema } from "@/lib/add-fee";
+import { FeeInfoTile } from "@/components/tiles";
 
 const optionSchema = z.object({
   value: z.string(),
@@ -66,9 +67,38 @@ function ShowFeeInfoPage(): JSX.Element {
     };
   });
 
+  // dialog states
   const router = useRouter();
   const [isEditFeeDialogOpen, setIsEditFeeDialogOpen] = useState(false);
   const [isCollectFeeDialogOpen, setIsCollectFeeDialogOpen] = useState(false);
+
+  // paid and unpaid households
+  const [paidHouseholds, setPaidHouseholds] = useState<
+    DetailedFeeInfo["fee_assignments"]
+  >([]);
+  const [unpaidHouseholds, setUnpaidHouseholds] = useState<
+    DetailedFeeInfo["fee_assignments"]
+  >([]);
+
+  useEffect(() => {
+    const [paid, unpaid] = feeInfo.fee_assignments.reduce(
+      (acc, assignment) => {
+        if (assignment.is_paid) {
+          acc[0].push(assignment);
+        } else {
+          acc[1].push(assignment);
+        }
+        return acc;
+      },
+      [[], []] as [
+        DetailedFeeInfo["fee_assignments"],
+        DetailedFeeInfo["fee_assignments"],
+      ]
+    );
+
+    setPaidHouseholds(paid);
+    setUnpaidHouseholds(unpaid);
+  }, [feeInfo.fee_assignments]);
 
   const editFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
@@ -140,21 +170,8 @@ function ShowFeeInfoPage(): JSX.Element {
       });
     collectFeeForm.reset();
     setIsCollectFeeDialogOpen(false);
+    router.invalidate();
   }
-
-  const paidHouseholds = [
-    // TODO
-    { room: "701", amount: "500.000 VND", paymentDate: "29/11/2024 18:51:20" },
-    { room: "803", amount: "500.000 VND", paymentDate: "29/11/2024 17:00:20" },
-    { room: "210", amount: "500.000 VND", paymentDate: "29/11/2024 08:11:59" },
-  ];
-
-  const unpaidHouseholds = [
-    // TODO
-    { room: "203", amount: "500.000 VND", dueDate: "04/12/2024" },
-    { room: "204", amount: "500.000 VND", dueDate: "04/12/2024" },
-    { room: "205", amount: "500.000 VND", dueDate: "04/12/2024" },
-  ];
 
   return (
     <div className="w-screen pt-0 px-4 bg-gray-100">
@@ -200,6 +217,7 @@ function ShowFeeInfoPage(): JSX.Element {
               </p>
             </div>
           </div>
+
           <div className="flex items-center gap-4 mt-4">
             <Dialog open={isEditFeeDialogOpen}>
               <DialogTrigger
@@ -408,23 +426,11 @@ function ShowFeeInfoPage(): JSX.Element {
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
             <h3 className="text-lg font-bold mb-4">
               Danh sách hộ đã nộp khoản thu
-              <Button style={{ float: "right", background: "white" }}>
-                <i className="text-blue-500">🔍</i>
-              </Button>
             </h3>
             <div className="space-y-4 overflow-y-auto max-h-60">
               <div className="space-y-2">
                 {paidHouseholds.map((house, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-4 shadow rounded flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold">Phòng: {house.room}</p>
-                      <p>Số tiền: {house.amount}</p>
-                      <p>Ngày giao dịch: {house.paymentDate}</p>
-                    </div>
-                  </div>
+                  <FeeInfoTile key={index} fee={house} isPaid={true} />
                 ))}
               </div>
             </div>
@@ -434,23 +440,11 @@ function ShowFeeInfoPage(): JSX.Element {
           <div className="bg-gray-200 shadow-md rounded-lg p-4">
             <h3 className="text-lg font-bold mb-4">
               Danh sách hộ chưa nộp khoản thu
-              <Button style={{ float: "right", background: "white" }}>
-                <i className="text-blue-500">🔍</i>
-              </Button>
             </h3>
             <div className="space-y-4 overflow-y-auto max-h-60">
               <div className="space-y-2">
                 {unpaidHouseholds.map((house, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-4 shadow rounded flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold">Phòng: {house.room}</p>
-                      <p>Số tiền: {house.amount}</p>
-                      <p>Hạn nộp: {house.dueDate}</p>
-                    </div>
-                  </div>
+                  <FeeInfoTile key={index} fee={house} isPaid={false} />
                 ))}
               </div>
             </div>
@@ -465,10 +459,10 @@ export const Route = createFileRoute("/dashboard/_layout/fees/info/$feeId")({
   component: ShowFeeInfoPage,
   loader: async ({ params }) => {
     try {
-      const feeInfo = (await invoke("get_fee_info", {
+      const feeInfo = await invoke<DetailedFeeInfo>("get_fee_info", {
         feeId: Number(params.feeId),
-      })) as DetailedFeeInfo;
-      const rooms = (await invoke("get_rooms")) as number[];
+      });
+      const rooms = await invoke<number[]>("get_rooms");
 
       return {
         feeInfo,

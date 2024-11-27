@@ -177,3 +177,44 @@ pub async fn get_user_role<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Strin
 
   Ok(response)
 }
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct Notification {
+  pub id: i32,
+  pub title: String,
+  pub message: String,
+  pub created_at: chrono::NaiveDateTime,
+  pub from: String,
+  pub to: String,
+}
+
+#[tauri::command]
+pub async fn get_notifications<R: Runtime>(
+  app: tauri::AppHandle<R>,
+) -> Result<Vec<Notification>, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let server_url = &state.server_url;
+  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+  let client = &state.client;
+
+  let response: Vec<Notification> = client
+    .get(&format!("{}/user/notifications", server_url))
+    .bearer_auth(access_token)
+    .send()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to send get notifications request: {}", e);
+      "Failed to send get notifications request".to_string()
+    })?
+    .json()
+    .await
+    .map_err(|e| {
+      log::error!("Failed to parse get notifications response: {}", e);
+      "Failed to parse get notifications response".to_string()
+    })?;
+
+  log::debug!("Notifications: {:?}", &response);
+
+  Ok(response)
+}

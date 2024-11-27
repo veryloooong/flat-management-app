@@ -60,8 +60,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(user::get_user_info, user::update_user_info))
     .routes(routes!(user::update_password))
     .routes(routes!(user::get_user_role))
+    .routes(routes!(user::get_notifications))
     .routes(routes!(check_token))
     .routes(routes!(crate::household::get_household_info))
+    .routes(routes!(crate::household::pay_fee))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::validate_request,
@@ -90,6 +92,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(crate::manager::assign_fee))
     .routes(routes!(crate::manager::get_rooms))
     .routes(routes!(crate::manager::get_rooms_detailed))
+    .routes(routes!(crate::manager::send_notification))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::manager_middleware,

@@ -186,6 +186,7 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
       return (
         <Dialog open={isOpen}>
           <DialogTrigger
+            asChild
             onClick={() => {
               setIsOpen(true);
             }}

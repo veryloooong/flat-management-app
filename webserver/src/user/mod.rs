@@ -2,8 +2,10 @@ pub mod types;
 
 use crate::prelude::*;
 
-use crate::entities::users;
+use crate::entities::{notifications, users};
 
+use sea_orm::sea_query::Alias;
+use sea_orm::{FromQueryResult, QuerySelect};
 use tags::USER;
 
 #[utoipa::path(
@@ -331,6 +333,78 @@ pub async fn get_user_role(
     }
   };
 
-  // hack to convert the enum to a &'static str then to a String wow this fucking sucks
+  // :) hack to convert the enum to a &'static str then to a String wow this fucking sucks
   Ok(serde_json::json!(user.role).as_str().unwrap().to_string())
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize, utoipa::ToSchema, FromQueryResult)]
+pub struct NotificationInfo {
+  pub id: i32,
+  pub title: String,
+  pub message: String,
+  pub created_at: chrono::NaiveDateTime,
+  pub from: String,
+  pub to: String,
+}
+
+#[utoipa::path(
+  get,
+  path = "/notifications",
+  description = "Lấy thông báo của người dùng, yêu cầu request có token ở header. Trả về thông báo dưới dạng JSON.",
+  tag = USER,
+  responses(
+    (status = OK, description = "User notifications", body = Vec<notifications::Model>),
+    (status = UNAUTHORIZED, description = "Invalid token", body = String),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_notifications(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+) -> Result<Json<Vec<NotificationInfo>>, StatusCode> {
+  let jwt_access_secret = &state.jwt_access_secret;
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return Err(StatusCode::UNAUTHORIZED);
+    }
+  };
+
+  let user_id = claims.custom.id;
+
+  let notifications = match Notifications::find()
+    .filter(notifications::Column::ToUser.eq(user_id))
+    .column_as(
+      Expr::col((Alias::new("users_from"), users::Column::Name)),
+      "from",
+    )
+    .column_as(
+      Expr::col((Alias::new("users_to"), users::Column::Name)),
+      "to",
+    )
+    .join_as(
+      sea_orm::JoinType::InnerJoin,
+      notifications::Relation::Users1.def(),
+      Alias::new("users_to"),
+    )
+    .join_as(
+      sea_orm::JoinType::InnerJoin,
+      notifications::Relation::Users2.def(),
+      Alias::new("users_from"),
+    )
+    .into_model::<NotificationInfo>()
+    .all(&state.db)
+    .await
+  {
+    Ok(notifications) => notifications,
+    Err(e) => {
+      log::error!("Error: {:#?}", e);
+      return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+  };
+
+  Ok(Json(notifications))
 }

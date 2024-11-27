@@ -20,6 +20,7 @@ export type BasicFeeInfo = {
 export type DetailedFeeInfo = BasicFeeInfo & {
   is_required: boolean;
   created_at: string;
+  fee_assignments: FeesRoomInfo[];
 };
 
 export type HouseholdInfo = {
@@ -51,7 +52,9 @@ export type PersonalHouseholdInfo = {
 
 export type Notification = {
   id: number;
+  title: string;
+  message: string;
+  created_at: string;
   from: string;
   to: string;
-  content: string;
 };
