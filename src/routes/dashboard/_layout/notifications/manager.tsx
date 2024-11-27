@@ -20,9 +20,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const sendNotificationSchema = z.object({
-  title: z.string(),
-  message: z.string(),
-  to_user: z.string(),
+  title: z.string().min(1, "Tiêu đề không được để trống"),
+  message: z.string().min(1, "Nội dung không được để trống"),
+  to_user: z.string().optional(),
   send_all: z.boolean(),
 });
 
@@ -43,130 +43,128 @@ function NotifyPage(): JSX.Element {
     },
   });
 
-  function onSubmit(info: z.infer<typeof sendNotificationSchema>) {
-    invoke("send_notification", { info })
-      .then(() => {
-        toast({
-          title: "Gửi thông báo thành công",
-          description: "Thông báo đã được gửi",
-          duration: 2000,
-        });
-        router.invalidate();
-      })
-      .catch(() => {
-        toast({
-          title: "Gửi thông báo thất bại",
-          description: "Vui lòng kiểm tra lại thông tin và thử lại",
-          variant: "destructive",
-          duration: 2000,
-        });
+  const handleNotificationSubmit = async (info: z.infer<typeof sendNotificationSchema>) => {
+    try {
+      await invoke("send_notification", { info });
+      toast({
+        title: "Thông báo đã được gửi thành công!",
+        description: "Người nhận sẽ nhận được thông báo ngay.",
+        duration: 2000,
       });
-  }
+      router.invalidate();
+    } catch {
+      toast({
+        title: "Gửi thông báo thất bại!",
+        description: "Vui lòng kiểm tra lại thông tin và thử lại.",
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
+  };
 
   return (
-    <div className="bg-gray-100 p-4 overflow-auto">
-      <Button
-        className="top-4 left-4 bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800 focus:ring-2 focus:ring-black"
-        onClick={() => {
-          setViewMode("new");
-          setSelectedNotification(null);
-        }}
-      >
-        Thông báo mới
-      </Button>
+    <div className="bg-gray-100 p-6 overflow-auto min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Quản lý thông báo</h1>
+        <Button
+          onClick={() => {
+            setViewMode("new");
+            setSelectedNotification(null);
+          }}
+          className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800"
+        >
+          Tạo Thông Báo Mới
+        </Button>
+      </div>
 
-      <div className="flex mt-4 gap-4 max-h-80 scroll-y">
-        <div className="p-4 bg-white rounded-lg shadow-md max-h-[80vh] overflow-y-auto w-1/3">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="border-b pb-4 mb-4 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
-                setSelectedNotification(notification);
-                setViewMode("view");
-              }}
-            >
-              <h2 className="font-bold text-lg">{notification.to}</h2>
-              <p className="text-gray-500 truncate">{notification.title}</p>
-            </div>
-          ))}
+      <div className="flex gap-6">
+        {/* Notifications List */}
+        <div className="flex-1 bg-white p-4 rounded-lg shadow-lg overflow-y-auto max-h-[80vh]">
+          <h2 className="font-semibold text-xl mb-4">Danh sách thông báo</h2>
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="border-b pb-4 mb-4 cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  setSelectedNotification(notification);
+                  setViewMode("view");
+                }}
+              >
+                <h3 className="font-bold text-lg">{notification.to}</h3>
+                <p className="text-gray-500 truncate">{notification.title}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">Không có thông báo nào.</p>
+          )}
         </div>
 
+        {/* Notification Details */}
         {viewMode === "view" && selectedNotification && (
-          <div className="flex-1 p-4 bg-white rounded-lg shadow-md max-h-[80vh] overflow-y-auto">
-            <h2 className="font-bold text-xl mb-4">Chi tiết thông báo</h2>
-            <p className="mb-2">
-              <span className="font-medium">Từ:</span>{" "}
-              {selectedNotification.from}
-            </p>
-            <p className="mb-2">
-              <span className="font-medium">Đến:</span>{" "}
-              {selectedNotification.to}
-            </p>
-            <p className="mb-2">
-              <span className="font-medium">Tiêu đề:</span>{" "}
-              {selectedNotification.title}
-            </p>
-            <p>
-              <span className="font-medium">Nội dung:</span>
-            </p>
-            <p className="mt-2 bg-gray-100 p-4 rounded-lg">
-              {selectedNotification.message}
-            </p>
+          <div className="flex-1 bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Chi tiết thông báo</h2>
+            <div className="space-y-4">
+              <p>
+                <span className="font-medium">Từ:</span> {selectedNotification.from}
+              </p>
+              <p>
+                <span className="font-medium">Đến:</span> {selectedNotification.to}
+              </p>
+              <p>
+                <span className="font-medium">Tiêu đề:</span> {selectedNotification.title}
+              </p>
+              <div>
+                <span className="font-medium">Nội dung:</span>
+                <p className="mt-2 bg-gray-100 p-4 rounded-lg">
+                  {selectedNotification.message}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
+        {/* Create New Notification Form */}
         {viewMode === "new" && (
-          <div className="flex-1 p-4 bg-white rounded-lg shadow-md">
-            <h2 className="font-bold text-xl mb-4">Gửi thông báo mới</h2>
+          <div className="flex-1 bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Gửi thông báo mới</h2>
             <Form {...sendNotificationForm}>
               <form
-                onSubmit={sendNotificationForm.handleSubmit(onSubmit)}
-                className="flex flex-col w-full"
+                onSubmit={sendNotificationForm.handleSubmit(handleNotificationSubmit)}
+                className="space-y-6"
               >
-                <div className="flex flex-row w-full">
-                  <FormField
-                    name="to_user"
-                    control={sendNotificationForm.control}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center gap-2">
-                        <FormLabel className="block text-sm font-medium">
-                          Người nhận
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            required
-                            disabled={sendNotificationForm.watch("send_all")}
-                          />
-                        </FormControl>
-                        <FormMessage>
-                          {
-                            sendNotificationForm.formState.errors.to_user
-                              ?.message
-                          }
-                        </FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name="send_all"
-                    control={sendNotificationForm.control}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center text-sm gap-2">
-                        {/* <FormLabel className="text-sm font-medium"> */}
-                        Gửi tất cả
-                        {/* </FormLabel> */}
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  name="to_user"
+                  control={sendNotificationForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Người nhận</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Nhập tên người nhận"
+                          disabled={sendNotificationForm.watch("send_all")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="send_all"
+                  control={sendNotificationForm.control}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2">
+                      <FormLabel>Gửi tất cả</FormLabel>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   name="title"
                   control={sendNotificationForm.control}
@@ -174,11 +172,9 @@ function NotifyPage(): JSX.Element {
                     <FormItem>
                       <FormLabel>Tiêu đề</FormLabel>
                       <FormControl>
-                        <input {...field} required />
+                        <Input {...field} placeholder="Nhập tiêu đề thông báo" />
                       </FormControl>
-                      <FormMessage>
-                        {sendNotificationForm.formState.errors.title?.message}
-                      </FormMessage>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -189,17 +185,20 @@ function NotifyPage(): JSX.Element {
                     <FormItem>
                       <FormLabel>Nội dung</FormLabel>
                       <FormControl>
-                        <textarea {...field} required />
+                        <textarea
+                          {...field}
+                          className="w-full border rounded-md p-2"
+                          placeholder="Nhập nội dung thông báo"
+                          rows={4}
+                        />
                       </FormControl>
-                      <FormMessage>
-                        {sendNotificationForm.formState.errors.message?.message}
-                      </FormMessage>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button
                   type="submit"
-                  className="bg-main-palette-4 hover:bg-main-palette-5 mt-8"
+                  className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800"
                 >
                   Gửi thông báo
                 </Button>
@@ -219,14 +218,9 @@ export const Route = createFileRoute(
   loader: async () => {
     try {
       const notifications = await invoke<Notification[]>("get_notifications");
-
-      return {
-        notifications,
-      };
+      return { notifications };
     } catch {
-      return {
-        notifications: [],
-      };
+      return { notifications: [] };
     }
   },
 });
