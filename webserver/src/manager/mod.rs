@@ -1,5 +1,5 @@
 use crate::{
-  entities::{fees, fees_room_assignment, notifications, rooms},
+  entities::{fees, fees_room_assignment, notifications, rooms, users},
   household::FeesRoomInfo,
   prelude::*,
 };
@@ -548,5 +548,110 @@ pub async fn get_rooms_detailed(
   Ok((StatusCode::OK, serde_json::to_string(&response).unwrap()))
 }
 
-#[allow(unused)]
-pub async fn send_notification() {}
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, ToSchema)]
+pub struct SendNotificationInfo {
+  pub title: String,
+  pub message: String,
+  pub to_user: Option<String>,
+  pub send_all: bool,
+}
+
+#[utoipa::path(
+  post,
+  path = "/notifications",
+  description = "Gửi thông báo đến một hoặc nhiều người dùng, yêu cầu request có role là Manager. Trả về status OK nếu thành công",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Notification sent"),
+    (status = NOT_FOUND, description = "User not found"),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error"),
+    (status = UNAUTHORIZED, description = "Unauthorized"),
+    (status = FORBIDDEN, description = "Forbidden"),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn send_notification(
+  State(state): State<AppState>,
+  TypedHeader(bearer): TypedHeader<Authorization<Bearer>>,
+  Json(notification_info): Json<SendNotificationInfo>,
+) -> StatusCode {
+  let jwt_access_secret = &state.jwt_access_secret;
+
+  // get manager info
+  let claims = match jwt_access_secret.verify_token::<AccessTokenClaims>(&bearer.token(), None) {
+    Ok(claims) => claims,
+    Err(_) => {
+      return StatusCode::UNAUTHORIZED;
+    }
+  };
+  let manager_id = claims.custom.id;
+
+  // send notification
+  if notification_info.send_all {
+    let users = match Users::find().all(&state.db).await {
+      Ok(users) => users,
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    };
+
+    for user in users {
+      let notification = notifications::ActiveModel {
+        title: Set(notification_info.title.clone()),
+        message: Set(notification_info.message.clone()),
+        from_user: Set(manager_id),
+        to_user: Set(user.id),
+        ..Default::default()
+      };
+
+      if let Err(e) = Notifications::insert(notification).exec(&state.db).await {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+
+    return StatusCode::OK;
+  } else {
+    let user = match Users::find()
+      .filter(
+        Condition::any()
+          .add(users::Column::Username.eq(notification_info.to_user.clone()))
+          .add(users::Column::Email.eq(notification_info.to_user.clone()))
+          .add(users::Column::Phone.eq(notification_info.to_user.clone())),
+      )
+      .one(&state.db)
+      .await
+    {
+      Ok(user) => user,
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    };
+
+    if user.is_none() {
+      return StatusCode::NOT_FOUND;
+    }
+
+    let user = user.unwrap();
+
+    let notification = notifications::ActiveModel {
+      title: Set(notification_info.title.clone()),
+      message: Set(notification_info.message.clone()),
+      from_user: Set(manager_id),
+      to_user: Set(user.id),
+      ..Default::default()
+    };
+
+    match Notifications::insert(notification).exec(&state.db).await {
+      Ok(_) => return StatusCode::OK,
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+  }
+}

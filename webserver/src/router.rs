@@ -92,6 +92,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(crate::manager::assign_fee))
     .routes(routes!(crate::manager::get_rooms))
     .routes(routes!(crate::manager::get_rooms_detailed))
+    .routes(routes!(crate::manager::send_notification))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::manager_middleware,
