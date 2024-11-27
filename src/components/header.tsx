@@ -8,6 +8,7 @@ import {
   SettingsIcon,
   UserIcon,
   UsersIcon,
+  BellIcon,
 } from "lucide-react";
 
 import {
@@ -88,6 +89,17 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
             <NavLink to="/dashboard/admin/accounts">
               <UsersIcon size={24} />
               <span>Quản trị viên</span>
+            </NavLink>
+          )}
+          {role === "tenant" ? (
+            <NavLink to="/dashboard/notifications">
+              <BellIcon size={24} />
+              <span>Thông báo</span>
+            </NavLink>
+          ) : (
+            <NavLink to="/dashboard/notifications/manager">
+              <BellIcon size={24} />
+              <span>Thông báo</span>
             </NavLink>
           )}
         </NavigationMenuList>

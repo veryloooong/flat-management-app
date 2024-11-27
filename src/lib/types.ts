@@ -22,6 +22,36 @@ export type DetailedFeeInfo = BasicFeeInfo & {
   created_at: string;
 };
 
-export type HouseholdInfo = BasicUserInfo & {
+export type HouseholdInfo = {
   room_number: number;
+  tenant_id: number;
+  tenant_name: string;
+  tenant_email: string;
+  tenant_phone: string;
+};
+
+export type FeesRoomInfo = {
+  room_number: number;
+  fee_id: number;
+  fee_name: string;
+  fee_amount: number;
+  due_date: string;
+  payment_date?: string;
+  is_paid: boolean;
+};
+
+export type PersonalHouseholdInfo = {
+  room_number: number;
+  tenant_id: number;
+  tenant_name: string;
+  tenant_email: string;
+  tenant_phone: string;
+  fees: FeesRoomInfo[];
+};
+
+export type Notification = {
+  id: number;
+  from: string;
+  to: string;
+  content: string;
 };

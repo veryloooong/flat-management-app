@@ -6,16 +6,11 @@ use tauri::Manager;
 use tokio::sync::Mutex;
 
 mod admin;
+#[allow(unused)]
 mod entities;
 mod household;
 mod manager;
 mod user;
-
-#[tauri::command]
-/// Test command to prove IPC works
-fn greet(name: &str) -> String {
-  format!("Hello, {}! You've been greeted from Rust!", name)
-}
 
 /// Application state, containing the server URL and (secret) tokens.
 #[derive(Debug, Clone)]
@@ -74,6 +69,7 @@ async fn main() {
       crate::manager::edit_fee_info,
       crate::manager::get_rooms,
       crate::manager::assign_fee,
+      crate::manager::get_rooms_detailed,
       // Household commands
       crate::household::get_household_info,
     ])

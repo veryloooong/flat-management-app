@@ -1,4 +1,4 @@
-use crate::{entities::users, prelude::*};
+use crate::prelude::*;
 
 /// Recover password
 #[utoipa::path(

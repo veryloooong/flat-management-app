@@ -408,3 +408,60 @@ pub async fn assign_fee(
 
   StatusCode::OK
 }
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, ToSchema)]
+pub struct DetailedRoomInfo {
+  room_number: i32,
+  tenant_id: i32,
+  tenant_name: String,
+  tenant_email: String,
+  tenant_phone: String,
+}
+
+#[utoipa::path(
+  get,
+  path = "/rooms/detailed",
+  description = "TODO Vũ làm",
+  tag = tags::MANAGER,
+  responses(
+    (status = OK, description = "Rooms retrieved", body = Vec<DetailedRoomInfo>),
+    (status = INTERNAL_SERVER_ERROR, description = "Server error", body = String),
+    (status = UNAUTHORIZED, description = "Unauthorized", body = String),
+    (status = FORBIDDEN, description = "Forbidden", body = String),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn get_rooms_detailed(
+  State(state): State<AppState>,
+) -> Result<impl IntoResponse, StatusCode> {
+  let rooms = Rooms::find()
+    .find_also_related(Users)
+    .all(&state.db)
+    .await
+    .map_err(|e| {
+      log::error!("Error: {:?}", e);
+      StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+  let response = rooms
+    .into_iter()
+    .map(|room| {
+      let room_info = room.0;
+      let user_info = room.1.unwrap();
+
+      let detailed_room = DetailedRoomInfo {
+        room_number: room_info.room_number,
+        tenant_id: user_info.id,
+        tenant_name: user_info.name,
+        tenant_email: user_info.email,
+        tenant_phone: user_info.phone,
+      };
+
+      detailed_room
+    })
+    .collect::<Vec<_>>();
+
+  Ok((StatusCode::OK, serde_json::to_string(&response).unwrap()))
+}

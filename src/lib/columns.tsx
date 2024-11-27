@@ -247,30 +247,22 @@ export const feeColumns: ColumnDef<BasicFeeInfo>[] = [
     },
   },
 ];
+
 export const householdColumns: ColumnDef<HouseholdInfo>[] = [
   {
     accessorKey: "room_number",
     header: "Số phòng",
-    cell: (info) => info.getValue(),
   },
   {
-    accessorKey: "owner",
+    accessorKey: "tenant_name",
     header: "Chủ hộ",
-    cell: (info) => info.getValue(),
   },
   {
-    accessorKey: "getHouseholdInfo",
-    header: "Thông tin",
-    cell: ({ row }) => {
-      const household = row.original.id.toString();
-
-      return (
-        <Link to={`/dashboard/household`} params={{ household: household }}>
-          <Button className="bg-main-palette-5 hover:bg-main-palette-6">
-            Thông tin
-          </Button>
-        </Link>
-      );
-    },
+    accessorKey: "tenant_email",
+    header: "Email",
+  },
+  {
+    accessorKey: "tenant_phone",
+    header: "Số điện thoại",
   },
 ];
