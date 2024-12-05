@@ -60,7 +60,7 @@ function FeesPage(): JSX.Element {
       due_date: add(new Date(), { months: 1 }),
       is_required: true,
       is_recurring: false,
-      recurrence: "none",
+      recurrence_type: "weekly",
     },
   });
 
@@ -72,7 +72,7 @@ function FeesPage(): JSX.Element {
       amount: data.amount,
       due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
-      // is_recurring: data.is_recurring,
+      recurrence_type: data.is_recurring ? data.recurrence_type : null,
     };
 
     invoke("add_fee", { info })
@@ -234,7 +234,7 @@ function FeesPage(): JSX.Element {
                 </div>
                 {addFeeForm.watch("is_recurring") && (
                   <FormField
-                    name="recurrence"
+                    name="recurrence_type"
                     control={addFeeForm.control}
                     render={({ field }) => (
                       <FormItem>
@@ -242,16 +242,9 @@ function FeesPage(): JSX.Element {
                         <FormControl>
                           <Select {...field}>
                             <SelectTrigger>
-                              <SelectValue>
-                                {field.value === "none"
-                                  ? "Không định kỳ"
-                                  : field.value}
-                              </SelectValue>
+                              <SelectValue placeholder="Chu kỳ lặp lại" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="none">
-                                Không định kỳ
-                              </SelectItem>
                               <SelectItem value="weekly">Hàng tuần</SelectItem>
                               <SelectItem value="monthly">
                                 Hàng tháng
@@ -261,7 +254,7 @@ function FeesPage(): JSX.Element {
                           </Select>
                         </FormControl>
                         <FormMessage>
-                          {addFeeForm.formState.errors.recurrence?.message}
+                          {addFeeForm.formState.errors.recurrence_type?.message}
                         </FormMessage>
                       </FormItem>
                     )}

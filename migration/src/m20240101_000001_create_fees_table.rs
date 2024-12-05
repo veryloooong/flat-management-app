@@ -1,3 +1,4 @@
+use sea_orm::{DeriveActiveEnum, EnumIter};
 use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]

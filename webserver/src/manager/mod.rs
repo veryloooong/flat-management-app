@@ -1,5 +1,5 @@
 use crate::{
-  entities::{fees, fees_room_assignment, notifications, rooms, users},
+  entities::{fee_recurrence, fees, fees_room_assignment, notifications, rooms, users},
   household::FeesRoomInfo,
   prelude::*,
 };
@@ -8,6 +8,8 @@ pub mod types {
   use crate::Fees;
   use sea_orm::{DerivePartialModel, FromQueryResult};
   use utoipa::ToSchema;
+
+  use super::RecurrenceType;
 
   #[derive(
     Debug,
@@ -33,6 +35,7 @@ pub mod types {
     pub amount: i64,
     pub is_required: bool,
     pub due_date: chrono::NaiveDateTime,
+    pub recurrence_type: Option<RecurrenceType>,
   }
 }
 
@@ -75,8 +78,6 @@ pub async fn get_fees(
     }
   };
 
-  log::info!("Fees: {:?}", fees);
-
   Ok((
     StatusCode::OK,
     HeaderMap::new(),
@@ -111,17 +112,41 @@ pub async fn add_fee(
     is_required: Set(fee_info.is_required),
     ..Default::default()
   };
-
-  match Fees::insert(new_fee).exec(&state.db).await {
+  let res = match Fees::insert(new_fee).exec(&state.db).await {
     Ok(res) => {
       log::info!("Fee added: {:?}", res);
-      StatusCode::CREATED
+      res
     }
     Err(e) => {
       log::error!("Error: {:?}", e);
-      StatusCode::INTERNAL_SERVER_ERROR
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  // make recurrence entry
+  if let Some(recurrence_type) = fee_info.recurrence_type {
+    let recurrence_entry = fee_recurrence::ActiveModel {
+      fee_id: Set(res.last_insert_id),
+      recurrence_type: Set(recurrence_type),
+      due_date: Set(fee_info.due_date),
+      ..Default::default()
+    };
+
+    match fee_recurrence::Entity::insert(recurrence_entry)
+      .exec(&state.db)
+      .await
+    {
+      Ok(res) => {
+        log::info!("Recurrence entry added: {:?}", res);
+      }
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
     }
   }
+
+  StatusCode::CREATED
 }
 
 // Chưa thấy kiểm tra authorization Long ơi

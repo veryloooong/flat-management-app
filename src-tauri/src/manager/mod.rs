@@ -45,6 +45,7 @@ pub struct AddFeeInfo {
   pub amount: i64,
   pub is_required: bool,
   pub due_date: chrono::NaiveDateTime,
+  pub recurrence_type: Option<String>,
 }
 
 #[tauri::command]
