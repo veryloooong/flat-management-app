@@ -20,7 +20,6 @@ pub(crate) async fn account_login<R: Runtime>(
   let server_url = &state.server_url;
   let client = &state.client;
 
-  log::debug!("Login attempt for user '{}'", username);
   let login_err = "Login failed".to_string();
 
   let response: LoginResponse = client
@@ -58,8 +57,6 @@ pub(crate) async fn account_register<R: Runtime>(
   let server_url = &state.server_url;
   let client = &state.client;
 
-  log::debug!("Registering user '{:?}'", account_info);
-
   let register_err = "Registration failed".to_string();
 
   let response = client
@@ -91,8 +88,6 @@ pub(crate) async fn account_recovery<R: Runtime>(
   let server_url = &state.server_url;
   let client = &state.client;
 
-  log::debug!("Recovering account '{:?}'", recovery_info);
-
   let recovery_err = "Recovery failed".to_string();
 
   let response = client
@@ -122,8 +117,6 @@ pub(crate) async fn account_logout<R: Runtime>(app: tauri::AppHandle<R>) -> Resu
   let server_url = &state.server_url;
   let access_token = state.access_token.clone().ok_or("Not logged in")?;
   let client = &state.client;
-
-  log::debug!("Logging out user");
 
   let logout_err = "Logout failed".to_string();
 
@@ -172,8 +165,6 @@ pub async fn get_user_role<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Strin
       log::error!("Failed to parse get user info response: {}", e);
       "Failed to parse get user info response".to_string()
     })?;
-
-  log::debug!("User role: {}", &response);
 
   Ok(response)
 }

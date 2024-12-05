@@ -5,4 +5,6 @@ export const addFeeSchema = z.object({
   amount: z.coerce.number().positive("Số tiền phải lớn hơn 0"),
   due_date: z.date(),
   is_required: z.boolean(),
+  is_recurring: z.boolean(),
+  recurrence: z.enum(["none", "weekly", "monthly", "yearly"]),
 });

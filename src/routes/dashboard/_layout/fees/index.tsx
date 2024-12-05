@@ -25,6 +25,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -52,15 +59,20 @@ function FeesPage(): JSX.Element {
       amount: 0,
       due_date: add(new Date(), { months: 1 }),
       is_required: true,
+      is_recurring: false,
+      recurrence: "none",
     },
   });
 
   function onSubmitAddFeeForm(data: z.infer<typeof addFeeSchema>) {
+    console.log(data);
+
     let info = {
       name: data.name,
       amount: data.amount,
       due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
+      // is_recurring: data.is_recurring,
     };
 
     invoke("add_fee", { info })
@@ -91,9 +103,6 @@ function FeesPage(): JSX.Element {
       <h1 className="text-center">Quản lý các khoản thu</h1>
       <div className="w-4/5 mx-auto mt-8">
         <DataTable columns={feeColumns} data={fees} className="bg-white" />
-        {/* <Link to="/dashboard/manager/add">
-          <Button>Thêm khoản thu</Button>
-        </Link> */}
         <Dialog open={isAddFeeDialogOpen}>
           <DialogTrigger
             onClick={() => {
@@ -185,24 +194,79 @@ function FeesPage(): JSX.Element {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  name="is_required"
-                  control={addFeeForm.control}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel>Có bắt buộc?</FormLabel>
-                      <FormMessage>
-                        {addFeeForm.formState.errors.is_required?.message}
-                      </FormMessage>
-                    </FormItem>
-                  )}
-                />
+                <div className="flex flex-row gap-4 justify-start">
+                  <FormField
+                    name="is_required"
+                    control={addFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel>Có bắt buộc?</FormLabel>
+                        <FormMessage>
+                          {addFeeForm.formState.errors.is_required?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="is_recurring"
+                    control={addFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel>Có định kỳ?</FormLabel>
+                        <FormMessage>
+                          {addFeeForm.formState.errors.is_recurring?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {addFeeForm.watch("is_recurring") && (
+                  <FormField
+                    name="recurrence"
+                    control={addFeeForm.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Định kỳ</FormLabel>
+                        <FormControl>
+                          <Select {...field}>
+                            <SelectTrigger>
+                              <SelectValue>
+                                {field.value === "none"
+                                  ? "Không định kỳ"
+                                  : field.value}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">
+                                Không định kỳ
+                              </SelectItem>
+                              <SelectItem value="weekly">Hàng tuần</SelectItem>
+                              <SelectItem value="monthly">
+                                Hàng tháng
+                              </SelectItem>
+                              <SelectItem value="yearly">Hàng năm</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage>
+                          {addFeeForm.formState.errors.recurrence?.message}
+                        </FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                )}
               </form>
             </Form>
             <DialogFooter>
