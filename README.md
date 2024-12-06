@@ -24,25 +24,38 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 ### Steps
 
 - Clone the repo to local machine.
+
 ```bash
 git clone https://github.com/veryloooong/flat-management-app && cd flat-management-app
 ```
+
 - Install dependencies for the application and the database.
+
 ```bash
 npm install
 cargo install sea-orm-cli # for db migration
-cargo install --locked bacon # for watching
 ```
+
 - Make an `.env` file, with keys following the `.env.example` file.
 - Initiate database migration.
+
 ```bash
 sea-orm-cli migrate refresh
 ```
-- Run in dev mode: `npm run tauri dev`
-- Build for prod: `npm run tauri build`
-- Run the webserver:
-  - Go to webserver directory: `cd webserver`
-  - Run the server: `bacon run`
+
+- Run the client:
+
+```bash
+npm run tauri dev # For development
+
+npm run tauri build # For deployment
+```
+
+- Run the server:
+
+```bash
+cd webserver && cargo run
+```
 
 ## Credits
 
