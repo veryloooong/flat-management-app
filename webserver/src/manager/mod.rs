@@ -9,7 +9,7 @@ pub mod types {
   use sea_orm::{DerivePartialModel, FromQueryResult};
   use utoipa::ToSchema;
 
-  use super::RecurrenceType;
+  use crate::entities::sea_orm_active_enums::RecurrenceType;
 
   #[derive(
     Debug,
@@ -105,11 +105,15 @@ pub async fn add_fee(
   State(state): State<AppState>,
   Json(fee_info): Json<AddFeeInfo>,
 ) -> StatusCode {
+  log::debug!("Adding fee: {:?}", fee_info);
+
   let new_fee = fees::ActiveModel {
     amount: Set(fee_info.amount),
     name: Set(fee_info.name),
     due_date: Set(fee_info.due_date),
     is_required: Set(fee_info.is_required),
+    is_recurring: Set(fee_info.recurrence_type.is_some()),
+    recurrence_type: Set(fee_info.recurrence_type.clone()),
     ..Default::default()
   };
   let res = match Fees::insert(new_fee).exec(&state.db).await {
@@ -124,10 +128,10 @@ pub async fn add_fee(
   };
 
   // make recurrence entry
-  if let Some(recurrence_type) = fee_info.recurrence_type {
+  if fee_info.recurrence_type.is_some() {
     let recurrence_entry = fee_recurrence::ActiveModel {
       fee_id: Set(res.last_insert_id),
-      recurrence_type: Set(recurrence_type),
+      previous_fee_id: Set(res.last_insert_id),
       due_date: Set(fee_info.due_date),
       ..Default::default()
     };
@@ -197,6 +201,7 @@ pub struct DetailedFeeInfo {
   pub is_required: bool,
   pub created_at: chrono::NaiveDateTime,
   pub due_date: chrono::NaiveDateTime,
+  pub recurrence_type: Option<RecurrenceType>,
   pub fee_assignments: Vec<FeesRoomInfo>,
 }
 
@@ -237,6 +242,8 @@ pub async fn get_one_fee(
     }
   };
 
+  log::debug!("Fee: {:?}", fee);
+
   // find all rooms that have this fee assigned
   let fee_rooms = match FeesRoomAssignment::find()
     .filter(fees_room_assignment::Column::FeeId.eq(id))
@@ -271,6 +278,7 @@ pub async fn get_one_fee(
     is_required: fee.is_required,
     created_at: fee.created_at,
     due_date: fee.due_date,
+    recurrence_type: fee.recurrence_type,
     fee_assignments: fee_rooms,
   };
 
@@ -321,19 +329,96 @@ pub async fn edit_fee_info(
     name: Set(fee_info.name),
     due_date: Set(fee_info.due_date),
     is_required: Set(fee_info.is_required),
+    is_recurring: Set(fee_info.recurrence_type.is_some()),
+    recurrence_type: Set(fee_info.recurrence_type.clone()),
     ..fee.into()
   };
 
   match Fees::update(fee).exec(&state.db).await {
     Ok(res) => {
       log::info!("Fee updated: {:?}", res);
-      StatusCode::NO_CONTENT
     }
     Err(e) => {
       log::error!("Error: {:?}", e);
-      StatusCode::INTERNAL_SERVER_ERROR
+      return StatusCode::INTERNAL_SERVER_ERROR;
     }
   }
+
+  let recurrence = match FeeRecurrence::find()
+    .filter(fee_recurrence::Column::FeeId.eq(id))
+    .one(&state.db)
+    .await
+  {
+    Ok(recurrence) => recurrence,
+    Err(e) => {
+      log::error!("Error: {:?}", e);
+      return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+  };
+
+  // if no recurrence entry and fee is recurring, create one
+  if fee_info.recurrence_type.is_some() && recurrence.is_none() {
+    let recurrence_entry = fee_recurrence::ActiveModel {
+      fee_id: Set(id),
+      previous_fee_id: Set(id),
+      due_date: Set(fee_info.due_date),
+      ..Default::default()
+    };
+
+    match fee_recurrence::Entity::insert(recurrence_entry)
+      .exec(&state.db)
+      .await
+    {
+      Ok(res) => {
+        log::info!("Recurrence entry added: {:?}", res);
+      }
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+  }
+
+  // if recurrence entry exists and fee is not recurring, delete it
+  if fee_info.recurrence_type.is_none() && recurrence.is_some() {
+    match FeeRecurrence::delete_many()
+      .filter(
+        Condition::any()
+          .add(fee_recurrence::Column::FeeId.eq(id))
+          .add(fee_recurrence::Column::PreviousFeeId.eq(id)),
+      )
+      .exec(&state.db)
+      .await
+    {
+      Ok(res) => {
+        log::info!("Recurrence entry deleted: {:?}", res);
+      }
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+  }
+
+  // if recurrence entry exists and fee is recurring, update it
+  if fee_info.recurrence_type.is_some() && recurrence.is_some() {
+    let recurrence = fee_recurrence::ActiveModel {
+      due_date: Set(fee_info.due_date),
+      ..recurrence.unwrap().into()
+    };
+
+    match FeeRecurrence::update(recurrence).exec(&state.db).await {
+      Ok(res) => {
+        log::info!("Recurrence entry updated: {:?}", res);
+      }
+      Err(e) => {
+        log::error!("Error: {:?}", e);
+        return StatusCode::INTERNAL_SERVER_ERROR;
+      }
+    }
+  }
+
+  StatusCode::NO_CONTENT
 }
 
 // Chưa thấy kiểm tra authorization Long ơi

@@ -240,7 +240,10 @@ function FeesPage(): JSX.Element {
                       <FormItem>
                         <FormLabel>Định kỳ</FormLabel>
                         <FormControl>
-                          <Select {...field}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Chu kỳ lặp lại" />
                             </SelectTrigger>

@@ -20,6 +20,7 @@ export type BasicFeeInfo = {
 export type DetailedFeeInfo = BasicFeeInfo & {
   is_required: boolean;
   created_at: string;
+  recurrence_type: "weekly" | "monthly" | "yearly" | null;
   fee_assignments: FeesRoomInfo[];
 };
 

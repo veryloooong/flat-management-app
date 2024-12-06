@@ -27,6 +27,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -107,6 +114,8 @@ function ShowFeeInfoPage(): JSX.Element {
       amount: feeInfo.amount,
       due_date: new Date(feeInfo.due_date),
       is_required: feeInfo.is_required,
+      is_recurring: !!feeInfo.recurrence_type,
+      recurrence_type: feeInfo.recurrence_type || undefined,
     },
   });
   function onSubmitEditFeeForm(data: z.infer<typeof addFeeSchema>) {
@@ -115,6 +124,7 @@ function ShowFeeInfoPage(): JSX.Element {
       amount: data.amount,
       due_date: format(data.due_date, "yyyy-MM-dd'T'HH:mm:ss"),
       is_required: data.is_required,
+      recurrence_type: data.is_recurring ? data.recurrence_type : null,
     };
 
     invoke("edit_fee_info", { id: feeInfo.id, info })
@@ -214,6 +224,18 @@ function ShowFeeInfoPage(): JSX.Element {
               <label className="font-semibold">Bắt buộc:</label>
               <p className="text-gray-700">
                 {feeInfo.is_required ? "Có" : "Không"}
+              </p>
+            </div>
+            <div>
+              <label className="font-semibold">Loại định kỳ:</label>
+              <p className="text-gray-700">
+                {feeInfo.recurrence_type === "weekly"
+                  ? "Hàng tuần"
+                  : feeInfo.recurrence_type === "monthly"
+                    ? "Hàng tháng"
+                    : feeInfo.recurrence_type === "yearly"
+                      ? "Hàng năm"
+                      : "Không định kỳ"}
               </p>
             </div>
           </div>
@@ -316,24 +338,88 @@ function ShowFeeInfoPage(): JSX.Element {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      name="is_required"
-                      control={editFeeForm.control}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormLabel>Có bắt buộc?</FormLabel>
-                          <FormMessage>
-                            {editFeeForm.formState.errors.is_required?.message}
-                          </FormMessage>
-                        </FormItem>
-                      )}
-                    />
+                    <div className="flex flex-row gap-4 justify-start">
+                      <FormField
+                        name="is_required"
+                        control={editFeeForm.control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel>Có bắt buộc?</FormLabel>
+                            <FormMessage>
+                              {
+                                editFeeForm.formState.errors.is_required
+                                  ?.message
+                              }
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="is_recurring"
+                        control={editFeeForm.control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel>Có định kỳ?</FormLabel>
+                            <FormMessage>
+                              {
+                                editFeeForm.formState.errors.is_recurring
+                                  ?.message
+                              }
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {editFeeForm.watch("is_recurring") && (
+                      <FormField
+                        name="recurrence_type"
+                        control={editFeeForm.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Định kỳ</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Chu kỳ lặp lại" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="weekly">
+                                    Hàng tuần
+                                  </SelectItem>
+                                  <SelectItem value="monthly">
+                                    Hàng tháng
+                                  </SelectItem>
+                                  <SelectItem value="yearly">
+                                    Hàng năm
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage>
+                              {
+                                editFeeForm.formState.errors.recurrence_type
+                                  ?.message
+                              }
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </form>
                 </Form>
                 <DialogFooter>

@@ -109,6 +109,7 @@ pub struct DetailedFeeInfo {
   pub is_required: bool,
   pub created_at: String,
   pub due_date: String,
+  pub recurrence_type: Option<String>,
   pub fee_assignments: Vec<FeesRoomInfo>,
 }
 
@@ -151,6 +152,7 @@ pub struct EditFeeInfo {
   pub amount: i64,
   pub is_required: bool,
   pub due_date: chrono::NaiveDateTime,
+  pub recurrence_type: Option<String>,
 }
 
 #[tauri::command]

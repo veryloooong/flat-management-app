@@ -1,5 +1,18 @@
-use sea_orm::{DeriveActiveEnum, EnumIter};
+use extension::postgres::Type;
+use sea_orm::{ActiveEnum, DbBackend, DeriveActiveEnum, EnumIter, Schema};
+
 use sea_orm_migration::{prelude::*, schema::*};
+
+#[derive(EnumIter, DeriveActiveEnum)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "recurrence_type")]
+pub enum RecurrenceType {
+  #[sea_orm(string_value = "weekly")]
+  Weekly,
+  #[sea_orm(string_value = "monthly")]
+  Monthly,
+  #[sea_orm(string_value = "yearly")]
+  Yearly,
+}
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -7,6 +20,11 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
   async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+    let schema = Schema::new(DbBackend::Postgres);
+    manager
+      .create_type(schema.create_enum_from_active_enum::<RecurrenceType>())
+      .await?;
+
     manager
       .create_table(
         Table::create()
@@ -21,6 +39,7 @@ impl MigrationTrait for Migration {
               .not_null()
               .default(Expr::current_timestamp()),
           )
+          .col(boolean(Fees::IsRecurring).not_null().default(false))
           .col(
             ColumnDef::new(Fees::DueDate)
               .timestamp()
@@ -29,6 +48,7 @@ impl MigrationTrait for Migration {
                 "current_date + interval '1 month'",
               ))),
           )
+          .col(ColumnDef::new(Fees::RecurrenceType).custom(RecurrenceType::name()))
           .to_owned(),
       )
       .await?;
@@ -66,6 +86,15 @@ impl MigrationTrait for Migration {
       .drop_table(Table::drop().table(Fees::Table).if_exists().to_owned())
       .await?;
 
+    manager
+      .drop_type(
+        Type::drop()
+          .name(RecurrenceType::name())
+          .if_exists()
+          .to_owned(),
+      )
+      .await?;
+
     Ok(())
   }
 }
@@ -79,4 +108,6 @@ pub enum Fees {
   IsRequired,
   CreatedAt,
   DueDate,
+  IsRecurring,
+  RecurrenceType,
 }
