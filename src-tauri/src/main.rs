@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use reqwest::Client as ReqwestClient;
-use tauri::Manager;
+use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
 mod admin;
@@ -11,6 +11,20 @@ mod entities;
 mod household;
 mod manager;
 mod user;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct Settings {
+  server_url: String,
+}
+
+#[tauri::command]
+async fn update_settings<R: Runtime>(app: tauri::AppHandle<R>, data: Settings) -> Result<(), ()> {
+  let state = app.state::<Mutex<AppState>>();
+  let mut state = state.lock().await;
+  state.server_url = data.server_url;
+
+  Ok(())
+}
 
 /// Application state, containing the server URL and (secret) tokens.
 #[derive(Debug, Clone)]
@@ -75,6 +89,8 @@ async fn main() {
       // Household commands
       crate::household::get_household_info,
       crate::household::pay_fee,
+      // Other commands
+      update_settings
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

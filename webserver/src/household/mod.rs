@@ -169,20 +169,15 @@ pub async fn pay_fee(
     .one(&state.db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
   let fee = match fee {
     Some(fee) => fee,
     None => {
       return Err(StatusCode::NOT_FOUND);
     }
   };
-
-  // check if the fee is already paid
   if fee.is_paid {
     return Ok(StatusCode::OK);
   }
-
-  // update payment date and is_paid status
   let mut fee: fees_room_assignment::ActiveModel = fee.into();
   fee.is_paid = Set(true);
   fee.payment_date = Set(Some(chrono::Utc::now().naive_utc()));
@@ -191,9 +186,10 @@ pub async fn pay_fee(
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-  // find if this fee is the last in the recurrence chain
+  // check if the fee is in a recurrence chain and assign the next fee to the room
   let next_recurrence = match FeeRecurrence::find()
     .filter(fee_recurrence::Column::PreviousFeeId.eq(fee_id))
+    .filter(fee_recurrence::Column::FeeId.ne(fee_id))
     .one(&state.db)
     .await
   {
@@ -204,23 +200,21 @@ pub async fn pay_fee(
     }
   };
   if let Some(next_recurrence) = next_recurrence {
-    if next_recurrence.fee_id != fee_id {
-      // assign the next fee to the current room
-      let new_fee = fees_room_assignment::ActiveModel {
-        room_number: Set(user.1.as_ref().unwrap().room_number),
-        fee_id: Set(next_recurrence.fee_id),
-        due_date: Set(next_recurrence.due_date),
-        ..Default::default()
-      };
-      new_fee.save(&state.db).await.map_err(|e| {
-        log::error!("Failed to save new fee assignment: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-      })?;
-      return Ok(StatusCode::OK);
-    }
+    // assign the next fee to the current room
+    let new_fee = fees_room_assignment::ActiveModel {
+      room_number: Set(user.1.as_ref().unwrap().room_number),
+      fee_id: Set(next_recurrence.fee_id),
+      due_date: Set(next_recurrence.due_date),
+      ..Default::default()
+    };
+    new_fee.save(&state.db).await.map_err(|e| {
+      log::error!("Failed to save new fee assignment: {}", e);
+      StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    return Ok(StatusCode::OK);
   }
 
-  // check if the fee is recurring, if yes, create a new fee for the next due date
+  // check if the fee is the last in a recurrence chain and create a new fee for the next due date
   let recurrence_entry = match FeeRecurrence::find()
     .filter(fee_recurrence::Column::FeeId.eq(fee_id))
     .one(&state.db)
@@ -233,6 +227,7 @@ pub async fn pay_fee(
     }
   };
   if recurrence_entry.is_some() {
+    // find the fee that is being paid
     let old_fee = Fees::find_by_id(fee_id)
       .one(&state.db)
       .await
@@ -243,7 +238,7 @@ pub async fn pay_fee(
         return Err(StatusCode::NOT_FOUND);
       }
     };
-
+    // create a new fee for the next due date
     let new_due_date = old_fee.due_date
       + match { old_fee.recurrence_type.as_ref().unwrap() } {
         RecurrenceType::Weekly => chrono::Duration::days(7),
@@ -257,6 +252,7 @@ pub async fn pay_fee(
       created_at: Set(chrono::Utc::now().naive_utc()),
       is_recurring: Set(true),
       due_date: Set(new_due_date),
+      recurrence_type: Set(old_fee.recurrence_type.clone()),
       ..Default::default()
     };
     let new_fee = new_fee.save(&state.db).await.map_err(|e| {
@@ -264,7 +260,7 @@ pub async fn pay_fee(
       StatusCode::INTERNAL_SERVER_ERROR
     })?;
     let new_fee_id = new_fee.id.unwrap();
-
+    // assign the new fee to the room
     let new_assignment = fees_room_assignment::ActiveModel {
       room_number: Set(user.1.as_ref().unwrap().room_number),
       fee_id: Set(new_fee_id),
@@ -275,7 +271,7 @@ pub async fn pay_fee(
       log::error!("Failed to save new fee assignment: {}", e);
       StatusCode::INTERNAL_SERVER_ERROR
     })?;
-
+    // create a new recurrence chain
     let new_recurrence = fee_recurrence::ActiveModel {
       fee_id: Set(new_fee_id),
       previous_fee_id: Set(fee_id),

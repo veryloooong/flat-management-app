@@ -10,7 +10,7 @@ function NotifyPage(): JSX.Element {
     useState<Notification | null>(null);
 
   return (
-    <div className=" bg-gray-100 p-4">
+    <div className="bg-gray-100 p-4">
       <div className="flex gap-4 max-h-80 scroll-y">
         <div className="p-4 bg-white rounded-lg shadow-md max-h-[80vh] overflow-y-auto w-1/3">
           {notifications.map((notification) => (

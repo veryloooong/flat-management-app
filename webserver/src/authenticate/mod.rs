@@ -183,7 +183,6 @@ pub(crate) async fn account_register(
     role,
     room_id,
   } = register_info;
-
   let user_exists = Users::find()
     .filter(
       Condition::any()
@@ -196,7 +195,6 @@ pub(crate) async fn account_register(
       log::error!("Error: {:?}", e);
       register_err.clone().err().unwrap()
     })?;
-
   if user_exists.is_some() {
     log::error!("User already exists");
     return register_err;
@@ -206,12 +204,10 @@ pub(crate) async fn account_register(
   let argon2_config = argon2::Config::default();
   let mut rng = fastrand::Rng::new();
   let salt = (0..16).map(|_| rng.u8(..)).collect::<Vec<u8>>();
-
   let password = argon2::hash_raw(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
     log::error!("Error hashing password: {:?}", e);
     register_err.clone().err().unwrap()
   })?;
-
   let new_user = users::ActiveModel {
     name: Set(name.clone()),
     username: Set(username.clone()),
@@ -222,14 +218,12 @@ pub(crate) async fn account_register(
     role: Set(role.clone()),
     ..Default::default()
   };
-
   let res = Users::insert(new_user).exec(db).await.map_err(|e| {
     log::error!("Error: {:?}", e);
     register_err.clone().err().unwrap()
   })?;
 
   let user_id = res.last_insert_id;
-
   // add new room to db and assign to user
   if room_id.is_some() && role == UserRole::Tenant {
     let room_id = room_id.unwrap();
@@ -243,9 +237,7 @@ pub(crate) async fn account_register(
         log::error!("Error: {:?}", e);
         register_err.clone().err().unwrap()
       })?;
-
     if room.is_some() {
-      // the room already exists, throw error
       return register_err.clone();
     }
 
@@ -255,7 +247,6 @@ pub(crate) async fn account_register(
       tenant_id: Set(user_id),
       ..Default::default()
     };
-
     new_room.insert(db).await.map_err(|e| {
       log::error!("Error: {:?}", e);
       register_err.clone().err().unwrap()
@@ -270,7 +261,7 @@ pub(crate) async fn account_register(
   post,
   path = "/logout",
   description = "Đăng xuất khỏi hệ thống. Nhận JWT token, sau đó tìm thông tin và kiểm tra trạng thái kích hoạt của người dùng trong database. 
-  Tăng phiên bản refresh token của người dùng trong cơ sở dữ liệu.  Điều này sẽ vô hiệu hóa tất cả các refresh token của người dùng. 
+  Tăng phiên bản refresh token của người dùng trong cơ sở dữ liệu. Điều này sẽ vô hiệu hóa tất cả các refresh token của người dùng. 
   Trả về mã trạng thái OK nếu đăng xuất thành công.",
   tag = AUTH,
   responses(

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "@/hooks/use-toast";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const registerFormSchema = z
   .object({
@@ -71,7 +72,7 @@ const registerFormSchema = z
     email: z.string().email("Email không hợp lệ"),
     phone: z.string(),
     role: z.enum(["manager", "tenant"]),
-    roomId: z.coerce.number().optional(),
+    roomId: z.coerce.number().positive().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu xác nhận không khớp",
@@ -89,7 +90,7 @@ function RegisterPage(): JSX.Element {
       email: "",
       phone: "",
       role: "manager",
-      roomId: 0,
+      roomId: 1,
     },
   });
 
@@ -156,7 +157,7 @@ function RegisterPage(): JSX.Element {
                   Mật khẩu <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} required />
+                  <PasswordInput {...field} required />
                 </FormControl>
                 <FormMessage>
                   {form.formState.errors.password?.message}
@@ -173,7 +174,7 @@ function RegisterPage(): JSX.Element {
                   Xác nhận mật khẩu <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} required />
+                  <PasswordInput {...field} required />
                 </FormControl>
                 <FormMessage>
                   {form.formState.errors.confirmPassword?.message}
@@ -264,7 +265,7 @@ function RegisterPage(): JSX.Element {
                 <FormItem>
                   <FormLabel>Phòng số</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input type="number" min={1} {...field} />
                   </FormControl>
                   <FormMessage>
                     {form.formState.errors.roomId?.message}

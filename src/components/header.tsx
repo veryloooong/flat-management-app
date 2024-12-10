@@ -75,14 +75,14 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
               <span>Thông tin phòng</span>
             </NavLink>
           )}
-          <NavLink to="/dashboard/news">
+          {/* <NavLink to="/dashboard/news">
             <NewspaperIcon size={24} />
             <span>Tin tức</span>
-          </NavLink>
-          <NavLink to="/dashboard/settings">
+          </NavLink> */}
+          {/* <NavLink to="/dashboard/settings">
             <SettingsIcon size={24} />
             <span>Cài đặt</span>
-          </NavLink>
+          </NavLink> */}
           {role === "admin" && (
             <NavLink to="/dashboard/admin/accounts">
               <UsersIcon size={24} />
@@ -130,6 +130,12 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Chỉnh sửa thông tin tài khoản
+              </Link>
+              <Link
+                to="/dashboard/settings"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Cài đặt ứng dụng
               </Link>
               <Link to="/login">
                 <button

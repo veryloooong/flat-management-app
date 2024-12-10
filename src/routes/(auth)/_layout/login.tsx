@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const loginFormSchema = z.object({
   username: z.string(),
@@ -103,7 +104,7 @@ function LoginPage(): JSX.Element {
                   </Link>
                 </FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} required />
+                  <PasswordInput {...field} required />
                 </FormControl>
                 <FormMessage>
                   {form.formState.errors.password?.message}
