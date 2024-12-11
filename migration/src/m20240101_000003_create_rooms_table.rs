@@ -31,7 +31,7 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
-    for i in 1..=20 {
+    for i in 1..=3 {
       let room_number = 100 + i;
       let tenant_id = i + 2;
       let insert_stmt = Query::insert()

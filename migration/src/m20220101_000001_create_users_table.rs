@@ -138,7 +138,7 @@ impl MigrationTrait for Migration {
 
     manager.exec_stmt(insert_stmt).await?;
 
-    for i in 1..=20 {
+    for i in 1..=3 {
       let tenant_username = format!("tenant{}", i);
       let tenant_name: String = Name().fake();
       let tenant_password = format!("tenant{}", i);

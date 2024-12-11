@@ -54,29 +54,29 @@ impl MigrationTrait for Migration {
       .await?;
 
     // Insert dummy data
-    let insert_stmt = Query::insert()
-      .into_table(Fees::Table)
-      .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
-      .values_panic(vec!["Phí vệ sinh".into(), 200000.into(), true.into()])
-      .to_owned();
+    // let insert_stmt = Query::insert()
+    //   .into_table(Fees::Table)
+    //   .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
+    //   .values_panic(vec!["Phí vệ sinh".into(), 200000.into(), true.into()])
+    //   .to_owned();
 
-    manager.exec_stmt(insert_stmt).await?;
+    // manager.exec_stmt(insert_stmt).await?;
 
-    let insert_stmt = Query::insert()
-      .into_table(Fees::Table)
-      .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
-      .values_panic(vec!["Phí quản lý".into(), 500000.into(), true.into()])
-      .to_owned();
+    // let insert_stmt = Query::insert()
+    //   .into_table(Fees::Table)
+    //   .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
+    //   .values_panic(vec!["Phí quản lý".into(), 500000.into(), true.into()])
+    //   .to_owned();
 
-    manager.exec_stmt(insert_stmt).await?;
+    // manager.exec_stmt(insert_stmt).await?;
 
-    let insert_stmt = Query::insert()
-      .into_table(Fees::Table)
-      .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
-      .values_panic(vec!["Phí abcdef".into(), 1000000.into(), false.into()])
-      .to_owned();
+    // let insert_stmt = Query::insert()
+    //   .into_table(Fees::Table)
+    //   .columns(vec![Fees::Name, Fees::Amount, Fees::IsRequired])
+    //   .values_panic(vec!["Phí abcdef".into(), 1000000.into(), false.into()])
+    //   .to_owned();
 
-    manager.exec_stmt(insert_stmt).await?;
+    // manager.exec_stmt(insert_stmt).await?;
 
     Ok(())
   }
