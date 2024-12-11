@@ -18,14 +18,6 @@ function AdminAccountsPage(): JSX.Element {
           data={users}
           className="bg-white"
         />
-        <Button
-          className="w-fit self-end bg-main-palette-4 hover:bg-main-palette-5"
-          onClick={() =>
-            console.log("// TODO update account activation status")
-          }
-        >
-          Cập nhật
-        </Button>
       </div>
     </div>
   );
