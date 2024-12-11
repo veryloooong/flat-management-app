@@ -11,15 +11,15 @@ This is a desktop app to manage flat details and fees. Made for school, class HU
 - `migration`: Handles database migrations.
 - `src`: Contains front-end source.
 - `src-tauri`: Contains back-end source.
-- `webserver`: Contains source for webserver.
+- `it3180-app-webserver`: Contains source for webserver.
 
 ## Development instructions
 
 ### Prerequisites
 
-- A Node.js installation. Install Node.js via the [Node Version Manager](https://github.com/nvm-sh/nvm).
-- Rustup. Install via [`rustup.rs`](https://rustup.rs/).
-- A PostgreSQL instance running. Install via the [official site](https://www.postgresql.org/download/).
+- Install [Node JS](https://nodejs.org/en)
+- Install [PostgreSQL](https://www.postgresql.org/download/)
+- Install [Rustup](https://rustup.rs/)
 
 ### Steps
 
@@ -34,9 +34,12 @@ git clone https://github.com/veryloooong/flat-management-app && cd flat-manageme
 ```bash
 npm install
 cargo install sea-orm-cli # for db migration
+cargo install cargo-shuttle # for backend
 ```
 
 - Make an `.env` file, with keys following the `.env.example` file.
+- Go to `it3180-app-webserver` folder.
+  - Copy the `Secrets.toml.example` files to `Secrets.dev.toml` file. Add the secrets as appropriate.
 - Initiate database migration.
 
 ```bash
@@ -54,7 +57,7 @@ npm run tauri build # For deployment
 - Run the server:
 
 ```bash
-cd webserver && cargo run
+cd it3180-app-webserver && shuttle run
 ```
 
 ## Credits

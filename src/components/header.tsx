@@ -3,8 +3,8 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   BuildingIcon,
   CircleDollarSignIcon,
-  NewspaperIcon,
-  SettingsIcon,
+  // NewspaperIcon,
+  // SettingsIcon,
   UserIcon,
   UsersIcon,
   BellIcon,

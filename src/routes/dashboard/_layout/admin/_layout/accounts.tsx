@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
 import { userInfoColumns } from "@/lib/columns";
 import { DataTable } from "@/components/ui/data-table";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 function AdminAccountsPage(): JSX.Element {
   const users = Route.useLoaderData();

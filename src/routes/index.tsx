@@ -4,6 +4,7 @@ import HomePageImage from "@/assets/homepage.jpg";
 import "@/App.css";
 import { Button } from "@/components/ui/button";
 import { User, UserPlus } from "lucide-react";
+// import { invoke } from "@tauri-apps/api/core";
 
 function HomePage(): JSX.Element {
   return (
