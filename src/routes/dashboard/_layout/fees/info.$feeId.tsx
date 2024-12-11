@@ -244,6 +244,7 @@ function ShowFeeInfoPage(): JSX.Element {
             <Dialog open={isEditFeeDialogOpen}>
               <DialogTrigger
                 onClick={() => {
+                  editFeeForm.setValue("amount", feeInfo.amount);
                   setIsEditFeeDialogOpen(true);
                 }}
               >
