@@ -23,7 +23,7 @@ async fn update_settings<R: Runtime>(app: tauri::AppHandle<R>, data: Settings) -
   let mut state = state.lock().await;
   state.server_url = data
     .server_url
-    .unwrap_or("https://it3180-app-webserver-7tst.shuttle.app".to_string());
+    .unwrap_or("http://localhost:8000".to_string());
 
   Ok(())
 }
@@ -52,7 +52,7 @@ async fn main() {
     Ok(url) => url,
     Err(_) => {
       eprintln!("No SERVER_URL environment variable set, setting to default server.");
-      "http://localhost:8080".to_string()
+      "http://localhost:8000".to_string()
     }
   };
 
