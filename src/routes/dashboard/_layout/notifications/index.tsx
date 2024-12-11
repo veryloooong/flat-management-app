@@ -23,6 +23,7 @@ function NotifyPage(): JSX.Element {
             >
               <h2 className="font-bold text-lg">{notification.from}</h2>
               <p className="text-gray-500 truncate">{notification.title}</p>
+              <p className="text-gray-500 truncate">{notification.created_at.substring(0, 10)}</p>
             </div>
           ))}
         </div>
@@ -41,8 +42,14 @@ function NotifyPage(): JSX.Element {
             <p>
               <span className="font-medium">Nội dung:</span>
             </p>
-            <p className="mt-2 bg-gray-100 p-4 rounded-lg">
-              {selectedNotification.message}
+            <div>
+              <p className="mt-2 bg-gray-100 p-4 rounded-lg">
+                {selectedNotification.message}
+              </p>
+            </div>
+            <br></br>
+            <p>
+              <span className="font-medium">Thời gian:</span> {selectedNotification.created_at.substring(0, 10)}
             </p>
           </div>
         )}

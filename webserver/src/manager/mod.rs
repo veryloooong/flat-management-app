@@ -42,7 +42,6 @@ pub mod types {
 use sea_orm::{sea_query::OnConflict, Order, QueryOrder};
 use types::*;
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/fees",
@@ -85,7 +84,6 @@ pub async fn get_fees(
   ))
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   post,
   path = "/fees",
@@ -153,7 +151,6 @@ pub async fn add_fee(
   StatusCode::CREATED
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   delete,
   path = "/fees/{id}",
@@ -205,7 +202,6 @@ pub struct DetailedFeeInfo {
   pub fee_assignments: Vec<FeesRoomInfo>,
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/fees/{id}",
@@ -285,7 +281,6 @@ pub async fn get_one_fee(
   Ok(Json(fee))
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 
 #[utoipa::path(
   put,
@@ -421,7 +416,6 @@ pub async fn edit_fee_info(
   StatusCode::NO_CONTENT
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   get,
   path = "/rooms",
@@ -461,7 +455,6 @@ pub async fn get_rooms(
   ))
 }
 
-// Chưa thấy kiểm tra authorization Long ơi
 #[utoipa::path(
   post,
   path = "/fees/{fee_id}/assign",
@@ -615,7 +608,7 @@ pub struct DetailedRoomInfo {
 #[utoipa::path(
   get,
   path = "/rooms/detailed",
-  description = "TODO Vũ làm",
+  description = "Lấy thông tin chi tiết về phòng",
   tag = tags::MANAGER,
   responses(
     (status = OK, description = "Rooms retrieved", body = Vec<DetailedRoomInfo>),

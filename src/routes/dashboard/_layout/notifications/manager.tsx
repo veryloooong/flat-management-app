@@ -93,6 +93,7 @@ function NotifyPage(): JSX.Element {
               >
                 <h3 className="font-bold text-lg">{notification.to}</h3>
                 <p className="text-gray-500 truncate">{notification.title}</p>
+                <p className="text-gray-500 truncate">{notification.created_at.substring(0, 10)}</p>
               </div>
             ))
           ) : (
@@ -120,6 +121,9 @@ function NotifyPage(): JSX.Element {
                   {selectedNotification.message}
                 </p>
               </div>
+              <p>
+                <span className="font-medium">Thời gian:</span> {selectedNotification.created_at.substring(0,10)}
+              </p>
             </div>
           </div>
         )}

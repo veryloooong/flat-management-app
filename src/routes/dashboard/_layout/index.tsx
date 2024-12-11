@@ -39,39 +39,6 @@ function DashboardPage(): JSX.Element {
               </InfoTile>
             </div>
           )}
-
-          {/* TODO: Lịch sử thu phí */}
-          <div className="bg-white p-4 rounded-lg shadow-md max-h-80 border-2">
-            <h3 className="font-semibold mb-4 sticky top-0 bg-white z-10">
-              Lịch sử thu phí
-            </h3>
-            <div className="space-y-4 overflow-y-auto max-h-60">
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">Tiền điện tháng 11/2024</p>
-                <p>Phòng: 701</p>
-                <p>Số tiền: 500.000 VND</p>
-                <p>Ngày giao dịch: 29/11/2024 18:51:20</p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">Tiền điện tháng 11/2024</p>
-                <p>Phòng: 701</p>
-                <p>Số tiền: 500.000 VND</p>
-                <p>Ngày giao dịch: 29/11/2024 18:51:20</p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">Tiền điện tháng 11/2024</p>
-                <p>Phòng: 703</p>
-                <p>Số tiền: 690.000 VND</p>
-                <p>Ngày giao dịch: 29/11/2024 18:51:20</p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">Tiền điện tháng 11/2024</p>
-                <p>Phòng: 302</p>
-                <p>Số tiền: 5.000.000 VND</p>
-                <p>Ngày giao dịch: 29/11/2024 18:51:20</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* News panel */}
