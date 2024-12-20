@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { PasswordInput } from "@/components/ui/password-input";
+import { ChevronLeft } from "lucide-react";
 
 const loginFormSchema = z.object({
   username: z.string(),
@@ -52,8 +53,19 @@ function LoginPage(): JSX.Element {
           });
         }, LOGIN_NAVIGATE_DELAY);
       })
-      .catch((_) => {
+      .catch((err) => {
         // handle login error
+        if ((err as string) === "unactivated") {
+          toast({
+            title: "Tài khoản chưa được kích hoạt",
+            description:
+              "Vui lòng chờ đợi kích hoạt tài khoản hoặc liên hệ với quản trị viên",
+            duration: 5000,
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
           title: "Đăng nhập thất bại",
           description:
@@ -66,6 +78,17 @@ function LoginPage(): JSX.Element {
 
   return (
     <Fragment>
+      <Link to="..">
+        <Button
+          className="flex flex-row items-center content-center gap-2 px-0 w-fit"
+          variant="link"
+          tabIndex={-1}
+        >
+          <ChevronLeft size={18} />
+          <p className="">Quay lại trang chính</p>
+        </Button>
+      </Link>
+
       <h1>Đăng nhập</h1>
 
       <Form {...form}>

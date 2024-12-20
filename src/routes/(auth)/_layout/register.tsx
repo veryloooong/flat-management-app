@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Fragment } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "@/hooks/use-toast";
 import { PasswordInput } from "@/components/ui/password-input";
+import { ChevronLeft } from "lucide-react";
 
 const registerFormSchema = z
   .object({
@@ -127,6 +128,17 @@ function RegisterPage(): JSX.Element {
 
   return (
     <Fragment>
+      <Link to="..">
+        <Button
+          className="flex flex-row items-center content-center gap-2 px-0 w-fit"
+          variant="link"
+          tabIndex={-1}
+        >
+          <ChevronLeft size={18} />
+          <p className="">Quay lại trang chính</p>
+        </Button>
+      </Link>
+
       <h1>Đăng ký tài khoản</h1>
 
       <Form {...form}>
@@ -165,6 +177,16 @@ function RegisterPage(): JSX.Element {
               </FormItem>
             )}
           />
+          <p className="text-sm my-4">
+            Mật khẩu được chấp nhận bao gồm:
+            <ul className="list-disc list-inside">
+              <li>Ít nhất 8 ký tự</li>
+              <li>Ít nhất một chữ cái viết hoa</li>
+              <li>Ít nhất một chữ cái viết thường</li>
+              <li>Ít nhất một chữ số</li>
+              <li>Ít nhất một ký tự đặc biệt</li>
+            </ul>
+          </p>
           <FormField
             name="confirmPassword"
             control={form.control}

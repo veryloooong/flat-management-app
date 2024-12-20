@@ -17,12 +17,13 @@ const InfoTile = ({
 };
 
 function DashboardPage(): JSX.Element {
-  const { role } = Route.useLoaderData();
+  const { role, userInfo } = Route.useLoaderData();
 
   return (
     <div className="w-screen">
       <h1 className="text-center">Dashboard</h1>
-      <div className="grid grid-cols-3 px-4 gap-x-2">
+      <h3 className="text-center italic">Xin chào, {userInfo.username}</h3>
+      <div className="px-4 gap-x-2">
         {/* Fees and homes panel */}
         <div className="col-span-2 space-y-2">
           {role !== "tenant" && (
@@ -42,19 +43,19 @@ function DashboardPage(): JSX.Element {
         </div>
 
         {/* News panel */}
-        <div className="col-span-1 border-2 rounded-md p-4 shadow-md bg-white">
+        {/* <div className="col-span-1 border-2 rounded-md p-4 shadow-md bg-white">
           <h3 className="text-lg font-bold mb-4 border-b-2 border-gray-400">
             Tin tức
           </h3>
-          {/* <ul className="space-y-3">
+          <ul className="space-y-3">
             <li>Tính năng đang được phát triển</li>
           </ul>
           <div className="mt-4">
             <Link to="/dashboard/news">
               <Button variant="link">Xem thêm</Button>
             </Link>
-          </div> */}
-        </div>
+          </div>
+        </div> */}
       </div>
     </div>
   );
@@ -64,12 +65,14 @@ export const Route = createFileRoute("/dashboard/_layout/")({
   component: DashboardPage,
   loader: async ({ context }) => {
     const role = await context.authentication.getRole();
-    if (role === undefined) {
+    const userInfo = await context.authentication.getBasicUserInfo();
+    if (role === undefined || userInfo === undefined) {
       throw redirect({ to: "/login" });
     }
 
     return {
       role,
+      userInfo,
     };
   },
 });

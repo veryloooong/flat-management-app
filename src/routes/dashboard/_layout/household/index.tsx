@@ -17,7 +17,7 @@ function HouseholdInfoPage(): JSX.Element {
   useEffect(() => {
     const [paid, unpaid] = householdInfo.fees.reduce(
       (acc, fee) => {
-        if (fee.payment_date) {
+        if (fee.is_paid) {
           acc[0].push(fee);
         } else {
           acc[1].push(fee);

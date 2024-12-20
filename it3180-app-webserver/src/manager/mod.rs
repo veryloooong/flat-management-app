@@ -1,8 +1,4 @@
-use crate::{
-  entities::{fee_recurrence, fees, fees_room_assignment, notifications, rooms, users},
-  household::FeesRoomInfo,
-  prelude::*,
-};
+use crate::{entities::*, household::FeesRoomInfo, prelude::*};
 
 pub mod types {
   use crate::Fees;
@@ -243,7 +239,7 @@ pub async fn get_one_fee(
   // find all rooms that have this fee assigned
   let fee_rooms = match FeesRoomAssignment::find()
     .filter(fees_room_assignment::Column::FeeId.eq(id))
-    .find_also_related(Fees)
+    .find_also_related(Transactions)
     .all(&state.db)
     .await
   {
@@ -256,14 +252,17 @@ pub async fn get_one_fee(
 
   let fee_rooms = fee_rooms
     .into_iter()
-    .map(|fee| FeesRoomInfo {
-      room_number: fee.0.room_number,
-      fee_id: fee.0.fee_id,
-      fee_name: fee.1.as_ref().unwrap().name.clone(),
-      fee_amount: fee.1.as_ref().unwrap().amount,
-      due_date: fee.0.due_date,
-      payment_date: fee.0.payment_date,
-      is_paid: fee.0.is_paid,
+    .map(|fr| FeesRoomInfo {
+      room_number: fr.0.room_number,
+      fee_id: fr.0.fee_id,
+      fee_name: fee.name.clone(),
+      fee_amount: match fr.1 {
+        Some(transaction) => Some(transaction.amount),
+        None => Some(fee.amount),
+      },
+      due_date: fr.0.due_date,
+      payment_date: fr.0.payment_date,
+      is_paid: fr.0.is_paid,
     })
     .collect::<Vec<_>>();
 
@@ -280,7 +279,6 @@ pub async fn get_one_fee(
 
   Ok(Json(fee))
 }
-
 
 #[utoipa::path(
   put,

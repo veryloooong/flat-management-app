@@ -3,11 +3,11 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   BuildingIcon,
   CircleDollarSignIcon,
-  // NewspaperIcon,
-  // SettingsIcon,
   UserIcon,
   UsersIcon,
   BellIcon,
+  HomeIcon,
+  ShieldIcon,
 } from "lucide-react";
 
 import {
@@ -44,7 +44,15 @@ const NavLink = ({
   );
 };
 
-export const Header = ({ role }: { role?: string }): JSX.Element => {
+export const Header = ({
+  userInfo,
+}: {
+  userInfo?: {
+    username: string;
+    role: string;
+  };
+}): JSX.Element => {
+  const { username, role } = userInfo!;
   const { logout } = useAuth();
 
   return (
@@ -54,7 +62,7 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
       <NavigationMenu className="text-white flex-grow mr-auto">
         <NavigationMenuList className="flex flex-row gap-8">
           <NavLink to="/dashboard">
-            <BellIcon size={24} />
+            <HomeIcon size={24} />
             <span>Trang chủ</span>
           </NavLink>
           {role !== "tenant" && (
@@ -85,7 +93,7 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
           </NavLink> */}
           {role === "admin" && (
             <NavLink to="/dashboard/admin/accounts">
-              <UsersIcon size={24} />
+              <ShieldIcon size={24} />
               <span>Quản trị viên</span>
             </NavLink>
           )}
@@ -105,18 +113,17 @@ export const Header = ({ role }: { role?: string }): JSX.Element => {
 
       {/* Icons */}
       <div className="flex items-center gap-4 relative">
-        {/* Icon Notification */}
-        {/* <div className="relative">
-          <BellIcon className="w-6 h-6 text-white cursor-pointer" />
-        </div> */}
-
         {/* Icon User */}
         <div className="relative">
           {/* Dropdown Menu */}
           <Popover>
-            <PopoverTrigger className="flex flex-row gap-2">
-              <UserIcon className="w-6 h-6 text-white cursor-pointer" />
-              <span className="text-white">{roleToText(role)}</span>
+            <PopoverTrigger className="flex flex-row gap-2 items-center">
+              <UserIcon className="text-white cursor-pointer" size={24} />
+              <div className="">
+                <span className="text-white">
+                  {username} / {roleToText(role)}
+                </span>
+              </div>
             </PopoverTrigger>
             <PopoverContent className="p-2 w-fit">
               <Link

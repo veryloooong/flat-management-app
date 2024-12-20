@@ -13,10 +13,10 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
 import { Route as DashboardLayoutImport } from './routes/dashboard/_layout'
 import { Route as authLayoutImport } from './routes/(auth)/_layout'
 import { Route as DashboardLayoutIndexImport } from './routes/dashboard/_layout/index'
+import { Route as authLayoutIndexImport } from './routes/(auth)/_layout/index'
 import { Route as DashboardLayoutSettingsImport } from './routes/dashboard/_layout/settings'
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout/register'
 import { Route as authLayoutPasswordResetImport } from './routes/(auth)/_layout/password-reset'
@@ -51,11 +51,6 @@ const authRoute = authImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const DashboardLayoutRoute = DashboardLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => DashboardRoute,
@@ -74,6 +69,11 @@ const DashboardLayoutAdminRoute = DashboardLayoutAdminImport.update({
 const DashboardLayoutIndexRoute = DashboardLayoutIndexImport.update({
   path: '/',
   getParentRoute: () => DashboardLayoutRoute,
+} as any)
+
+const authLayoutIndexRoute = authLayoutIndexImport.update({
+  path: '/',
+  getParentRoute: () => authLayoutRoute,
 } as any)
 
 const DashboardLayoutSettingsRoute = DashboardLayoutSettingsImport.update({
@@ -165,13 +165,6 @@ const DashboardLayoutAdminLayoutAccountsRoute =
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
     '/(auth)': {
       id: '/'
       path: '/'
@@ -227,6 +220,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardLayoutSettingsImport
       parentRoute: typeof DashboardLayoutImport
+    }
+    '/(auth)/_layout/': {
+      id: '/_layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authLayoutIndexImport
+      parentRoute: typeof authLayoutImport
     }
     '/dashboard/_layout/': {
       id: '/dashboard/_layout/'
@@ -328,12 +328,14 @@ interface authLayoutRouteChildren {
   authLayoutLoginRoute: typeof authLayoutLoginRoute
   authLayoutPasswordResetRoute: typeof authLayoutPasswordResetRoute
   authLayoutRegisterRoute: typeof authLayoutRegisterRoute
+  authLayoutIndexRoute: typeof authLayoutIndexRoute
 }
 
 const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutLoginRoute: authLayoutLoginRoute,
   authLayoutPasswordResetRoute: authLayoutPasswordResetRoute,
   authLayoutRegisterRoute: authLayoutRegisterRoute,
+  authLayoutIndexRoute: authLayoutIndexRoute,
 }
 
 const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
@@ -425,7 +427,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 )
 
 export interface FileRoutesByFullPath {
-  '/': typeof authLayoutRouteWithChildren
+  '/': typeof authLayoutIndexRoute
   '/dashboard': typeof DashboardLayoutRouteWithChildren
   '/login': typeof authLayoutLoginRoute
   '/password-reset': typeof authLayoutPasswordResetRoute
@@ -446,12 +448,12 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
-  '/': typeof authLayoutRouteWithChildren
   '/dashboard': typeof DashboardLayoutIndexRoute
   '/login': typeof authLayoutLoginRoute
   '/password-reset': typeof authLayoutPasswordResetRoute
   '/register': typeof authLayoutRegisterRoute
   '/dashboard/settings': typeof DashboardLayoutSettingsRoute
+  '/': typeof authLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
   '/dashboard/notifications/manager': typeof DashboardLayoutNotificationsManagerRoute
@@ -475,6 +477,7 @@ export interface FileRoutesById {
   '/_layout/password-reset': typeof authLayoutPasswordResetRoute
   '/_layout/register': typeof authLayoutRegisterRoute
   '/dashboard/_layout/settings': typeof DashboardLayoutSettingsRoute
+  '/_layout/': typeof authLayoutIndexRoute
   '/dashboard/_layout/': typeof DashboardLayoutIndexRoute
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
@@ -513,12 +516,12 @@ export interface FileRouteTypes {
     | '/dashboard/fees/info/$feeId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/dashboard'
     | '/login'
     | '/password-reset'
     | '/register'
     | '/dashboard/settings'
+    | '/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
     | '/dashboard/notifications/manager'
@@ -540,6 +543,7 @@ export interface FileRouteTypes {
     | '/_layout/password-reset'
     | '/_layout/register'
     | '/dashboard/_layout/settings'
+    | '/_layout/'
     | '/dashboard/_layout/'
     | '/dashboard/_layout/account/edit'
     | '/dashboard/_layout/admin'
@@ -557,13 +561,11 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   authRoute: typeof authRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   authRoute: authRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
 }
@@ -581,7 +583,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/",
         "/dashboard"
       ]
     },
@@ -597,7 +598,8 @@ export const routeTree = rootRoute
       "children": [
         "/_layout/login",
         "/_layout/password-reset",
-        "/_layout/register"
+        "/_layout/register",
+        "/_layout/"
       ]
     },
     "/dashboard": {
@@ -639,6 +641,10 @@ export const routeTree = rootRoute
     "/dashboard/_layout/settings": {
       "filePath": "dashboard/_layout/settings.tsx",
       "parent": "/dashboard/_layout"
+    },
+    "/_layout/": {
+      "filePath": "(auth)/_layout/index.tsx",
+      "parent": "/_layout"
     },
     "/dashboard/_layout/": {
       "filePath": "dashboard/_layout/index.tsx",

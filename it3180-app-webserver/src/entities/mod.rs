@@ -8,4 +8,5 @@ pub mod fees_room_assignment;
 pub mod notifications;
 pub mod rooms;
 pub mod sea_orm_active_enums;
+pub mod transactions;
 pub mod users;

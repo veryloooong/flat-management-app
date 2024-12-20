@@ -67,12 +67,6 @@ const collectFeeSchema = z.object({
 
 function ShowFeeInfoPage(): JSX.Element {
   const { feeInfo, rooms } = Route.useLoaderData();
-  const options: Option[] = rooms.map((room) => {
-    return {
-      value: room.toString(),
-      label: `Phòng ${room}`,
-    };
-  });
 
   // dialog states
   const router = useRouter();
@@ -106,6 +100,20 @@ function ShowFeeInfoPage(): JSX.Element {
     setPaidHouseholds(paid);
     setUnpaidHouseholds(unpaid);
   }, [feeInfo.fee_assignments]);
+
+  const options: Option[] = rooms
+    .filter(
+      (room) =>
+        !feeInfo.fee_assignments.some(
+          (assignment) => assignment.room_number === room
+        )
+    )
+    .map((room) => {
+      return {
+        value: room.toString(),
+        label: `Phòng ${room}`,
+      };
+    });
 
   const editFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
@@ -451,7 +459,10 @@ function ShowFeeInfoPage(): JSX.Element {
               open={isCollectFeeDialogOpen}
               onOpenChange={setIsCollectFeeDialogOpen}
             >
-              <DialogContent className="[&>button]:hidden">
+              <DialogContent
+                className="[&>button]:hidden"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+              >
                 <DialogTitle>Thu phí</DialogTitle>
                 <DialogDescription>
                   Chọn các phòng cần thu phí và điền thông tin để xác nhận thông
@@ -472,12 +483,23 @@ function ShowFeeInfoPage(): JSX.Element {
                         <FormItem>
                           <FormLabel>Chọn phòng</FormLabel>
                           <FormControl>
-                            <MultipleSelector
-                              {...field}
-                              defaultOptions={options}
-                              placeholder="Chọn các phòng cần thu phí"
-                              emptyIndicator="Không có phòng nào"
-                            />
+                            <>
+                              <MultipleSelector
+                                {...field}
+                                defaultOptions={options}
+                                placeholder="Chọn các phòng cần thu phí"
+                                emptyIndicator="Không có phòng nào"
+                              />
+                              <Button
+                                type="button"
+                                className="mt-2"
+                                onClick={() => {
+                                  collectFeeForm.setValue("rooms", options);
+                                }}
+                              >
+                                Chọn tất cả
+                              </Button>
+                            </>
                           </FormControl>
                           <FormMessage>
                             {collectFeeForm.formState.errors.rooms?.message}
@@ -485,6 +507,15 @@ function ShowFeeInfoPage(): JSX.Element {
                         </FormItem>
                       )}
                     />
+                    {/* <div className="flex items-center space-x-2">
+                      <Checkbox id="select_all" />
+                      <label
+                        htmlFor="select_all"
+                        className="cursor-pointer text-sm font-medium leading-none"
+                      >
+                        Chọn tất cả
+                      </label>
+                    </div> */}
                   </form>
                 </Form>
                 <DialogFooter>

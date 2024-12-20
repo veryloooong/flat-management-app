@@ -23,7 +23,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20240101_000003_create_rooms_table::Migration),
       // Box::new(m20240101_000004_create_room_tenant_table::Migration),
       Box::new(m20240101_000005_create_fees_room_table::Migration),
-      // Box::new(m20240101_000006_create_transactions_table::Migration),
+      Box::new(m20240101_000006_create_transactions_table::Migration),
       Box::new(m20240101_000007_create_notifications_table::Migration),
       Box::new(m20240101_000008_create_fee_recurrence_table::Migration),
     ]
