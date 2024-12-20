@@ -5,11 +5,11 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Header } from "@/components/header";
 
 function DashboardLayoutPage(): JSX.Element {
-  const { role } = Route.useLoaderData();
+  const { userInfo } = Route.useLoaderData();
 
   return (
     <div className="bg-main-palette-0 min-h-screen pt-20">
-      <Header role={role} />
+      <Header userInfo={userInfo} />
       <div className="pt-8 w-screen">
         <Outlet />
       </div>
@@ -34,15 +34,15 @@ export const Route = createFileRoute("/dashboard/_layout")({
     }
   },
   loader: async ({ context }) => {
-    const { getRole } = context.authentication;
+    const { getBasicUserInfo } = context.authentication;
 
-    const role = await getRole();
-    if (role === undefined) {
+    const userInfo = await getBasicUserInfo();
+    if (userInfo === undefined) {
       throw redirect({ to: "/login" });
     }
 
     return {
-      role,
+      userInfo,
     };
   },
   component: DashboardLayoutPage,

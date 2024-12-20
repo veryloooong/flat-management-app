@@ -9,7 +9,7 @@ pub struct FeesRoomInfo {
   room_number: i32,
   fee_id: i32,
   fee_name: String,
-  fee_amount: i64,
+  fee_amount: Option<i64>,
   due_date: NaiveDateTime,
   payment_date: Option<NaiveDateTime>,
   is_paid: bool,
@@ -35,7 +35,7 @@ pub async fn get_household_info<R: Runtime>(
   let server_url = &state.server_url;
   let jwt_access_token = state.access_token.clone().ok_or("Not logged in")?;
 
-  let response: PersonalHouseholdInfo = client
+  let response = client
     .get(&format!("{}/user/household", server_url))
     .bearer_auth(jwt_access_token)
     .send()
@@ -50,6 +50,8 @@ pub async fn get_household_info<R: Runtime>(
       log::error!("Failed to parse household info response: {}", e);
       "Failed to parse household info response".to_string()
     })?;
+
+  log::debug!("Household info: {:?}", response);
 
   Ok(response)
 }

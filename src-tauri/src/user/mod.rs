@@ -6,6 +6,7 @@ use crate::entities::sea_orm_active_enums::*;
 use crate::AppState;
 use types::{AccountRecoveryInfo, LoginResponse, RegisterInfo};
 
+use base64::prelude::*;
 use tauri::{Manager, Runtime};
 use tokio::sync::Mutex;
 
@@ -22,7 +23,7 @@ pub(crate) async fn account_login<R: Runtime>(
 
   let login_err = "Login failed".to_string();
 
-  let response: LoginResponse = client
+  let response = client
     .post(&format!("{}/auth/login", server_url))
     .json(&serde_json::json!({
       "username": username,
@@ -33,13 +34,27 @@ pub(crate) async fn account_login<R: Runtime>(
     .map_err(|e| {
       log::error!("Failed to send login request: {}", e);
       login_err.clone()
-    })?
-    .json()
-    .await
-    .map_err(|e| {
-      log::error!("Failed to parse login response: {}", e);
-      login_err.clone()
     })?;
+  // .json()
+  // .await
+  // .map_err(|e| {
+  //   log::error!("Failed to parse login response: {}", e);
+  //   login_err.clone()
+  // })?;
+
+  let response = response.text().await.map_err(|e| {
+    log::error!("Failed to parse login response: {}", e);
+    login_err.clone()
+  })?;
+
+  if response.contains("unauthorized_client") {
+    return Err("unactivated".to_string());
+  }
+
+  let response: LoginResponse = serde_json::from_str(&response).map_err(|e| {
+    log::error!("Failed to parse login response: {}", e);
+    login_err.clone()
+  })?;
 
   state.access_token = Some(response.access_token.clone());
   state.refresh_token = Some(response.refresh_token.clone());
@@ -208,4 +223,23 @@ pub async fn get_notifications<R: Runtime>(
   log::debug!("Notifications: {:?}", &response);
 
   Ok(response)
+}
+
+#[tauri::command]
+pub async fn get_basic_user_info<R: Runtime>(
+  app: tauri::AppHandle<R>,
+) -> Result<serde_json::Value, String> {
+  let state = app.state::<Mutex<AppState>>();
+  let state = state.lock().await;
+  let access_token = state.access_token.clone().ok_or("Not logged in")?;
+
+  let payload = access_token.split('.').nth(1).ok_or("Invalid token")?;
+  let payload = BASE64_STANDARD
+    .decode(payload.as_bytes())
+    .map_err(|e| e.to_string())?;
+  let payload = String::from_utf8(payload).map_err(|e| e.to_string())?;
+
+  let payload: serde_json::Value = serde_json::from_str(&payload).map_err(|e| e.to_string())?;
+
+  Ok(payload)
 }

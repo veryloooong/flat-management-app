@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Fragment } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -24,6 +24,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
+import { ChevronLeft } from "lucide-react";
 
 const forgotPasswordFormSchema = z.object({
   email: z.string().email(),
@@ -62,6 +63,17 @@ function ForgotPasswordPage(): JSX.Element {
 
   return (
     <Fragment>
+      <Link to="..">
+        <Button
+          className="flex flex-row items-center content-center gap-2 px-0 w-fit"
+          variant="link"
+          tabIndex={-1}
+        >
+          <ChevronLeft size={18} />
+          <p className="">Quay lại trang chính</p>
+        </Button>
+      </Link>
+
       <h1>Khôi phục mật khẩu</h1>
       <p>
         Để khôi phục mật khẩu, vui lòng nhập thông tin dưới đây. Chúng tôi sẽ

@@ -72,6 +72,18 @@ export const useAuth = () => {
     }
   };
 
+  const getBasicUserInfo = async () => {
+    try {
+      const res = await invoke("get_basic_user_info");
+      return res as {
+        username: string;
+        role: string;
+      };
+    } catch (error) {
+      return undefined;
+    }
+  };
+
   return {
     isAuthenticated,
     getUserInfo,
@@ -80,6 +92,7 @@ export const useAuth = () => {
     isAdmin,
     isManager,
     getRole,
+    getBasicUserInfo,
   };
 };
 

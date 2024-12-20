@@ -77,6 +77,7 @@ async fn main() {
       user::account_register,
       user::account_recovery,
       user::account_logout,
+      user::get_basic_user_info,
       // User info commands
       user::info::get_user_info,
       user::info::update_user_info,

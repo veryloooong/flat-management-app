@@ -6,5 +6,5 @@ export const addFeeSchema = z.object({
   due_date: z.date(),
   is_required: z.boolean(),
   is_recurring: z.boolean(),
-  recurrence_type: z.enum(["weekly", "monthly", "yearly"]),
+  recurrence_type: z.enum(["weekly", "monthly", "yearly"]).optional(),
 });

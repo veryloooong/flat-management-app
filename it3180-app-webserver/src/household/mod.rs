@@ -1,16 +1,17 @@
 use axum_extra::extract::Query;
+use sea_orm::{FromQueryResult, IntoActiveModel, QuerySelect};
 
 use crate::{
-  entities::{fee_recurrence, fees, fees_room_assignment},
+  entities::{fee_recurrence, fees, fees_room_assignment, transactions},
   prelude::*,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema, FromQueryResult)]
 pub struct FeesRoomInfo {
   pub room_number: i32,
   pub fee_id: i32,
   pub fee_name: String,
-  pub fee_amount: i64,
+  pub fee_amount: Option<i64>,
   pub due_date: DateTime,
   pub payment_date: Option<DateTime>,
   pub is_paid: bool,
@@ -74,10 +75,42 @@ pub async fn get_household_info(
     return Err(StatusCode::NOT_FOUND);
   }
 
+  #[derive(Debug, Clone, Serialize, Deserialize, Default, FromQueryResult)]
+  struct FeesAssignmentDetail {
+    room_number: i32,
+    fee_id: i32,
+    due_date: DateTime,
+    payment_date: Option<DateTime>,
+    is_paid: bool,
+
+    // fees
+    fee_name: String,
+    fee_amount: i64,
+
+    // transactions
+    transaction_amount: Option<i64>,
+  }
+
   // find fees that the user has to pay
   let fees = FeesRoomAssignment::find()
+    .column_as(fees_room_assignment::Column::RoomNumber, "room_number")
+    .column_as(fees_room_assignment::Column::FeeId, "fee_id")
+    .column_as(fees_room_assignment::Column::DueDate, "due_date")
+    .column_as(fees_room_assignment::Column::PaymentDate, "payment_date")
+    .column_as(fees_room_assignment::Column::IsPaid, "is_paid")
+    .column_as(fees::Column::Name, "fee_name")
+    .column_as(fees::Column::Amount, "fee_amount")
+    .column_as(transactions::Column::Amount, "transaction_amount")
+    .join(
+      sea_orm::JoinType::Join,
+      fees_room_assignment::Relation::Fees.def(),
+    )
+    .join(
+      sea_orm::JoinType::LeftJoin,
+      fees_room_assignment::Relation::Transactions.def(),
+    )
     .filter(fees_room_assignment::Column::RoomNumber.eq(user.1.as_ref().unwrap().room_number))
-    .find_also_related(Fees)
+    .into_model::<FeesAssignmentDetail>()
     .all(&state.db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -85,13 +118,16 @@ pub async fn get_household_info(
   let fees = fees
     .into_iter()
     .map(|fee| FeesRoomInfo {
-      room_number: fee.0.room_number,
-      fee_id: fee.0.fee_id,
-      fee_name: fee.1.as_ref().unwrap().name.clone(),
-      fee_amount: fee.1.as_ref().unwrap().amount,
-      due_date: fee.0.due_date,
-      payment_date: fee.0.payment_date,
-      is_paid: fee.0.is_paid,
+      room_number: fee.room_number,
+      fee_id: fee.fee_id,
+      fee_name: fee.fee_name,
+      fee_amount: match fee.is_paid {
+        true => fee.transaction_amount,
+        false => Some(fee.fee_amount),
+      },
+      due_date: fee.due_date,
+      payment_date: fee.payment_date,
+      is_paid: fee.is_paid,
     })
     .collect::<Vec<_>>();
 
@@ -102,6 +138,7 @@ pub async fn get_household_info(
     tenant_email: user.0.email.clone(),
     tenant_phone: user.0.phone.clone(),
     fees,
+    // fees: vec![],
   };
 
   // return user and room info as one json object
@@ -166,6 +203,7 @@ pub async fn pay_fee(
         .add(fees_room_assignment::Column::FeeId.eq(fee_id))
         .add(fees_room_assignment::Column::RoomNumber.eq(user.1.as_ref().unwrap().room_number)),
     )
+    .find_also_related(Fees)
     .one(&state.db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -175,13 +213,33 @@ pub async fn pay_fee(
       return Err(StatusCode::NOT_FOUND);
     }
   };
-  if fee.is_paid {
+  if fee.0.is_paid {
     return Ok(StatusCode::OK);
   }
-  let mut fee: fees_room_assignment::ActiveModel = fee.into();
-  fee.is_paid = Set(true);
-  fee.payment_date = Set(Some(chrono::Utc::now().naive_utc()));
-  fee
+  // mark the fee as paid
+  let mut fee_assignment = fee.0.into_active_model();
+  fee_assignment.is_paid = Set(true);
+  fee_assignment.payment_date = Set(Some(chrono::Utc::now().naive_utc()));
+  let insert_result = fees_room_assignment::Entity::update(fee_assignment)
+    .exec(&state.db)
+    .await
+    .map_err(|e| {
+      log::error!("Failed to mark fee as paid: {}", e);
+      StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+  // fee
+  //   .save(&state.db)
+  //   .await
+  //   .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+  // add a new transaction
+  let new_transaction = transactions::ActiveModel {
+    amount: Set(fee.1.as_ref().unwrap().amount),
+    created_at: Set(chrono::Utc::now().naive_utc()),
+    assignment_id: Set(insert_result.assignment_id),
+    ..Default::default()
+  };
+  new_transaction
     .save(&state.db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
