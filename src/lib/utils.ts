@@ -13,7 +13,7 @@ export function roleToText(role: UserRole | string | undefined) {
     case "manager":
       return "Quản lý";
     case "tenant":
-      return "Người thuê";
+      return "Hộ dân";
     default:
       return "Khách";
   }
