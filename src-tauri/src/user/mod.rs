@@ -234,7 +234,7 @@ pub async fn get_basic_user_info<R: Runtime>(
   let access_token = state.access_token.clone().ok_or("Not logged in")?;
 
   let payload = access_token.split('.').nth(1).ok_or("Invalid token")?;
-  let payload = BASE64_STANDARD
+  let payload = BASE64_STANDARD_NO_PAD
     .decode(payload.as_bytes())
     .map_err(|e| e.to_string())?;
   let payload = String::from_utf8(payload).map_err(|e| e.to_string())?;

@@ -138,12 +138,12 @@ export const Header = ({
               >
                 Chỉnh sửa thông tin tài khoản
               </Link>
-              <Link
+              {/* <Link
                 to="/dashboard/settings"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Cài đặt ứng dụng
-              </Link>
+              </Link> */}
               <Link to="/login">
                 <button
                   type="button"

@@ -1,7 +1,7 @@
 {
   "name": "it3180-flat-management-app",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run routes:watch\" \"vite\"",
