@@ -24,7 +24,7 @@ function AccountPage(): JSX.Element {
                     ? "Quản trị viên"
                     : userInfo.role === "manager"
                       ? "Quản lý"
-                      : "Người thuê",
+                      : "Hộ dân",
                 icon: "🔑",
               },
             ].map((item, idx) => (
