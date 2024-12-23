@@ -20,10 +20,33 @@ function NotFound(): JSX.Element {
   );
 }
 
+function LoadingComponent(): JSX.Element {
+  return (
+    <div className="h-screen w-screen flex flex-col gap-4 items-center justify-center">
+      <div className="lds-default">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <h1 className="text-2xl">Đang tải...</h1>
+    </div>
+  );
+}
+
 const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFound,
   context: { authentication: undefined! },
+  defaultPendingComponent: LoadingComponent,
 });
 
 declare module "@tanstack/react-router" {
