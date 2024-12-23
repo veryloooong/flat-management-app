@@ -115,11 +115,10 @@ function RegisterPage(): JSX.Element {
           duration: 2000,
         });
       })
-      .catch((_) => {
+      .catch((err) => {
         toast({
           title: "Đăng ký tài khoản thất bại",
-          description:
-            "Có lỗi xảy ra khi đăng ký tài khoản, vui lòng thử lại sau",
+          description: `Có lỗi xảy ra khi đăng ký tài khoản: ${err}, vui lòng thử lại sau`,
           variant: "destructive",
           duration: 2000,
         });

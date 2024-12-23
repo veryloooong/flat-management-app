@@ -172,7 +172,7 @@ pub(crate) async fn account_register(
 ) -> Result<impl IntoResponse, impl IntoResponse> {
   let AppState { db, .. } = &state;
 
-  let register_err = Err((StatusCode::BAD_REQUEST, "Registration failed"));
+  let server_err = (StatusCode::INTERNAL_SERVER_ERROR, "Server error");
 
   let RegisterInfo {
     name,
@@ -193,11 +193,11 @@ pub(crate) async fn account_register(
     .await
     .map_err(|e| {
       log::error!("Error: {:?}", e);
-      register_err.clone().err().unwrap()
+      (StatusCode::INTERNAL_SERVER_ERROR, "Server error")
     })?;
   if user_exists.is_some() {
     log::error!("User already exists");
-    return register_err;
+    return Err((StatusCode::BAD_REQUEST, "User already exists"));
   }
 
   // Hash the password
@@ -206,7 +206,7 @@ pub(crate) async fn account_register(
   let salt = (0..16).map(|_| rng.u8(..)).collect::<Vec<u8>>();
   let password = argon2::hash_raw(password.as_bytes(), &salt, &argon2_config).map_err(|e| {
     log::error!("Error hashing password: {:?}", e);
-    register_err.clone().err().unwrap()
+    (StatusCode::INTERNAL_SERVER_ERROR, "Server error")
   })?;
   let new_user = users::ActiveModel {
     name: Set(name.clone()),
@@ -220,8 +220,10 @@ pub(crate) async fn account_register(
   };
   let res = Users::insert(new_user).exec(db).await.map_err(|e| {
     log::error!("Error: {:?}", e);
-    register_err.clone().err().unwrap()
+    (StatusCode::INTERNAL_SERVER_ERROR, "Server error")
   })?;
+
+  log::info!("User registered: {}", username);
 
   let user_id = res.last_insert_id;
   // add new room to db and assign to user
@@ -235,10 +237,10 @@ pub(crate) async fn account_register(
       .await
       .map_err(|e| {
         log::error!("Error: {:?}", e);
-        register_err.clone().err().unwrap()
+        server_err.clone()
       })?;
     if room.is_some() {
-      return register_err.clone();
+      return Err(server_err.clone());
     }
 
     // create new room
@@ -249,7 +251,7 @@ pub(crate) async fn account_register(
     };
     new_room.insert(db).await.map_err(|e| {
       log::error!("Error: {:?}", e);
-      register_err.clone().err().unwrap()
+      server_err.clone()
     })?;
   }
 

@@ -115,7 +115,7 @@ function LoginPage(): JSX.Element {
               <FormItem>
                 <FormLabel className="flex flex-row justify-between items-center w-full">
                   <p>Mật khẩu</p>
-                  <Link to="/password-reset">
+                  {/* <Link to="/password-reset">
                     <Button
                       type="button"
                       className="p-0 text-main-palette-5"
@@ -124,7 +124,7 @@ function LoginPage(): JSX.Element {
                     >
                       Quên mật khẩu?
                     </Button>
-                  </Link>
+                  </Link> */}
                 </FormLabel>
                 <FormControl>
                   <PasswordInput {...field} required />
