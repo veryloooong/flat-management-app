@@ -289,12 +289,6 @@ function FeesPage(): JSX.Element {
 
 export const Route = createFileRoute("/dashboard/_layout/fees/")({
   component: FeesPage,
-  beforeLoad: async () => {
-    if (import.meta.env.DEV) {
-      // cause a 2s delay
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-  },
   loader: async (_) => {
     try {
       const fees = (await invoke("get_fees")) as BasicFeeInfo[];

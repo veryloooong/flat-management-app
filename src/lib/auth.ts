@@ -45,7 +45,10 @@ export const useAuth = () => {
 
   const login = async (data: { username: string; password: string }) => {
     try {
-      const res = await invoke("account_login", data);
+      const res = await invoke("account_login", {
+        username: data.username.toLowerCase(),
+        password: data.password,
+      });
       return res as string;
     } catch (error) {
       throw error;

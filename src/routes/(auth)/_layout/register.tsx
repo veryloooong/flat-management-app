@@ -71,7 +71,12 @@ const registerFormSchema = z
       }, "Mật khẩu phải chứa ít nhất một ký tự đặc biệt"),
     confirmPassword: z.string().min(8, "Mật khẩu phải chứa ít nhất 8 ký tự"),
     email: z.string().email("Email không hợp lệ"),
-    phone: z.string(),
+    phone: z
+      .string()
+      .regex(
+        /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g,
+        "Số điện thoại không hợp lệ"
+      ),
     role: z.enum(["manager", "tenant"]),
     roomId: z.coerce.number().positive().optional(),
   })
@@ -99,9 +104,9 @@ function RegisterPage(): JSX.Element {
     invoke("account_register", {
       accountInfo: {
         name: data.name,
-        username: data.username,
+        username: data.username.toLowerCase(),
         password: data.password,
-        email: data.email,
+        email: data.email.toLowerCase(),
         phone: data.phone,
         role: data.role,
         room_id: data.roomId,

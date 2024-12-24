@@ -1,6 +1,6 @@
 [package]
 name = "it3180-flat-management-app"
-version = "0.2.3"
+version = "0.2.4"
 description = "A Tauri App"
 authors = ["long"]
 edition = "2021"

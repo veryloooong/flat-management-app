@@ -1,4 +1,9 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { Fragment } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +29,12 @@ import { useAuth } from "@/lib/auth";
 const updateUserInfoSchema = z.object({
   name: z.string().min(2, "Tên không hợp lệ"),
   email: z.string().email("Email không hợp lệ"),
-  phone: z.string().min(10, "Số điện thoại không hợp lệ"),
+  phone: z
+    .string()
+    .regex(
+      /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g,
+      "Số điện thoại không hợp lệ"
+    ),
 });
 
 const updatePasswordSchema = z
@@ -33,10 +43,22 @@ const updatePasswordSchema = z
     newPassword: z
       .string()
       .min(8, "Mật khẩu phải chứa ít nhất 8 ký tự")
-      .refine((value) => /[A-Z]/.test(value), "Mật khẩu phải chứa ít nhất một chữ cái viết hoa")
-      .refine((value) => /[a-z]/.test(value), "Mật khẩu phải chứa ít nhất một chữ cái viết thường")
-      .refine((value) => /[0-9]/.test(value), "Mật khẩu phải chứa ít nhất một chữ số")
-      .refine((value) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value), "Mật khẩu phải chứa ít nhất một ký tự đặc biệt"),
+      .refine(
+        (value) => /[A-Z]/.test(value),
+        "Mật khẩu phải chứa ít nhất một chữ cái viết hoa"
+      )
+      .refine(
+        (value) => /[a-z]/.test(value),
+        "Mật khẩu phải chứa ít nhất một chữ cái viết thường"
+      )
+      .refine(
+        (value) => /[0-9]/.test(value),
+        "Mật khẩu phải chứa ít nhất một chữ số"
+      )
+      .refine(
+        (value) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value),
+        "Mật khẩu phải chứa ít nhất một ký tự đặc biệt"
+      ),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -49,6 +71,7 @@ const updatePasswordSchema = z
   });
 
 function AccountEditPage(): JSX.Element {
+  const router = useRouter();
   const userInfo = Route.useLoaderData();
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -71,7 +94,9 @@ function AccountEditPage(): JSX.Element {
     },
   });
 
-  function onSubmitUpdateUserInfoForm(data: z.infer<typeof updateUserInfoSchema>) {
+  function onSubmitUpdateUserInfoForm(
+    data: z.infer<typeof updateUserInfoSchema>
+  ) {
     invoke("update_user_info", { info: snakecaseKeys(data) })
       .then(() => {
         toast({
@@ -79,6 +104,7 @@ function AccountEditPage(): JSX.Element {
           description: "Thông tin tài khoản của bạn đã được cập nhật",
           duration: 5000,
         });
+        router.invalidate();
       })
       .catch(() => {
         toast({
@@ -89,17 +115,22 @@ function AccountEditPage(): JSX.Element {
       });
   }
 
-  function onSubmitUpdatePasswordForm(data: z.infer<typeof updatePasswordSchema>) {
+  function onSubmitUpdatePasswordForm(
+    data: z.infer<typeof updatePasswordSchema>
+  ) {
     invoke("update_password", { passwordInfo: snakecaseKeys(data) })
       .then(() => {
         toast({
           title: "Cập nhật mật khẩu thành công",
-          description: "Mật khẩu của bạn đã được cập nhật. Vui lòng đăng nhập lại",
+          description:
+            "Mật khẩu của bạn đã được cập nhật. Vui lòng đăng nhập lại",
           duration: 5000,
         });
 
         setTimeout(() => {
-          logout().then(() => navigate({ to: "/login" })).catch(() => navigate({ to: "/login" }));
+          logout()
+            .then(() => navigate({ to: "/login" }))
+            .catch(() => navigate({ to: "/login" }));
         }, 5000);
       })
       .catch(() => {
@@ -121,7 +152,11 @@ function AccountEditPage(): JSX.Element {
               Cập nhật thông tin tài khoản
             </h2>
             <Form {...updateUserInfoForm}>
-              <form onSubmit={updateUserInfoForm.handleSubmit(onSubmitUpdateUserInfoForm)}>
+              <form
+                onSubmit={updateUserInfoForm.handleSubmit(
+                  onSubmitUpdateUserInfoForm
+                )}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Name */}
                   <FormField
@@ -133,9 +168,15 @@ function AccountEditPage(): JSX.Element {
                           Họ và tên <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Nhập họ và tên" aria-required="true" />
+                          <Input
+                            {...field}
+                            placeholder="Nhập họ và tên"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updateUserInfoForm.formState.errors.name?.message}</FormMessage>
+                        <FormMessage>
+                          {updateUserInfoForm.formState.errors.name?.message}
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -149,9 +190,15 @@ function AccountEditPage(): JSX.Element {
                           Địa chỉ email <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Nhập địa chỉ email" aria-required="true" />
+                          <Input
+                            {...field}
+                            placeholder="Nhập địa chỉ email"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updateUserInfoForm.formState.errors.email?.message}</FormMessage>
+                        <FormMessage>
+                          {updateUserInfoForm.formState.errors.email?.message}
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -165,15 +212,24 @@ function AccountEditPage(): JSX.Element {
                           Số điện thoại <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Nhập số điện thoại" aria-required="true" />
+                          <Input
+                            {...field}
+                            placeholder="Nhập số điện thoại"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updateUserInfoForm.formState.errors.phone?.message}</FormMessage>
+                        <FormMessage>
+                          {updateUserInfoForm.formState.errors.phone?.message}
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
                 </div>
                 <div className="flex justify-end mt-6">
-                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                  <Button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
                     Cập nhật
                   </Button>
                 </div>
@@ -183,9 +239,15 @@ function AccountEditPage(): JSX.Element {
 
           {/* Change Password Section */}
           <div className="bg-white shadow rounded-lg p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Thay đổi mật khẩu</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Thay đổi mật khẩu
+            </h2>
             <Form {...updatePasswordForm}>
-              <form onSubmit={updatePasswordForm.handleSubmit(onSubmitUpdatePasswordForm)}>
+              <form
+                onSubmit={updatePasswordForm.handleSubmit(
+                  onSubmitUpdatePasswordForm
+                )}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Old Password */}
                   <FormField
@@ -197,9 +259,18 @@ function AccountEditPage(): JSX.Element {
                           Mật khẩu cũ <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <PasswordInput {...field} placeholder="Nhập mật khẩu cũ" aria-required="true" />
+                          <PasswordInput
+                            {...field}
+                            placeholder="Nhập mật khẩu cũ"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updatePasswordForm.formState.errors.oldPassword?.message}</FormMessage>
+                        <FormMessage>
+                          {
+                            updatePasswordForm.formState.errors.oldPassword
+                              ?.message
+                          }
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -213,9 +284,18 @@ function AccountEditPage(): JSX.Element {
                           Mật khẩu mới <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <PasswordInput {...field} placeholder="Nhập mật khẩu mới" aria-required="true" />
+                          <PasswordInput
+                            {...field}
+                            placeholder="Nhập mật khẩu mới"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updatePasswordForm.formState.errors.newPassword?.message}</FormMessage>
+                        <FormMessage>
+                          {
+                            updatePasswordForm.formState.errors.newPassword
+                              ?.message
+                          }
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -226,18 +306,31 @@ function AccountEditPage(): JSX.Element {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Xác nhận mật khẩu <span className="text-red-500">*</span>
+                          Xác nhận mật khẩu{" "}
+                          <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <PasswordInput {...field} placeholder="Xác nhận mật khẩu mới" aria-required="true" />
+                          <PasswordInput
+                            {...field}
+                            placeholder="Xác nhận mật khẩu mới"
+                            aria-required="true"
+                          />
                         </FormControl>
-                        <FormMessage>{updatePasswordForm.formState.errors.confirmPassword?.message}</FormMessage>
+                        <FormMessage>
+                          {
+                            updatePasswordForm.formState.errors.confirmPassword
+                              ?.message
+                          }
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
                 </div>
                 <div className="flex justify-end mt-6">
-                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                  <Button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
                     Thay đổi mật khẩu
                   </Button>
                 </div>
