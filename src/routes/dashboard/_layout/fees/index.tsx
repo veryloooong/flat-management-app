@@ -5,7 +5,6 @@ import { BasicFeeInfo } from "@/lib/types";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -109,7 +108,9 @@ function FeesPage(): JSX.Element {
               setIsAddFeeDialogOpen(true);
             }}
           >
-            <Button>Thêm khoản thu</Button>
+            <Button className="bg-main-palette-5 hover:bg-main-palette-6 text-white p-2 rounded">
+              Thêm khoản thu
+            </Button>
           </DialogTrigger>
           <DialogContent className="[&>button]:hidden">
             <DialogTitle>Thêm khoản thu</DialogTitle>
@@ -274,11 +275,7 @@ function FeesPage(): JSX.Element {
               >
                 Thêm
               </Button>
-              <DialogClose>
-                <Button onClick={() => setIsAddFeeDialogOpen(false)}>
-                  Đóng
-                </Button>
-              </DialogClose>
+              <Button onClick={() => setIsAddFeeDialogOpen(false)}>Đóng</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -1,6 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { BasicUserInfo, BasicFeeInfo, HouseholdInfo } from "./types";
+import {
+  BasicUserInfo,
+  BasicFeeInfo,
+  HouseholdInfo,
+  FamilyInfo,
+} from "./types";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
@@ -265,5 +270,21 @@ export const householdColumns: ColumnDef<HouseholdInfo>[] = [
   {
     accessorKey: "tenant_phone",
     header: "Số điện thoại",
+  },
+];
+
+export const familyColumns: ColumnDef<FamilyInfo>[] = [
+  {
+    accessorKey: "name",
+    header: "Họ tên",
+  },
+  {
+    accessorKey: "birthday",
+    header: "Ngày sinh",
+    cell: ({ cell }) => {
+      const date = cell.getValue() as string;
+
+      return <span>{format(date, "dd/MM/yyyy")}</span>;
+    },
   },
 ];

@@ -60,7 +60,6 @@ function HouseholdInfoPage(): JSX.Element {
         </div>
       </div>
 
-      {/* TODO: add payment info and option to pay */}
       {/* Payment and Transaction Sections */}
       <div className="flex-1 space-y-6">
         {/* Pending Payment Section with Scrollable Area */}

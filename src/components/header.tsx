@@ -8,6 +8,7 @@ import {
   BellIcon,
   HomeIcon,
   ShieldIcon,
+  ContactIcon,
 } from "lucide-react";
 
 import {
@@ -78,19 +79,17 @@ export const Header = ({
             </>
           )}
           {role === "tenant" && (
-            <NavLink to="/dashboard/household">
-              <BuildingIcon size={24} />
-              <span>Thông tin phòng</span>
-            </NavLink>
+            <>
+              <NavLink to="/dashboard/household">
+                <BuildingIcon size={24} />
+                <span>Thông tin phòng</span>
+              </NavLink>
+              <NavLink to="/dashboard/household/family">
+                <ContactIcon size={24} />
+                <span>Thông tin hộ</span>
+              </NavLink>
+            </>
           )}
-          {/* <NavLink to="/dashboard/news">
-            <NewspaperIcon size={24} />
-            <span>Tin tức</span>
-          </NavLink> */}
-          {/* <NavLink to="/dashboard/settings">
-            <SettingsIcon size={24} />
-            <span>Cài đặt</span>
-          </NavLink> */}
           {role === "admin" && (
             <NavLink to="/dashboard/admin/accounts">
               <ShieldIcon size={24} />

@@ -59,3 +59,9 @@ export type Notification = {
   from: string;
   to: string;
 };
+
+export type FamilyInfo = {
+  id: number;
+  name: string;
+  birthday: string;
+};

@@ -28,6 +28,7 @@ import { Route as DashboardLayoutHomesIndexImport } from './routes/dashboard/_la
 import { Route as DashboardLayoutFeesIndexImport } from './routes/dashboard/_layout/fees/index'
 import { Route as DashboardLayoutAccountIndexImport } from './routes/dashboard/_layout/account/index'
 import { Route as DashboardLayoutNotificationsManagerImport } from './routes/dashboard/_layout/notifications/manager'
+import { Route as DashboardLayoutHouseholdFamilyImport } from './routes/dashboard/_layout/household/family'
 import { Route as DashboardLayoutAdminLayoutImport } from './routes/dashboard/_layout/admin/_layout'
 import { Route as DashboardLayoutAccountEditImport } from './routes/dashboard/_layout/account/edit'
 import { Route as DashboardLayoutFeesInfoFeeIdImport } from './routes/dashboard/_layout/fees/info.$feeId'
@@ -132,6 +133,12 @@ const DashboardLayoutAccountIndexRoute =
 const DashboardLayoutNotificationsManagerRoute =
   DashboardLayoutNotificationsManagerImport.update({
     path: '/notifications/manager',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
+
+const DashboardLayoutHouseholdFamilyRoute =
+  DashboardLayoutHouseholdFamilyImport.update({
+    path: '/household/family',
     getParentRoute: () => DashboardLayoutRoute,
   } as any)
 
@@ -255,6 +262,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin'
       preLoaderRoute: typeof DashboardLayoutAdminLayoutImport
       parentRoute: typeof DashboardLayoutAdminRoute
+    }
+    '/dashboard/_layout/household/family': {
+      id: '/dashboard/_layout/household/family'
+      path: '/household/family'
+      fullPath: '/dashboard/household/family'
+      preLoaderRoute: typeof DashboardLayoutHouseholdFamilyImport
+      parentRoute: typeof DashboardLayoutImport
     }
     '/dashboard/_layout/notifications/manager': {
       id: '/dashboard/_layout/notifications/manager'
@@ -383,6 +397,7 @@ interface DashboardLayoutRouteChildren {
   DashboardLayoutIndexRoute: typeof DashboardLayoutIndexRoute
   DashboardLayoutAccountEditRoute: typeof DashboardLayoutAccountEditRoute
   DashboardLayoutAdminRoute: typeof DashboardLayoutAdminRouteWithChildren
+  DashboardLayoutHouseholdFamilyRoute: typeof DashboardLayoutHouseholdFamilyRoute
   DashboardLayoutNotificationsManagerRoute: typeof DashboardLayoutNotificationsManagerRoute
   DashboardLayoutAccountIndexRoute: typeof DashboardLayoutAccountIndexRoute
   DashboardLayoutFeesIndexRoute: typeof DashboardLayoutFeesIndexRoute
@@ -398,6 +413,7 @@ const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
   DashboardLayoutIndexRoute: DashboardLayoutIndexRoute,
   DashboardLayoutAccountEditRoute: DashboardLayoutAccountEditRoute,
   DashboardLayoutAdminRoute: DashboardLayoutAdminRouteWithChildren,
+  DashboardLayoutHouseholdFamilyRoute: DashboardLayoutHouseholdFamilyRoute,
   DashboardLayoutNotificationsManagerRoute:
     DashboardLayoutNotificationsManagerRoute,
   DashboardLayoutAccountIndexRoute: DashboardLayoutAccountIndexRoute,
@@ -436,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/household/family': typeof DashboardLayoutHouseholdFamilyRoute
   '/dashboard/notifications/manager': typeof DashboardLayoutNotificationsManagerRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
@@ -456,6 +473,7 @@ export interface FileRoutesByTo {
   '/': typeof authLayoutIndexRoute
   '/dashboard/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/admin': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/household/family': typeof DashboardLayoutHouseholdFamilyRoute
   '/dashboard/notifications/manager': typeof DashboardLayoutNotificationsManagerRoute
   '/dashboard/account': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/fees': typeof DashboardLayoutFeesIndexRoute
@@ -482,6 +500,7 @@ export interface FileRoutesById {
   '/dashboard/_layout/account/edit': typeof DashboardLayoutAccountEditRoute
   '/dashboard/_layout/admin': typeof DashboardLayoutAdminRouteWithChildren
   '/dashboard/_layout/admin/_layout': typeof DashboardLayoutAdminLayoutRouteWithChildren
+  '/dashboard/_layout/household/family': typeof DashboardLayoutHouseholdFamilyRoute
   '/dashboard/_layout/notifications/manager': typeof DashboardLayoutNotificationsManagerRoute
   '/dashboard/_layout/account/': typeof DashboardLayoutAccountIndexRoute
   '/dashboard/_layout/fees/': typeof DashboardLayoutFeesIndexRoute
@@ -505,6 +524,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
+    | '/dashboard/household/family'
     | '/dashboard/notifications/manager'
     | '/dashboard/account'
     | '/dashboard/fees'
@@ -524,6 +544,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard/account/edit'
     | '/dashboard/admin'
+    | '/dashboard/household/family'
     | '/dashboard/notifications/manager'
     | '/dashboard/account'
     | '/dashboard/fees'
@@ -548,6 +569,7 @@ export interface FileRouteTypes {
     | '/dashboard/_layout/account/edit'
     | '/dashboard/_layout/admin'
     | '/dashboard/_layout/admin/_layout'
+    | '/dashboard/_layout/household/family'
     | '/dashboard/_layout/notifications/manager'
     | '/dashboard/_layout/account/'
     | '/dashboard/_layout/fees/'
@@ -616,6 +638,7 @@ export const routeTree = rootRoute
         "/dashboard/_layout/",
         "/dashboard/_layout/account/edit",
         "/dashboard/_layout/admin",
+        "/dashboard/_layout/household/family",
         "/dashboard/_layout/notifications/manager",
         "/dashboard/_layout/account/",
         "/dashboard/_layout/fees/",
@@ -667,6 +690,10 @@ export const routeTree = rootRoute
       "children": [
         "/dashboard/_layout/admin/_layout/accounts"
       ]
+    },
+    "/dashboard/_layout/household/family": {
+      "filePath": "dashboard/_layout/household/family.tsx",
+      "parent": "/dashboard/_layout"
     },
     "/dashboard/_layout/notifications/manager": {
       "filePath": "dashboard/_layout/notifications/manager.tsx",

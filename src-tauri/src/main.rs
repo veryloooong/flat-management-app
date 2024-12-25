@@ -8,6 +8,7 @@ use tokio::sync::Mutex;
 mod admin;
 #[allow(unused)]
 mod entities;
+mod family;
 mod household;
 mod manager;
 mod user;
@@ -102,6 +103,8 @@ async fn main() {
       // Household commands
       crate::household::get_household_info,
       crate::household::pay_fee,
+      crate::family::add_family_member,
+      crate::family::get_family_members,
       // Other commands
       update_settings
     ])

@@ -13,19 +13,25 @@ function NotifyPage(): JSX.Element {
     <div className="bg-gray-100 p-4">
       <div className="flex gap-4 max-h-80 scroll-y">
         <div className="p-4 bg-white rounded-lg shadow-md max-h-[80vh] overflow-y-auto w-1/3">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="border-b pb-4 mb-4 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
-                setSelectedNotification(notification);
-              }}
-            >
-              <h2 className="font-bold text-lg">{notification.from}</h2>
-              <p className="text-gray-500 truncate">{notification.title}</p>
-              <p className="text-gray-500 truncate">{notification.created_at.substring(0, 10)}</p>
-            </div>
-          ))}
+          {notifications.length ? (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="border-b pb-4 mb-4 cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  setSelectedNotification(notification);
+                }}
+              >
+                <h2 className="font-bold text-lg">{notification.from}</h2>
+                <p className="text-gray-500 truncate">{notification.title}</p>
+                <p className="text-gray-500 truncate">
+                  {notification.created_at.substring(0, 10)}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>Hiện không có thông báo</p>
+          )}
         </div>
 
         {selectedNotification && (
@@ -49,7 +55,8 @@ function NotifyPage(): JSX.Element {
             </div>
             <br></br>
             <p>
-              <span className="font-medium">Thời gian:</span> {selectedNotification.created_at.substring(0, 10)}
+              <span className="font-medium">Thời gian:</span>{" "}
+              {selectedNotification.created_at.substring(0, 10)}
             </p>
           </div>
         )}

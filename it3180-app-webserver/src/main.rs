@@ -1,6 +1,7 @@
 mod admin;
 mod authenticate;
 mod entities;
+mod family;
 mod household;
 mod manager;
 mod middleware;

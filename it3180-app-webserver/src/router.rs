@@ -20,6 +20,7 @@ pub mod tags {
   pub const ADMIN: &str = "Admin";
   pub const MANAGER: &str = "Manager";
   pub const HOUSEHOLD: &str = "Household";
+  pub const FAMILY: &str = "Family";
 }
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
@@ -64,6 +65,10 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(check_token))
     .routes(routes!(crate::household::get_household_info))
     .routes(routes!(crate::household::pay_fee))
+    .routes(routes!(
+      crate::family::get_family_members,
+      crate::family::add_family_member
+    ))
     .layer(middleware::from_fn_with_state(
       state.clone(),
       crate::middleware::validate_request,

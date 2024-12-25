@@ -92,7 +92,10 @@ function LoginPage(): JSX.Element {
       <h1>Đăng nhập</h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
           <FormField
             name="username"
             control={form.control}
@@ -138,14 +141,14 @@ function LoginPage(): JSX.Element {
 
           <Button
             type="submit"
-            className="bg-main-palette-4 hover:bg-main-palette-5 mt-8"
+            className="bg-main-palette-4 hover:bg-main-palette-5 mt-4"
           >
             Đăng nhập
           </Button>
           <Link to="/register" className="w-full">
             <Button
               type="button"
-              className="bg-main-palette-6 hover:bg-main-palette-7 mt-2 w-full"
+              className="bg-main-palette-6 hover:bg-main-palette-7 w-full"
               tabIndex={-1}
             >
               Đăng ký

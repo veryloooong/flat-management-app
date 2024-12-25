@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod family;
 pub mod fee_recurrence;
 pub mod fees;
 pub mod fees_room_assignment;
