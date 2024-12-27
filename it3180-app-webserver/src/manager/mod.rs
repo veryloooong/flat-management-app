@@ -1,4 +1,7 @@
 use crate::{entities::*, household::FeesRoomInfo, prelude::*};
+use qrcode::QrCode;
+use qrcode::render::svg;
+use image::Luma;
 
 pub mod types {
   use crate::Fees;
@@ -98,9 +101,12 @@ pub async fn get_fees(
 pub async fn add_fee(
   State(state): State<AppState>,
   Json(fee_info): Json<AddFeeInfo>,
-) -> StatusCode {
+) -> Result<Json<String>, StatusCode> {
   log::debug!("Adding fee: {:?}", fee_info);
 
+  let fee_name = fee_info.name.clone();
+  let fee_amount = fee_info.amount;
+  let fee_due_date = fee_info.due_date.clone();
   let new_fee = fees::ActiveModel {
     amount: Set(fee_info.amount),
     name: Set(fee_info.name),
@@ -110,41 +116,27 @@ pub async fn add_fee(
     recurrence_type: Set(fee_info.recurrence_type.clone()),
     ..Default::default()
   };
-  let res = match Fees::insert(new_fee).exec(&state.db).await {
+  let _res = match Fees::insert(new_fee).exec(&state.db).await {
     Ok(res) => {
       log::info!("Fee added: {:?}", res);
       res
     }
     Err(e) => {
       log::error!("Error: {:?}", e);
-      return StatusCode::INTERNAL_SERVER_ERROR;
+      return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
   };
 
-  // make recurrence entry
-  if fee_info.recurrence_type.is_some() {
-    let recurrence_entry = fee_recurrence::ActiveModel {
-      fee_id: Set(res.last_insert_id),
-      previous_fee_id: Set(res.last_insert_id),
-      due_date: Set(fee_info.due_date),
-      ..Default::default()
-    };
+  // Generate QR code
+  let fee_info_str = format!(
+    "Name: {}, Amount: {}, Due Date: {}",
+    fee_name, fee_amount, fee_due_date
+  );
+  let code = QrCode::new(fee_info_str).unwrap();
+  let qr_code_svg = code.render::<svg::Color>().build();
 
-    match fee_recurrence::Entity::insert(recurrence_entry)
-      .exec(&state.db)
-      .await
-    {
-      Ok(res) => {
-        log::info!("Recurrence entry added: {:?}", res);
-      }
-      Err(e) => {
-        log::error!("Error: {:?}", e);
-        return StatusCode::INTERNAL_SERVER_ERROR;
-      }
-    }
-  }
-
-  StatusCode::CREATED
+  // Return QR code as SVG
+  Ok(Json(qr_code_svg))
 }
 
 #[utoipa::path(

@@ -45,12 +45,14 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addFeeSchema } from "@/lib/add-fee";
+import { QRCodeSVG } from "qrcode.react";
 
 function FeesPage(): JSX.Element {
   const fees = Route.useLoaderData();
   const router = useRouter();
   const [isAddFeeDialogOpen, setIsAddFeeDialogOpen] = useState(false);
 
+  const [qrCode, setQrCode] = useState<string | null>(null);
   const addFeeForm = useForm<z.infer<typeof addFeeSchema>>({
     resolver: zodResolver(addFeeSchema),
     defaultValues: {
@@ -276,6 +278,12 @@ function FeesPage(): JSX.Element {
                 Thêm
               </Button>
               <Button onClick={() => setIsAddFeeDialogOpen(false)}>Đóng</Button>
+              {qrCode && (
+                <div>
+                  <h2>QR Code:</h2>
+                  <QRCodeSVG value={qrCode} />
+                </div>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
