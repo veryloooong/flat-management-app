@@ -3,7 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { format, add } from "date-fns";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { moneyFormatter } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -11,13 +11,13 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import QRCode from "qrcode";
 
-import QRCode from "@/images/rickroll.png";
+import RickrollQRCode from "@/images/rickroll.png";
 
 export const HouseholdFeeInfoTile = ({
   fee,
@@ -28,29 +28,38 @@ export const HouseholdFeeInfoTile = ({
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
+  const [qrCode, setQRCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    QRCode.toDataURL(JSON.stringify(fee)).then(setQRCode);
+  }, [fee]);
 
   const handlePayment = () => {
-    invoke("pay_fee", { feeId: fee.fee_id })
-      .then(() => {
-        toast({
-          title: "Thanh toán thành công",
-          description: `Đã thanh toán khoản phí ${fee.fee_name}`,
-        });
-        router.invalidate();
+    invoke("check_payment", { id: fee.assignment_id })
+      .then((res) => {
+        if (res) {
+          toast({
+            title: "Thanh toán thành công",
+            duration: 2000,
+          });
+          setIsDialogOpen(false);
+          router.invalidate();
+        } else {
+          toast({
+            title: "Thanh toán thất bại",
+            variant: "destructive",
+            duration: 2000,
+          });
+        }
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        console.error(err);
         toast({
-          title: "Lỗi thanh toán",
-          description: `Không thể thanh toán khoản phí ${fee.fee_name}`,
+          title: "Đã xảy ra lỗi khi thanh toán",
           variant: "destructive",
+          duration: 2000,
         });
-      })
-      .finally(() => {
-        setIsDialogOpen(false);
       });
-
-    setIsDialogOpen(false);
   };
 
   return (
@@ -81,15 +90,31 @@ export const HouseholdFeeInfoTile = ({
           </DialogTrigger>
           <DialogContent className="[&>button]:hidden">
             <DialogTitle>Thanh toán khoản phí</DialogTitle>
-            <DialogDescription>
-              Hiện tại không có liên kết với ngân hàng. Để demo thì bạn hãy quét
-              QR code này coi như đã thanh toán. Sau khi quét xong thì nhấn nút
-              thanh toán ở dưới. Hệ thống sẽ tự động cập nhật trạng thái khoản
-              phí.
-            </DialogDescription>
 
-            <div className="flex justify-center">
-              <img src={QRCode} alt="QR Code" className="w-64 h-64" />
+            <div className="flex flex-col w-full justify-center items-center space-y-4">
+              <div className="flex flex-col items-center w-full">
+                <p className="text-sm w-3/4 text-center">
+                  Mã QR dưới dùng để xuất thông tin ra. Ban quản trị có thể quét
+                  QR để xác nhận thông tin.
+                </p>
+                <img
+                  src={qrCode || RickrollQRCode}
+                  alt="QR Code"
+                  className="w-36 h-36"
+                />
+              </div>
+              <div className="flex flex-col items-center w-full">
+                <p className="text-sm w-3/4 text-center">
+                  Quét mã QR dưới để thanh toán trực tiếp. Sau khi thanh toán,
+                  nhấn nút kiểm tra bên dưới để xác nhận.
+                </p>
+                {/* https://qr.sepay.vn/img?acc=29052004101&bank=TPBank&amount=100000&des=FLATAPP1 */}
+                <img
+                  src={`https://qr.sepay.vn/img?acc=29052004101&bank=TPBank&amount=${fee.fee_amount}&des=FLATAPP${fee.assignment_id}`}
+                  alt="QR Code"
+                  className="w-36 h-36"
+                />
+              </div>
             </div>
 
             <DialogFooter>
@@ -101,7 +126,7 @@ export const HouseholdFeeInfoTile = ({
                   Hủy
                 </Button>
               </DialogClose>
-              <Button onClick={handlePayment}>Thanh toán</Button>
+              <Button onClick={handlePayment}>Kiểm tra</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

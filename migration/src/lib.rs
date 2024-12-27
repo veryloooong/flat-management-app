@@ -11,6 +11,7 @@ mod m20240101_000006_create_transactions_table;
 mod m20240101_000007_create_notifications_table;
 mod m20240101_000008_create_fee_recurrence_table;
 mod m20240101_000009_create_family_table;
+mod m20240101_000010_create_transaction_logs_table;
 
 pub struct Migrator;
 
@@ -28,6 +29,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20240101_000007_create_notifications_table::Migration),
       Box::new(m20240101_000008_create_fee_recurrence_table::Migration),
       Box::new(m20240101_000009_create_family_table::Migration),
+      Box::new(m20240101_000010_create_transaction_logs_table::Migration),
     ]
   }
 }

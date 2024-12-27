@@ -6,6 +6,7 @@ use tokio::sync::Mutex;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct FeesRoomInfo {
+  assignment_id: i32,
   room_number: i32,
   fee_id: i32,
   fee_name: String,

@@ -9,6 +9,7 @@ pub mod prelude;
 mod router;
 pub mod types;
 mod user;
+mod webhook;
 
 use crate::prelude::*;
 
@@ -19,6 +20,7 @@ use shuttle_runtime::SecretStore;
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {
   pub(crate) db: DatabaseConnection,
+  payment_api_key: String,
   jwt_access_secret: HS256Key,
   jwt_refresh_secret: HS256Key,
 }
@@ -30,6 +32,9 @@ async fn main(
 ) -> shuttle_axum::ShuttleAxum {
   let state = AppState {
     db: SqlxPostgresConnector::from_sqlx_postgres_pool(pool),
+    payment_api_key: secrets
+      .get("PAYMENT_API_KEY")
+      .expect("PAYMENT_API_KEY not found"),
     jwt_access_secret: HS256Key::from_bytes(
       hex::decode(
         secrets

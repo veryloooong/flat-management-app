@@ -1590,7 +1590,7 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "it3180-app-webserver"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "axum 0.7.9",
@@ -1602,6 +1602,7 @@ dependencies = [
  "hex",
  "jwt-simple",
  "log",
+ "regex",
  "rust-argon2",
  "sea-orm",
  "serde",

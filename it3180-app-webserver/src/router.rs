@@ -21,6 +21,7 @@ pub mod tags {
   pub const MANAGER: &str = "Manager";
   pub const HOUSEHOLD: &str = "Household";
   pub const FAMILY: &str = "Family";
+  pub const WEBHOOK: &str = "Webhook";
 }
 
 pub(crate) fn create_router(state: crate::AppState) -> Router {
@@ -64,7 +65,7 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
     .routes(routes!(user::get_notifications))
     .routes(routes!(check_token))
     .routes(routes!(crate::household::get_household_info))
-    .routes(routes!(crate::household::pay_fee))
+    // .routes(routes!(crate::household::pay_fee))
     .routes(routes!(
       crate::family::get_family_members,
       crate::family::add_family_member
@@ -109,6 +110,8 @@ pub(crate) fn create_router(state: crate::AppState) -> Router {
 
   let (auth_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
     .routes(routes!(health_check))
+    .routes(routes!(crate::webhook::webhook_payment_handler))
+    .routes(routes!(crate::webhook::check_payment))
     .nest("/auth", authenticate_router)
     .nest("/user", user_router)
     .nest("/admin", admin_router)

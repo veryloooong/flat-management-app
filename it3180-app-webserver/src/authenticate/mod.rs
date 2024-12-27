@@ -32,6 +32,7 @@ pub(crate) async fn account_login(
     db,
     jwt_access_secret,
     jwt_refresh_secret,
+    ..
   } = &state;
   let mut headers = HeaderMap::new();
   headers.append(header::CONTENT_TYPE, "application/json".parse().unwrap());

@@ -8,6 +8,7 @@ use crate::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema, FromQueryResult)]
 pub struct FeesRoomInfo {
+  pub assignment_id: i32,
   pub room_number: i32,
   pub fee_id: i32,
   pub fee_name: String,
@@ -77,6 +78,7 @@ pub async fn get_household_info(
 
   #[derive(Debug, Clone, Serialize, Deserialize, Default, FromQueryResult)]
   struct FeesAssignmentDetail {
+    assignment_id: i32,
     room_number: i32,
     fee_id: i32,
     due_date: DateTime,
@@ -93,6 +95,7 @@ pub async fn get_household_info(
 
   // find fees that the user has to pay
   let fees = FeesRoomAssignment::find()
+    .column_as(fees_room_assignment::Column::AssignmentId, "assignment_id")
     .column_as(fees_room_assignment::Column::RoomNumber, "room_number")
     .column_as(fees_room_assignment::Column::FeeId, "fee_id")
     .column_as(fees_room_assignment::Column::DueDate, "due_date")
@@ -118,6 +121,7 @@ pub async fn get_household_info(
   let fees = fees
     .into_iter()
     .map(|fee| FeesRoomInfo {
+      assignment_id: fee.assignment_id,
       room_number: fee.room_number,
       fee_id: fee.fee_id,
       fee_name: fee.fee_name,

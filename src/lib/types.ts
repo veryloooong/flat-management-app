@@ -33,6 +33,7 @@ export type HouseholdInfo = {
 };
 
 export type FeesRoomInfo = {
+  assignment_id: number;
   room_number: number;
   fee_id: number;
   fee_name: string;

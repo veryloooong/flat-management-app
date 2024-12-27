@@ -253,6 +253,7 @@ pub async fn get_one_fee(
   let fee_rooms = fee_rooms
     .into_iter()
     .map(|fr| FeesRoomInfo {
+      assignment_id: fr.0.assignment_id,
       room_number: fr.0.room_number,
       fee_id: fr.0.fee_id,
       fee_name: fee.name.clone(),
