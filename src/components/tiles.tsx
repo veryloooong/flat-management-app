@@ -66,7 +66,43 @@ export const HouseholdFeeInfoTile = ({
     <div className="bg-white p-4 rounded-lg mb-4 shadow flex flex-row justify-between items-end">
       <div>
         <div className="flex items-center mb-2 border-b">
-          <h3 className="text-lg font-semibold">{fee.fee_name}</h3>
+          <Dialog>
+            <DialogTrigger asChild>
+              <h3 className="text-lg font-semibold cursor-pointer">
+                {fee.fee_name}
+              </h3>
+            </DialogTrigger>
+            <DialogContent className="[&>button]:hidden">
+              <DialogTitle>Thông tin khoản thu</DialogTitle>
+              <div className="flex flex-col w-full justify-center items-center space-y-2">
+                <p className="text-sm w-3/4 text-center">
+                  Mã QR dưới dùng để xuất thông tin ra. Ban quản trị có thể quét
+                  QR để xác nhận thông tin.
+                </p>
+                <img
+                  src={qrCode || RickrollQRCode}
+                  alt="QR Code"
+                  className="w-36 h-36"
+                />
+              </div>
+              <DialogFooter>
+                {/* Button to download QR Code */}
+                <Button
+                  onClick={() => {
+                    const a = document.createElement("a");
+                    a.href = qrCode || RickrollQRCode;
+                    a.download = `QRCode_${fee.assignment_id}.png`;
+                    a.click();
+                  }}
+                >
+                  Tải xuống
+                </Button>
+                <DialogClose asChild>
+                  <Button variant="secondary">Đóng</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
         <p>Số tiền: {moneyFormatter.format(fee.fee_amount)}</p>
         {isPaid ? (
@@ -92,18 +128,7 @@ export const HouseholdFeeInfoTile = ({
             <DialogTitle>Thanh toán khoản phí</DialogTitle>
 
             <div className="flex flex-col w-full justify-center items-center space-y-4">
-              <div className="flex flex-col items-center w-full">
-                <p className="text-sm w-3/4 text-center">
-                  Mã QR dưới dùng để xuất thông tin ra. Ban quản trị có thể quét
-                  QR để xác nhận thông tin.
-                </p>
-                <img
-                  src={qrCode || RickrollQRCode}
-                  alt="QR Code"
-                  className="w-36 h-36"
-                />
-              </div>
-              <div className="flex flex-col items-center w-full">
+              <div className="flex flex-col items-center w-full space-y-2">
                 <p className="text-sm w-3/4 text-center">
                   Quét mã QR dưới để thanh toán trực tiếp. Sau khi thanh toán,
                   nhấn nút kiểm tra bên dưới để xác nhận.
