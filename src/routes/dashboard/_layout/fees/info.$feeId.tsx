@@ -60,8 +60,8 @@ const optionSchema = z.object({
 });
 
 const collectFeeSchema = z.object({
-  rooms: z.array(optionSchema).refine((value) => value.some((item) => item), {
-    message: "Hãy chọn ít nhất một phòng",
+  floors: z.array(optionSchema).refine((value) => value.some((item) => item), {
+    message: "Hãy chọn ít nhất một tầng",
   }),
 });
 
@@ -100,6 +100,22 @@ function ShowFeeInfoPage(): JSX.Element {
     setPaidHouseholds(paid);
     setUnpaidHouseholds(unpaid);
   }, [feeInfo.fee_assignments]);
+
+  const floorOptions = Object.entries(
+    rooms.reduce(
+      (acc, room) => {
+        const floor = Math.floor(room / 100);
+        if (!acc[floor]) acc[floor] = [];
+        acc[floor].push(room);
+        return acc;
+      },
+      {} as Record<number, number[]>
+    )
+  ).map(([floor, rooms]) => ({
+    value: floor,
+    label: `Tầng ${floor}`,
+    rooms,
+  }));
 
   const options: Option[] = rooms
     .filter(
@@ -157,15 +173,19 @@ function ShowFeeInfoPage(): JSX.Element {
   const collectFeeForm = useForm<z.infer<typeof collectFeeSchema>>({
     resolver: zodResolver(collectFeeSchema),
     defaultValues: {
-      rooms: [],
+      floors: [],
     },
   });
 
   function onSubmitCollectFeeForm(data: z.infer<typeof collectFeeSchema>) {
+    const selectedRooms = data.floors.flatMap(
+      (floor) =>
+        floorOptions.find((opt) => opt.value === floor.value)?.rooms || []
+    );
+
     const info = {
-      rooms: data.rooms.map((room) => Number(room.value)),
+      rooms: selectedRooms,
     };
-    console.log(info);
 
     invoke("assign_fee", { feeId: feeInfo.id, roomNumbers: info.rooms })
       .then(() => {
@@ -465,7 +485,7 @@ function ShowFeeInfoPage(): JSX.Element {
               >
                 <DialogTitle>Thu phí</DialogTitle>
                 <DialogDescription>
-                  Chọn các phòng cần thu phí và điền thông tin để xác nhận thông
+                  Chọn các tầng cần thu phí và điền thông tin để xác nhận thông
                   báo thu phí.
                 </DialogDescription>
                 <Form {...collectFeeForm}>
@@ -475,47 +495,27 @@ function ShowFeeInfoPage(): JSX.Element {
                     )}
                     className="flex flex-col gap-4"
                   >
-                    {/* Room Field */}
+                    {/* Modified: Floor Selector */}
                     <FormField
                       control={collectFeeForm.control}
-                      name="rooms"
+                      name="floors"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Chọn phòng</FormLabel>
+                          <FormLabel>Chọn tầng</FormLabel>
                           <FormControl>
-                            <>
-                              <MultipleSelector
-                                {...field}
-                                defaultOptions={options}
-                                placeholder="Chọn các phòng cần thu phí"
-                                emptyIndicator="Không có phòng nào"
-                              />
-                              <Button
-                                type="button"
-                                className="mt-2"
-                                onClick={() => {
-                                  collectFeeForm.setValue("rooms", options);
-                                }}
-                              >
-                                Chọn tất cả
-                              </Button>
-                            </>
+                            <MultipleSelector
+                              {...field}
+                              defaultOptions={floorOptions}
+                              placeholder="Chọn các tầng cần thu phí"
+                              emptyIndicator="Không có tầng nào"
+                            />
                           </FormControl>
                           <FormMessage>
-                            {collectFeeForm.formState.errors.rooms?.message}
+                            {collectFeeForm.formState.errors.floors?.message}
                           </FormMessage>
                         </FormItem>
                       )}
                     />
-                    {/* <div className="flex items-center space-x-2">
-                      <Checkbox id="select_all" />
-                      <label
-                        htmlFor="select_all"
-                        className="cursor-pointer text-sm font-medium leading-none"
-                      >
-                        Chọn tất cả
-                      </label>
-                    </div> */}
                   </form>
                 </Form>
                 <DialogFooter>
